@@ -1,8 +1,8 @@
-package jshop.service;
+package jshop.domain.jwt.service;
 
-import jshop.dto.CustomUserDetails;
-import jshop.entity.User;
-import jshop.repository.UserRepository;
+import jshop.domain.jwt.dto.CustomUserDetails;
+import jshop.domain.user.entity.User;
+import jshop.domain.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,8 +21,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
 
         if (user != null) {
             return new CustomUserDetails(user);

@@ -1,4 +1,4 @@
-package jshop.jwt;
+package jshop.domain.jwt.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,8 +6,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jshop.dto.CustomUserDetails;
+import jshop.domain.jwt.dto.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -34,37 +35,38 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = null;
+        String email = null;
         String password = null;
         try {
             Map<String, String> parameter = objectMapper.readValue(request.getInputStream(), Map.class);
-            username = parameter.get("username");
+            email = parameter.get("username");
             password = parameter.get("password");
         } catch (IOException exception) {
-            System.err.println("JSON Request Body is Empty");
+            throw new BadCredentialsException(exception.getMessage() + " | Request Body(JSON) is Empty");
         }
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
         return authenticationManager.authenticate(authToken);
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        String username = customUserDetails.getUsername();
+        String email = customUserDetails.getUsername();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
 
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60 * 60 * 1000L);
+        String token = jwtUtil.createJwt(email, role, 60 * 60 * 1000L);
 
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         response.addHeader("Authorization", "Bearer " + token);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        System.out.println("fail");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

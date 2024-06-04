@@ -1,6 +1,6 @@
-package jshop.dto;
+package jshop.domain.jwt.dto;
 
-import jshop.entity.User;
+import jshop.domain.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -29,6 +29,10 @@ public class CustomUserDetails implements UserDetails {
         return collection;
     }
 
+    public Long getId() {
+        return user.getId();
+    }
+
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -36,7 +40,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override

@@ -1,11 +1,11 @@
-package jshop.jwt;
+package jshop.domain.jwt.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jshop.dto.CustomUserDetails;
-import jshop.entity.User;
+import jshop.domain.jwt.dto.CustomUserDetails;
+import jshop.domain.user.entity.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,11 +41,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String username = jwtUtil.getUsername(token);
+        String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
 
         User user = new User();
-        user.setUsername(username);
+        user.setEmail(email);
         user.setPassword("test");
         user.setRole(role);
 

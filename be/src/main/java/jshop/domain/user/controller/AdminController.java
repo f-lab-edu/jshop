@@ -1,4 +1,4 @@
-package jshop.controller;
+package jshop.domain.user.controller;
 
 
 import org.springframework.stereotype.Controller;

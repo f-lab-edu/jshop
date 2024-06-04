@@ -1,10 +1,10 @@
-package jshop.config;
+package jshop.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jshop.jwt.JWTUtil;
-import jshop.jwt.JwtFilter;
-import jshop.jwt.LoginFilter;
+import jshop.domain.jwt.filter.JWTUtil;
+import jshop.domain.jwt.filter.JwtFilter;
+import jshop.domain.jwt.filter.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,10 +22,12 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final ObjectMapper objectMapper;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -39,16 +41,16 @@ public class SecurityConfig {
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/", "/join")
+                .requestMatchers("/api/login", "/api/join")
                 .permitAll()
                 .requestMatchers("/admin")
                 .hasRole("ADMIN")
                 .anyRequest()
                 .authenticated());
-
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterAt(new LoginFilter(new ObjectMapper(), authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterAt(new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
         return http.build();
