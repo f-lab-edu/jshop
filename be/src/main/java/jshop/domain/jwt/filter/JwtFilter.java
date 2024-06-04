@@ -26,18 +26,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            System.err.println("token null");
             filterChain.doFilter(request, response);
-
             return;
         }
 
         String token = authorization.split(" ")[1];
 
         if (jwtUtil.isExpired(token)) {
-            System.err.println("token expired");
             filterChain.doFilter(request, response);
-
             return;
         }
 
@@ -46,8 +42,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         User user = new User();
         user.setEmail(email);
-        user.setPassword("test");
-        user.setRole(role);
 
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
 

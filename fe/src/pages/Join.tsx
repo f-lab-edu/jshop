@@ -19,7 +19,6 @@ const JoinContainer = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
-  padding-bottom: 300px;
 `
 
 const Buttons = styled.div`

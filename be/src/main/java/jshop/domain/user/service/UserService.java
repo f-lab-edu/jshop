@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class JoinService {
+public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserRepository userRepository;
 
-    public JoinService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }

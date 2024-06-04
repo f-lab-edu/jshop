@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .hasRole("ADMIN")
                 .anyRequest()
                 .authenticated());
+
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 

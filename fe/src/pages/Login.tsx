@@ -18,7 +18,6 @@ const LoginContainer = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
-  padding-bottom: 300px;
 `
 
 const Buttons = styled.div`
@@ -41,6 +40,7 @@ export default function Login() {
       })
       .catch(e => {        
         alert("아이디와 비밀번호가 잘못되었습니다.");
+        window.location.reload();
       })
   }
 
