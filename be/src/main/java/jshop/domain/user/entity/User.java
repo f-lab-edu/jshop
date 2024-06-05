@@ -1,32 +1,35 @@
 package jshop.domain.user.entity;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jshop.domain.user.dto.UserType;
 import jshop.global.entity.CreatedAt;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User extends CreatedAt {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Setter
-    private String username;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Setter
-    private String password;
+  private String username;
+  private String password;
+  private String email;
+  private String role;
 
-    @Setter
-    private String email;
+  @Enumerated(EnumType.STRING)
+  private UserType userType;
 
-    @Setter
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
-
-    @Setter
-    private String role;
 }

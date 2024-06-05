@@ -1,6 +1,6 @@
 package jshop.global.controller;
 
-import jshop.global.common.ResponseCode;
+import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.AlreadyRegisteredEmailException;
 import org.springframework.http.HttpStatus;
@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AlreadyRegisteredEmailException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    protected Response handleCustomException(RuntimeException ex) {
-        Response response = new Response();
-        response.setHeader(ResponseCode.ALREADY_REGISTERED_EMAIL, ex.getMessage());
+  @ExceptionHandler(AlreadyRegisteredEmailException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  protected Response handleCustomException(RuntimeException ex) {
+    
+    Response response = Response.builder()
+        .error(ErrorCode.ALREADY_REGISTERED_EMAIL)
+        .message(ex.getMessage())
+        .data(null)
+        .build();
 
-        return response;
-    }
+    return response;
+  }
 }

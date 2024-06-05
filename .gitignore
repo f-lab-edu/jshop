@@ -9,6 +9,7 @@
 
 ##### CUSTOM #####
 **/*.drawio*
+**/*application.yml
 
 # User-specific stuff
 .idea/**/workspace.xml
