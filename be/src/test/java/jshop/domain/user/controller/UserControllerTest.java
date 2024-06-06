@@ -31,47 +31,46 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-  @InjectMocks
-  private UserController userController;
+    @InjectMocks
+    private UserController userController;
 
-  @Mock
-  private UserService userService;
+    @Mock
+    private UserService userService;
 
-  @Captor
-  private ArgumentCaptor<JoinDto> joinDtoCapture;
+    @Captor
+    private ArgumentCaptor<JoinDto> joinDtoCapture;
 
-  private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-  @BeforeEach
-  public void beforeEach() {
-    mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-  }
+    @BeforeEach
+    public void beforeEach() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    }
 
-  @Test
-  public void 회원가입() throws Exception {
-    // given
-    String username = "test";
-    String email = "email@email.com";
-    String password = "test";
-    UserType userType = UserType.USER;
+    @Test
+    public void 회원가입() throws Exception {
+        // given
+        String username = "test";
+        String email = "email@email.com";
+        String password = "test";
+        UserType userType = UserType.USER;
 
-    JSONObject requestBody = new JSONObject();
-    requestBody.put("username", username);
-    requestBody.put("email", email);
-    requestBody.put("password", password);
-    requestBody.put("userType", "USER");
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
 
-    JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
-    // when
-    ResultActions perform = mockMvc.perform(
-        MockMvcRequestBuilders.post("/api/join")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
 
-    // then
-    verify(userService, times(1)).joinUser(joinDtoCapture.capture());
-    JoinDto capturedJoinDto = joinDtoCapture.getValue();
-    perform.andExpect(MockMvcResultMatchers.status().isNoContent());
-    assertThat(capturedJoinDto).isEqualTo(joinDto);
-  }
+        // then
+        verify(userService, times(1)).joinUser(joinDtoCapture.capture());
+        JoinDto capturedJoinDto = joinDtoCapture.getValue();
+        perform.andExpect(MockMvcResultMatchers.status().isNoContent());
+        assertThat(capturedJoinDto).isEqualTo(joinDto);
+    }
 }

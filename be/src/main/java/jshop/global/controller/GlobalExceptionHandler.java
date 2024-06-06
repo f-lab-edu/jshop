@@ -14,30 +14,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(AlreadyRegisteredEmailException.class)
-  @ResponseStatus(HttpStatus.CONFLICT)
-  protected Response handleCustomException(AlreadyRegisteredEmailException ex) {
+    @ExceptionHandler(AlreadyRegisteredEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    protected Response handleCustomException(AlreadyRegisteredEmailException ex) {
 
-    Response response = Response.builder()
-        .error(ErrorCode.ALREADY_REGISTERED_EMAIL)
-        .message(ex.getMessage())
-        .data(null)
-        .build();
+        Response response = Response.builder().error(ErrorCode.ALREADY_REGISTERED_EMAIL)
+            .message(ex.getMessage()).data(null).build();
 
-    return response;
-  }
+        return response;
+    }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  protected Response handleBindException(MethodArgumentNotValidException ex) {
-    Response response = Response.builder()
-        .error(ErrorCode.INVALID_REQUEST_BODY)
-        .message("입력 형식이 잘못되었습니다.")
-        .data(null)
-        .build();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Response handleBindException(MethodArgumentNotValidException ex) {
+        Response response = Response.builder().error(ErrorCode.INVALID_REQUEST_BODY)
+            .message("입력 형식이 잘못되었습니다.").data(null).build();
 
-    log.error(ex.getMessage());
+        log.error(ex.getMessage());
 
-    return response;
-  }
+        return response;
+    }
 }

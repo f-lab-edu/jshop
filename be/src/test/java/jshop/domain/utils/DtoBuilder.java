@@ -5,16 +5,12 @@ import jshop.domain.user.dto.UserType;
 
 public class DtoBuilder {
 
-  static public JoinDto getJoinDto(String username, String email, String password,
-      UserType userType) {
+    static public JoinDto getJoinDto(String username, String email, String password,
+        UserType userType) {
 
-    JoinDto joinDto = JoinDto.builder()
-        .password(password)
-        .email(email)
-        .username(username)
-        .userType(userType)
-        .build();
-    return joinDto;
-  }
+        JoinDto joinDto = JoinDto.builder().password(password).email(email).username(username)
+            .userType(userType).build();
+        return joinDto;
+    }
 
 }

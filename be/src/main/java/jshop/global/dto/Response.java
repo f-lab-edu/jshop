@@ -8,9 +8,9 @@ import lombok.Getter;
 @Builder
 public class Response<T> {
 
-  private final T data;
-  private final String message;
-  private ErrorCode error;
+    private final T data;
+    private final String message;
+    private ErrorCode error;
 }
 
 

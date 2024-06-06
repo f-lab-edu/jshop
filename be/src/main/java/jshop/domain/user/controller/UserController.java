@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  @PostMapping("/api/join")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void join(@RequestBody @Valid JoinDto joinDto) {
-    userService.joinUser(joinDto);
-  }
+    @PostMapping("/api/join")
+    @ResponseStatus(HttpStatus.OK)
+    public void join(@RequestBody @Valid JoinDto joinDto) {
+        userService.joinUser(joinDto);
+    }
 }
 

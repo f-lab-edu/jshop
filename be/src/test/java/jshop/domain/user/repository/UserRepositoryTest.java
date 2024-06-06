@@ -11,24 +11,20 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 public class UserRepositoryTest {
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  @Test
-  public void 회원가입() {
-    // given
-    User user = User.builder()
-        .email("test")
-        .userType(UserType.USER)
-        .username("kim")
-        .password("kim")
-        .build();
+    @Test
+    public void 회원가입() {
+        // given
+        User user = User.builder().email("test").userType(UserType.USER).username("kim")
+            .password("kim").build();
 
-    // when
-    userRepository.save(user);
+        // when
+        userRepository.save(user);
 
-    // then
-    User findUser = userRepository.findByEmail("test");
-    assertThat(findUser).isEqualTo(user);
-  }
+        // then
+        User findUser = userRepository.findByEmail("test");
+        assertThat(findUser).isEqualTo(user);
+    }
 }

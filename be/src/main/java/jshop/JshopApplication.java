@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 public class JshopApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(JshopApplication.class, args);
-	}
+
+    public static void main(String[] args) {
+        SpringApplication.run(JshopApplication.class, args);
+    }
 }

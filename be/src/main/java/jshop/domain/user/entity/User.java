@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jshop.domain.user.dto.UserType;
-import jshop.global.entity.CreatedAt;
+import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,19 +20,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User extends CreatedAt {
+public class User extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private String username;
-  private String password;
-  private String email;
-  private String role;
+    private String username;
+    private String password;
+    private String email;
+    private String role;
 
-  @Enumerated(EnumType.STRING)
-  private UserType userType;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
-  
+
 }

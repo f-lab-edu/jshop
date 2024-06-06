@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class JoinDto {
 
-  @NotEmpty
-  private String username;
+    @NotEmpty
+    private String username;
 
-  @NotEmpty
-  private String password;
+    @NotEmpty
+    private String password;
 
-  @NotEmpty
-  @Email
-  private String email;
+    @NotEmpty
+    @Email
+    private String email;
 
-  @JsonFormat(shape = JsonFormat.Shape.STRING)
-  @NotNull
-  private UserType userType;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @NotNull
+    private UserType userType;
 }

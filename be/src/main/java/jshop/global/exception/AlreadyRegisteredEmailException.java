@@ -1,9 +1,8 @@
 package jshop.global.exception;
 
-public class AlreadyRegisteredEmailException extends RuntimeException{
-    private String detail;
-    public AlreadyRegisteredEmailException(String message, String detail) {
+public class AlreadyRegisteredEmailException extends RuntimeException {
+
+    public AlreadyRegisteredEmailException(String message) {
         super(message);
-        this.detail = detail;
     }
 }
