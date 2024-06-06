@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Input from "../styled/InputComponent";
 import Button1 from "../styled/Button1";
 import axios from "axios";
+import isAuthenticated from "../utils/isAuthenticated";
+import { Navigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -26,9 +28,13 @@ const Buttons = styled.div`
   margin-top: 30px;
 `
 
-export default function Login() {
+export default function Login() {  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  if (isAuthenticated()) {
+    return <Navigate to="/" />
+  }
 
   function signIn() {
     axios.post("/api/login", {
@@ -36,7 +42,13 @@ export default function Login() {
       password,      
     })
       .then(d => {
+        if (d.headers.authorization) {
+          sessionStorage.setItem("token", d.headers.authorization);
           window.location.href = "/";
+        } else {
+          alert("로그인 실패. 관리자에게 문의하세요 ")
+        }
+          
       })
       .catch(e => {        
         alert("아이디와 비밀번호가 잘못되었습니다.");

@@ -4,6 +4,8 @@ import Input from "../styled/InputComponent";
 import Button1 from "../styled/Button1";
 import design from "../config/design.json";
 import axios from "axios";
+import isAuthenticated from "../utils/isAuthenticated";
+import { Navigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -32,6 +34,11 @@ export default function Join() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("USER")
+
+  if (isAuthenticated()) {
+    return <Navigate to="/" />
+  }
+
 
   function signUp() {
     axios.post("/api/join", {
