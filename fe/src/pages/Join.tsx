@@ -44,8 +44,9 @@ export default function Join() {
       alert("성공적으로 가입되었습니다.");
       window.location.href = "/login";
     })
-    .catch(e => {      
-      alert(e?.response?.data?.header?.message ?? "알 수 없는 오류가 발생했습니다.");
+    .catch(e => {   
+      console.log(e)   ;
+      alert(e?.response?.data?.message ?? "알 수 없는 오류가 발생했습니다.");
     })
   }
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 public class JwtUtilTest {
 
-
   @Test
   public void 토큰생성() {
     // given

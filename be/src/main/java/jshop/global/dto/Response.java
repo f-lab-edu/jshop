@@ -10,5 +10,7 @@ public class Response<T> {
 
   private final T data;
   private final String message;
-  private final ErrorCode error;
+  private ErrorCode error;
 }
+
+

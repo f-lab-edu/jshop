@@ -1,26 +1,23 @@
 package jshop.domain.user.service;
 
+import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
-import jshop.domain.user.dto.request.JoinDto;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.exception.AlreadyRegisteredEmailException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final UserRepository userRepository;
 
-  public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-    this.userRepository = userRepository;
-    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-  }
-
-  public void joinProcess(JoinDto joinDto) {
+  public void joinUser(JoinDto joinDto) {
     String username = joinDto.getUsername();
     String password = joinDto.getPassword();
     String email = joinDto.getEmail();
