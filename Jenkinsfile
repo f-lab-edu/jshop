@@ -1,9 +1,10 @@
 pipeline {
     agent any
     
-    environment {
+    environment {        
         NCLOUD_ACCESS_KEY_ID = credentials('NCLOUD_ACCESS_KEY_ID')
         NCLOUD_SECRET_KEY = credentials('NCLOUD_SECRET_KEY')
+        IMAGE = jshop.kr.ncr.ntruss.com/jshop:v1.0.1
     }
 
     stages {
@@ -23,7 +24,7 @@ pipeline {
                 script {
                     dir('be') {
                         echo 'build'
-                        sh 'docker build -t jshop.kr.ncr.ntruss.com/jshop:v1.0.0 .'
+                        sh "docker build -t ${IMAGE} ."
                     }                    
                 }
             }
@@ -33,10 +34,30 @@ pipeline {
             steps {
                 script {
                     echo 'push'
-                    sh 'echo $NCLOUD_SECRET_KEY | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin'
-                    sh 'docker push jshop.kr.ncr.ntruss.com/jshop:v1.0.0'
+                    sh "echo ${NCLOUD_SECRET_KEY} | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin"                
+                    sh "docker push ${IMAGE}"
                 }
             }
         }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    def SERVERS = [:]
+                    configFileProvider([configFile(fileId: 'a05b0d1b-420b-4e46-a827-9b7bae9b7e25', variable: 'JSON_CONFIG_FILE')]) {
+                        def jsonContent = readFile(file: JSON_CONFIG_FILE)
+                                            
+                        def jsonConfig = new groovy.json.JsonSlurper().parseText(jsonContent)
+                        SERVERS = jsonConfig.servers
+                    }
+                    
+                    SERVERS.each { server ->
+                        sshagent(['ssh-deploy-key']) {
+                            sh "ssh jhkim@${server} 'echo $NCLOUD_SECRET_KEY | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin'"
+                            sh "ssh jhkim@${server} 'docker service update --image ${IMAGE} jshop'"
+                        }
+                    }                                            
+                }
+            }
     }
 }
