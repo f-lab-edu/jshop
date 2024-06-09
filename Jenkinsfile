@@ -4,7 +4,7 @@ pipeline {
     environment {        
         NCLOUD_ACCESS_KEY_ID = credentials('NCLOUD_ACCESS_KEY_ID')
         NCLOUD_SECRET_KEY = credentials('NCLOUD_SECRET_KEY')
-        IMAGE = jshop.kr.ncr.ntruss.com/jshop:v1.0.1
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v1.0.1'
     }
 
     stages {
@@ -54,10 +54,11 @@ pipeline {
                     SERVERS.each { server ->
                         sshagent(['ssh-deploy-key']) {
                             sh "ssh jhkim@${server} 'echo $NCLOUD_SECRET_KEY | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin'"
-                            sh "ssh jhkim@${server} 'docker service update --image ${IMAGE} jshop'"
+                            sh "ssh jhkim@${server} 'docker service update --image ${IMAGE} jshop_jshop --with-registry-auth'"
                         }
                     }                                            
                 }
             }
+        }
     }
 }
