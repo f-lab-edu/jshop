@@ -19,11 +19,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,7 +72,70 @@ class UserControllerTest {
         // then
         verify(userService, times(1)).joinUser(joinDtoCapture.capture());
         JoinDto capturedJoinDto = joinDtoCapture.getValue();
-        perform.andExpect(MockMvcResultMatchers.status().isNoContent());
+        perform.andExpect(MockMvcResultMatchers.status().isOk());
         assertThat(capturedJoinDto).isEqualTo(joinDto);
+    }
+
+    @Test
+    public void 잘못된회원가입_이메일오류() throws Exception {
+        // given
+        String username = "test";
+        String email = "email";
+        String password = "test";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+            MethodArgumentNotValidException.class));
+    }
+
+    @Test
+    public void 잘못된회원가입_필드오류() throws Exception {
+        // given
+        String username = "";
+        String email = "email@email.com";
+        String password = "test";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+            MethodArgumentNotValidException.class));
+    }
+
+    @Test
+    public void 잘못된회원가입_빈요청() throws Exception {
+        // given
+
+        // when
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/join"));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+            HttpMessageNotReadableException.class));
     }
 }
