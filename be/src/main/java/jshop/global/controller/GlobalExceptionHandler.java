@@ -23,8 +23,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     protected Response handleCustomException(AlreadyRegisteredEmailException ex) {
 
-        Response response = Response.builder().error(ErrorCode.ALREADY_REGISTERED_EMAIL)
-            .message(ex.getMessage()).data(null).build();
+        Response response = Response.builder()
+            .error(ErrorCode.ALREADY_REGISTERED_EMAIL)
+            .message(ex.getMessage())
+            .data(null)
+            .build();
 
         return response;
     }
@@ -40,8 +43,13 @@ public class GlobalExceptionHandler {
             errorMsg = fieldError.getDefaultMessage();
         }
 
-        Response response = Response.builder().error(ErrorCode.INVALID_REQUEST_BODY)
-            .message(Optional.of(errorMsg).orElse(ex.getMessage())).data(null).build();
+        Response response = Response.builder()
+            .error(ErrorCode.INVALID_REQUEST_BODY)
+            .message(Optional.of(errorMsg).orElse(ex.getMessage()))
+            .data(null)
+            .build();
+
+        System.out.println(response);
 
         return response;
     }
