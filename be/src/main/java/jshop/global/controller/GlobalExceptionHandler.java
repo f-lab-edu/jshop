@@ -1,10 +1,15 @@
 package jshop.global.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.AlreadyRegisteredEmailException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -27,10 +32,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleBindException(MethodArgumentNotValidException ex) {
-        Response response = Response.builder().error(ErrorCode.INVALID_REQUEST_BODY)
-            .message("입력 형식이 잘못되었습니다.").data(null).build();
+        BindingResult bindingResult = ex.getBindingResult();
+        String errorMsg = null;
 
-        log.error(ex.getMessage());
+        if (bindingResult.hasFieldErrors()) {
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            errorMsg = fieldError.getDefaultMessage();
+        }
+
+        Response response = Response.builder().error(ErrorCode.INVALID_REQUEST_BODY)
+            .message(Optional.of(errorMsg).orElse(ex.getMessage())).data(null).build();
 
         return response;
     }
