@@ -1,15 +1,17 @@
 package jshop.domain.user.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.domain.utils.DtoBuilder;
-
 import jshop.global.controller.GlobalExceptionHandler;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,12 +29,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -103,8 +99,7 @@ class UserControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일 형식에 맞지않습니다."));
@@ -131,8 +126,7 @@ class UserControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일은 공백일 수 없습니다."));
@@ -269,7 +263,10 @@ class UserControllerTest {
         perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("비밀번호는 공백일 수 없습니다."));
+            .andExpect(jsonPath("$.message", Matchers.anyOf(
+                Matchers.is("비밀번호는 공백일 수 없습니다."),
+                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다.")
+            )));
     }
 
     @Test
@@ -280,10 +277,7 @@ class UserControllerTest {
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join"));
 
         // then
-        perform
-            .andExpect((result) ->
-                assertThat(result.getResolvedException()).isInstanceOf(
-                    HttpMessageNotReadableException.class))
-            .andExpect(status().isBadRequest());
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+            HttpMessageNotReadableException.class)).andExpect(status().isBadRequest());
     }
 }

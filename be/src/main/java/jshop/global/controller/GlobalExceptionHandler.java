@@ -1,12 +1,9 @@
 package jshop.global.controller;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.AlreadyRegisteredEmailException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyRegisteredEmailException.class)
@@ -48,8 +44,6 @@ public class GlobalExceptionHandler {
             .message(Optional.of(errorMsg).orElse(ex.getMessage()))
             .data(null)
             .build();
-
-        System.out.println(response);
 
         return response;
     }
