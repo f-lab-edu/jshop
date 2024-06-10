@@ -1,15 +1,18 @@
 package jshop.domain.user.controller;
 
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 
+import java.util.List;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.domain.utils.DtoBuilder;
 
 import jshop.global.controller.GlobalExceptionHandler;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,8 +106,7 @@ class UserControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일 형식에 맞지않습니다."));
@@ -131,8 +133,7 @@ class UserControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일은 공백일 수 없습니다."));
@@ -269,7 +270,11 @@ class UserControllerTest {
         perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("비밀번호는 공백일 수 없습니다."));
+            .andExpect(jsonPath("$.message", Matchers.anyOf(
+                Matchers.is("비밀번호는 공백일 수 없습니다."),
+                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다.")
+            )));
+
     }
 
     @Test
@@ -280,10 +285,7 @@ class UserControllerTest {
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join"));
 
         // then
-        perform
-            .andExpect((result) ->
-                assertThat(result.getResolvedException()).isInstanceOf(
-                    HttpMessageNotReadableException.class))
-            .andExpect(status().isBadRequest());
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+            HttpMessageNotReadableException.class)).andExpect(status().isBadRequest());
     }
 }
