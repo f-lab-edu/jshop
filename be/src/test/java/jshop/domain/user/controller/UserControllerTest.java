@@ -2,13 +2,16 @@ package jshop.domain.user.controller;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+import java.util.List;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.domain.utils.DtoBuilder;
-
+import jshop.global.controller.GlobalExceptionHandler;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -46,15 +52,17 @@ class UserControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+            .setControllerAdvice(GlobalExceptionHandler.class)
+            .build();
     }
 
     @Test
-    public void 회원가입() throws Exception {
+    public void 정상회원가입() throws Exception {
         // given
         String username = "test";
         String email = "email@email.com";
-        String password = "test";
+        String password = "testtest";
         UserType userType = UserType.USER;
 
         JSONObject requestBody = new JSONObject();
@@ -65,9 +73,9 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody.toString()));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
 
         // then
         verify(userService, times(1)).joinUser(joinDtoCapture.capture());
@@ -77,11 +85,11 @@ class UserControllerTest {
     }
 
     @Test
-    public void 잘못된회원가입_이메일오류() throws Exception {
+    public void 잘못된회원가입_이메일형식오류() throws Exception {
         // given
         String username = "test";
         String email = "email";
-        String password = "test";
+        String password = "test123123123";
         UserType userType = UserType.USER;
 
         JSONObject requestBody = new JSONObject();
@@ -92,19 +100,102 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody.toString()));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
 
         // then
         perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-            MethodArgumentNotValidException.class));
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("이메일 형식에 맞지않습니다."));
     }
 
     @Test
-    public void 잘못된회원가입_필드오류() throws Exception {
+    public void 잘못된회원가입_빈이메일() throws Exception {
         // given
-        String username = "";
+        String username = "test";
+        String email = "";
+        String password = "test123123123";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("이메일은 공백일 수 없습니다."));
+    }
+
+    @Test
+    public void 잘못된회원가입_긴유저이름() throws Exception {
+        // given
+        String username = "123456789912345667";
+        String email = "email@email.com";
+        String password = "test123123123";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
+    }
+
+    @Test
+    public void 잘못된회원가입_짧은유저이름() throws Exception {
+        // given
+        String username = "김";
+        String email = "email@email.com";
+        String password = "test123123123";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
+    }
+
+    @Test
+    public void 잘못된회원가입_짧은비밀번호() throws Exception {
+        // given
+        String username = "jhkim";
         String email = "email@email.com";
         String password = "test";
         UserType userType = UserType.USER;
@@ -117,13 +208,72 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/join").contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody.toString()));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
 
         // then
         perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-            MethodArgumentNotValidException.class));
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
+    }
+
+    @Test
+    public void 잘못된회원가입_긴비밀번호() throws Exception {
+        // given
+        String username = "jhkim";
+        String email = "email@email.com";
+        String password = "testtesttesttesttesttesttesttesttesttest";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
+    }
+
+    @Test
+    public void 잘못된회원가입_공백비밀번호() throws Exception {
+        // given
+        String username = "jhkim";
+        String email = "email@email.com";
+        String password = "";
+        UserType userType = UserType.USER;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+        requestBody.put("userType", "USER");
+
+        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                MethodArgumentNotValidException.class))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", Matchers.anyOf(
+                Matchers.is("비밀번호는 공백일 수 없습니다."),
+                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다.")
+            )));
     }
 
     @Test
@@ -131,11 +281,13 @@ class UserControllerTest {
         // given
 
         // when
-        ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/join"));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join"));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-            HttpMessageNotReadableException.class));
+        perform
+            .andExpect((result) ->
+                assertThat(result.getResolvedException()).isInstanceOf(
+                    HttpMessageNotReadableException.class))
+            .andExpect(status().isBadRequest());
     }
 }

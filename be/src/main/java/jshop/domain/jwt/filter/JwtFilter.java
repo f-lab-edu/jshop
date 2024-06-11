@@ -36,17 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String email = jwtUtil.getEmail(token);
-        String role = jwtUtil.getRole(token);
 
         User user = User.builder().email(email).build();
-
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
-
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
             customUserDetails.getAuthorities());
-
         SecurityContextHolder.getContext().setAuthentication(authToken);
-
         filterChain.doFilter(request, response);
     }
 }
