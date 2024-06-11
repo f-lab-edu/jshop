@@ -1,16 +1,15 @@
 package jshop.domain.user.controller;
 
-
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.domain.utils.DtoBuilder;
-
 import jshop.global.controller.GlobalExceptionHandler;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
@@ -133,7 +132,8 @@ class UserControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일은 공백일 수 없습니다."));
@@ -285,7 +285,10 @@ class UserControllerTest {
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join"));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-            HttpMessageNotReadableException.class)).andExpect(status().isBadRequest());
+        perform
+            .andExpect((result) ->
+                assertThat(result.getResolvedException()).isInstanceOf(
+                    HttpMessageNotReadableException.class))
+            .andExpect(status().isBadRequest());
     }
 }

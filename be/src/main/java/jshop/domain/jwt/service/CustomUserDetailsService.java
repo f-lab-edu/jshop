@@ -1,5 +1,6 @@
 package jshop.domain.jwt.service;
 
+import java.util.Optional;
 import jshop.domain.jwt.dto.CustomUserDetails;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
@@ -18,11 +19,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        Optional<User> optionalUser = Optional.of(userRepository.findByEmail(email));
 
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found: " + email);
-        }
+        User user = optionalUser.orElseThrow(
+            () -> new UsernameNotFoundException("User not found: " + email));
+
         return new CustomUserDetails(user);
     }
 }
