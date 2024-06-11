@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
         Response response = Response.builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
-            .message(Optional.of(errorMsg).orElse(ex.getMessage()))
+            .message(Optional.ofNullable(errorMsg).orElse(ex.getMessage()))
             .data(null)
             .build();
 

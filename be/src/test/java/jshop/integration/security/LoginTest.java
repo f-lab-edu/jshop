@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-
 @EnableWebMvc
 @SpringBootTest(classes = {SecurityConfig.class, JwtUtil.class, ObjectMapper.class,
     TestController.class})
@@ -130,31 +129,56 @@ public class LoginTest {
     }
 
     @Test
-    public void 잘못된토큰테스트() throws Exception {
+    public void 잘못된토큰1_jwt형식() throws Exception {
         // given
-        BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
-        User u = User.builder()
-            .username("user")
-            .email("user")
-            .password(bpe.encode("password"))
-            .role("ROLE_USER")
-            .build();
 
-        UserDetails userDetails = new CustomUserDetails(u);
-        when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
-
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "user");
-        requestBody.put("password", "password");
+        // invalid jwt
+        String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/test")
             .header("Authorization",
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
+                token));
         // then
         perform.andExpect(status().isForbidden());
     }
+
+    @Test
+    public void 잘못된토큰2_이상한문자열() throws Exception {
+        // given
+
+        // invalid jwt
+        String token = "asdf";
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/test")
+            .header("Authorization",
+                token));
+        // then
+        perform.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void 잘못된토큰3_Bearer로시작() throws Exception {
+        // given
+
+        // invalid jwt
+        String token = "Bearer invalidtoken";
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/test")
+            .header("Authorization",
+                token));
+        // then
+        perform.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void 잘못된토큰4_없음() throws Exception {
+        // given
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/test"));
+        // then
+        perform.andExpect(status().isForbidden());
+    }
+
 
     @Test
     public void 인가받은유저_페이지접속() throws Exception {

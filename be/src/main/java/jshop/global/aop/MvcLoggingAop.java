@@ -77,9 +77,10 @@ public class MvcLoggingAop {
                 headers.putIfAbsent(header, attributes.getResponse().getHeader(header));
             }
             responseLog.put("headers", headers);
-            if (response != null) {
-                responseLog.put("data", response);
-            }
+
+            Optional.ofNullable(response).ifPresent(r -> {
+                responseLog.put("data", r);
+            });
         });
 
         try {
