@@ -17,8 +17,12 @@ public class UserRepositoryTest {
     @Test
     public void 회원가입() {
         // given
-        User user = User.builder().email("test").userType(UserType.USER).username("kim")
-            .password("kim").build();
+        User user = User.builder()
+            .email("test")
+            .userType(UserType.USER)
+            .username("kim")
+            .password("kim")
+            .build();
 
         // when
         userRepository.save(user);

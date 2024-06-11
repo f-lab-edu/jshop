@@ -1,4 +1,4 @@
-package jshop.domain.jwt.filter;
+package jshop.global.jwt.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import jshop.domain.jwt.dto.CustomUserDetails;
-import lombok.RequiredArgsConstructor;
+import jshop.global.jwt.dto.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

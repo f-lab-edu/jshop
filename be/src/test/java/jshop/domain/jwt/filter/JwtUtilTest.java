@@ -2,6 +2,7 @@ package jshop.domain.jwt.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jshop.global.jwt.filter.JwtUtil;
 import org.junit.jupiter.api.Test;
 
 public class JwtUtilTest {

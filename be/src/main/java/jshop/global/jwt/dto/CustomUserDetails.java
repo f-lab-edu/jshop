@@ -1,4 +1,4 @@
-package jshop.domain.jwt.dto;
+package jshop.global.jwt.dto;
 
 import java.util.ArrayList;
 import java.util.Collection;
