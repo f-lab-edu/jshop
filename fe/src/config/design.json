@@ -1,0 +1,13 @@
+{
+  "theme1" : "#2081C3",
+  "theme2" : "#63D2FF",
+  "theme3" : "#78D5D7",
+  "theme4" : "#BED8D4",
+  "theme5" : "#F7F9F9",
+  "button1" : {
+    "background" : "#2081C3",
+    "hover" : {
+      "background" : "#2081C3"
+    }
+  }
+}
