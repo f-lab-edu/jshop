@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +64,11 @@ public class MvcLoggingAop {
         responseLog.put("id", id);
         responseLog.put("response_time", responseTime);
         responseLog.put("execution_time", responseTime - requestTime);
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
+        Optional<ServletRequestAttributes> optionalAttrivutes = Optional.of(
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+
+        optionalAttrivutes.ifPresent((attributes) -> {
+            responseLog.put("status", attributes.getResponse().getStatus());
             responseLog.put("status", attributes.getResponse().getStatus());
             Map<String, Object> headers = new HashMap<>();
 
@@ -76,7 +80,7 @@ public class MvcLoggingAop {
             if (response != null) {
                 responseLog.put("data", response);
             }
-        }
+        });
 
         try {
             log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLog));

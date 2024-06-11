@@ -42,7 +42,6 @@ public class JwtUtil {
                 .getExpiration()
                 .before(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
         } catch (ExpiredJwtException ex) {
-            System.err.println(ex.getMessage());
             return true;
         }
     }
