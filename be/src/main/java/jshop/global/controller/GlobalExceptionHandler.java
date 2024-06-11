@@ -45,7 +45,6 @@ public class GlobalExceptionHandler {
             .message(Optional.of(errorMsg).orElse(ex.getMessage()))
             .data(null)
             .build();
-
         return response;
     }
 
