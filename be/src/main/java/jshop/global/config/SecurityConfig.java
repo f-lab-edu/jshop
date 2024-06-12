@@ -46,13 +46,16 @@ public class SecurityConfig {
             .anyRequest()
             .authenticated());
 
+        http.logout(auth -> auth
+            .logoutUrl("/api/logout")
+            .logoutSuccessUrl("/"));
+
         http.sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterAt(
             new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration),
-                jwtUtil),
-            UsernamePasswordAuthenticationFilter.class);
+                jwtUtil), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
         return http.build();
