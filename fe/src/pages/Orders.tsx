@@ -1,16 +1,9 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import OrderCard from "../components/OrderCard";
-import { Order } from "../components/OrderCard"
+import IOrder from "../types/IOrder";
 
 export default function Orders() {
-  const orders: Order[] = [];
-  const order: Order = {
-    orderNumber: "1",
-    product: "2",
-    quantity: 3,
-    price: 4,
-    date: "2023.05.05"
-  }
+  const orders: IOrder[] = [];
 
   for (let i = 0; i < 10; i++) {
     orders.push({
@@ -24,7 +17,8 @@ export default function Orders() {
 
   
   return (
-    <Box flexDirection={"column"} justifyContent={"center"} alignItems={"center"} sx={{ width: "100%", display: "flex" }}>
+    <Box flexDirection={"column"} justifyContent={"center"} alignItems={"center"} sx={{ width: "100%", display: "flex" }}>    
+      <Typography variant="h4" width={"100%"} marginBottom={3}>주문내역</Typography>    
       {orders.map((o) => (
         <OrderCard order={o} />
       ))}

@@ -35,6 +35,11 @@ public class Address extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "receiver_name")
+    private String receiverName;
+    @Column(name = "receiver_number")
+    private String receiverNumber;
+    private String message;
     private String province;
     private String city;
     private String district;

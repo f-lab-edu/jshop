@@ -1,15 +1,10 @@
 import { Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material";
+import IOrder from "../types/IOrder";
+import AddressCard from "./AddressCard";
 
-export interface Order {
-  orderNumber: string;
-  product: string;
-  quantity: number;
-  price: number;
-  date: string;
-}
+export default function OrderCard(props: { order: IOrder }) {
+  const {order} = props;
 
-export default function OrderCard(props: { order: Order }) {
-  const order = props.order;
   return (
     <Card variant="outlined" sx={{ width: "100%", margin: 1 }} >
       <Grid container spacing={2}>
@@ -44,7 +39,7 @@ export default function OrderCard(props: { order: Order }) {
             </Stack>
           </Box>
         </Grid>
-      </Grid>
+      </Grid>      
     </Card >
   )
 }

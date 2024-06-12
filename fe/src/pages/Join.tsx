@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import axios from "axios";
 import isAuthenticated from "../utils/isAuthenticated";
 import { Navigate } from "react-router-dom";
@@ -30,6 +31,10 @@ export default function Join() {
   function validatePassword(password: string) {
     setIsInvalidPassword(password.length < 8 || password.length > 16);
   };
+
+  function totalValidate() {
+    return isInvalidEmail || isInvalidUsername || isInvalidPassword || email == "" || username == "" || password == "";
+  }
 
   function signUp() {
     axios.post("/api/join", {
@@ -87,7 +92,7 @@ export default function Join() {
             size="small"
           />
           <TextField
-            label="text"
+            label="password"
             type="password"
             value={password}
             onChange={e => {
@@ -110,7 +115,7 @@ export default function Join() {
           </ButtonGroup>
         </Stack>
         <Stack direction="row" justifyContent={"center"}>
-          <Button onClick={signUp} variant="contained">Sign up</Button>
+          <Button onClick={signUp} variant="contained" disabled={totalValidate() ? true : false}>Sign up</Button>
         </Stack>
       </Stack>
     </Box>
