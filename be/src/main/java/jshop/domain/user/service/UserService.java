@@ -2,6 +2,7 @@ package jshop.domain.user.service;
 
 import java.util.List;
 import java.util.Optional;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.cart.entity.Cart;
@@ -40,7 +41,11 @@ public class UserService {
             throw new UserIdNotFoundException(errMsg);
         });
 
-        List<Address> addresses = addressRepository.findByUser(user);
+        List<AddressDto> addresses = addressRepository
+            .findByUser(user)
+            .stream()
+            .map(Address::getAddressDto)
+            .toList();
 
         return UserInfoResponse
             .builder()

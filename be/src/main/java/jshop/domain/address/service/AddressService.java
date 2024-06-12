@@ -1,7 +1,7 @@
 package jshop.domain.address.service;
 
 import java.util.Optional;
-import jshop.domain.address.SaveAddressDto;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
@@ -17,20 +17,20 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
 
-    public Address saveAddress(SaveAddressDto saveAddressDto, Optional<User> optionalUser) {
+    public Address saveAddress(AddressDto addressDto, Optional<User> optionalUser) {
 
         User user = optionalUser.orElseThrow(JwtUserNotFoundException::new);
         Address newAddress = Address
             .builder()
-            .receiverName(saveAddressDto.getReceiverName())
-            .receiverNumber(saveAddressDto.getReceiverNumber())
-            .province(saveAddressDto.getProvince())
-            .city(saveAddressDto.getCity())
-            .district(saveAddressDto.getDistrict())
-            .street(saveAddressDto.getStreet())
-            .detailAddress1(saveAddressDto.getDetailAddress1())
-            .detailAddress2(saveAddressDto.getDetailAddress2())
-            .message(saveAddressDto.getMessage())
+            .receiverName(addressDto.getReceiverName())
+            .receiverNumber(addressDto.getReceiverNumber())
+            .province(addressDto.getProvince())
+            .city(addressDto.getCity())
+            .district(addressDto.getDistrict())
+            .street(addressDto.getStreet())
+            .detailAddress1(addressDto.getDetailAddress1())
+            .detailAddress2(addressDto.getDetailAddress2())
+            .message(addressDto.getMessage())
             .user(user)
             .build();
 

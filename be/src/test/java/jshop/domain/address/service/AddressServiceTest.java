@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
-import jshop.domain.address.SaveAddressDto;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
@@ -35,9 +35,10 @@ public class AddressServiceTest {
     public void 새주소추가() {
         // given
         String city = "광주시";
-        User user = User.builder().username("kim").email("test").build();
+        User user = User
+            .builder().username("kim").email("test").build();
 
-        SaveAddressDto saveAddressDto = SaveAddressDto
+        AddressDto addressDto = AddressDto
             .builder()
             .receiverName("김재현")
             .receiverNumber("010-1234-5678")
@@ -51,7 +52,7 @@ public class AddressServiceTest {
             .build();
 
         // when
-        addressService.saveAddress(saveAddressDto, Optional.of(user));
+        addressService.saveAddress(addressDto, Optional.of(user));
 
         // then
         verify(addressRepository, times(1)).save(addressCaptor.capture());
@@ -64,12 +65,12 @@ public class AddressServiceTest {
     @Test
     public void 새주소추가_유저없을때() {
         // given
-        SaveAddressDto saveAddressDto = SaveAddressDto.builder().build();
+        AddressDto addressDto = AddressDto
+            .builder().build();
 
         // when
 
         // then
-        assertThrows(JwtUserNotFoundException.class,
-            () -> addressService.saveAddress(saveAddressDto, Optional.empty()));
+        assertThrows(JwtUserNotFoundException.class, () -> addressService.saveAddress(addressDto, Optional.empty()));
     }
 }

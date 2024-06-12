@@ -1,6 +1,7 @@
 package jshop.domain.user.dto;
 
 import java.util.List;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.wallet.entity.Wallet;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,5 @@ public class UserInfoResponse {
     private String email;
     private UserType userType;
     private Long balance;
-    private List<Address> addresses;
+    private List<AddressDto> addresses;
 }

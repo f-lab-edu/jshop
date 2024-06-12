@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,22 @@ public class Address extends BaseEntity {
 
     @Column(name = "detail_address2")
     private String detailAddress2;
+
+    public AddressDto getAddressDto() {
+        return AddressDto
+            .builder()
+            .id(id)
+            .receiverName(receiverName)
+            .receiverNumber(receiverNumber)
+            .message(message)
+            .province(province)
+            .city(city)
+            .district(district)
+            .street(street)
+            .detailAddress1(detailAddress1)
+            .detailAddress2(detailAddress2)
+            .build();
+    }
 
     @Override
     public String toString() {

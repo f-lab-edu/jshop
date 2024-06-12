@@ -3,11 +3,8 @@ package jshop.domain.address.controller;
 
 import jakarta.validation.Valid;
 import java.util.Optional;
-import jshop.domain.address.SaveAddressDto;
-import jshop.domain.address.entity.Address;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.service.AddressService;
-import jshop.domain.user.dto.JoinDto;
-import jshop.domain.user.service.UserService;
 import jshop.global.dto.Response;
 import jshop.global.jwt.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +25,11 @@ public class AddressController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Response saveAddress(@RequestBody @Valid SaveAddressDto saveAddressDto,
+    public Response saveAddress(@RequestBody @Valid AddressDto addressDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        addressService.saveAddress(saveAddressDto, Optional.ofNullable(userDetails.getUser()));
+        addressService.saveAddress(addressDto, Optional.ofNullable(userDetails.getUser()));
         return Response
-            .builder()
-            .message("정상적으로 저장되었습니다.")
-            .build();
+            .builder().message("정상적으로 저장되었습니다.").build();
     }
 }
 

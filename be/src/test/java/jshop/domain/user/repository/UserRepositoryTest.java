@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.UserInfoResponse;
@@ -127,7 +128,11 @@ public class UserRepositoryTest {
         User findUser = optionalFindUser.orElseThrow(UserIdNotFoundException::new);
 
         System.out.println("address 조회 before");
-        List<Address> findAddresses = addressRepository.findByUser(findUser);
+        List<AddressDto> findAddresses = addressRepository
+            .findByUser(findUser)
+            .stream()
+            .map(Address::getAddressDto)
+            .toList();
         System.out.println("address 조회 after");
 
         UserInfoResponse userInfoResponse = UserInfoResponse

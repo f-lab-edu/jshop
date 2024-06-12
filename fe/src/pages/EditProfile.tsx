@@ -1,26 +1,34 @@
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import UsernameInput from "../components/UsernameInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Addresses from "../components/Addresses";
 import IAddress from "../types/IAddress";
 import AddressCard from "../components/AddressCard";
+import apiInstance from "../api/instance";
+import IUserInfo from "../types/IUserInfo";
+import IResponse from "../types/IResponse";
 
 export default function EditProfile() {
   const [username, setUsername] = useState("test");
   const [selectedAddress, setSelectedAddress] = useState<IAddress>();
-  const addresses: IAddress[] = [] 
+  const [addresses, setAddresses] = useState<IAddress[]>([]);
+  
 
-  addresses.push({
-    id: 1,
-    receiverName: "김재현",
-    receiverNumber: "010-1234-5678",
-    province: "경기도",
-    city: "광주시",
-    district: "송정동",
-    street: "경안천로 159",
-    detailAddress1: "101-1202",
-    message: "문앞에 놔주세요"
-  })
+  function updateUserInfo() {
+    /**
+     * TODO address가 추가되면, 유저 페이지에서 업데이트하는 기능
+     */
+    apiInstance.get<IResponse<IUserInfo>>("/api/users")
+      .then(d => {
+        debugger;
+        console.log(d.data);
+        setUsername(d.data.data.username);
+        setAddresses(d.data.data.addresses);
+      });
+  }
+  useEffect(() => {
+    updateUserInfo();
+  }, [])
 
   return (
     <Box>

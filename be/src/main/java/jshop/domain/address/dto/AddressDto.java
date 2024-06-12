@@ -1,5 +1,7 @@
-package jshop.domain.address;
+package jshop.domain.address.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +16,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class SaveAddressDto {
+public class AddressDto {
+
+    private Long id;
 
     @NotBlank(message = "받는 사람은 공백일 수 없습니다.")
     private String receiverName;

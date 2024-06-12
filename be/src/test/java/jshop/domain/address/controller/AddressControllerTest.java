@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
-import jshop.domain.address.SaveAddressDto;
+import jshop.domain.address.dto.AddressDto;
 import jshop.domain.address.service.AddressService;
 import jshop.domain.user.entity.User;
 import jshop.global.controller.GlobalExceptionHandler;
@@ -37,7 +37,7 @@ public class AddressControllerTest {
     private AddressService addressService;
 
     @Captor
-    private ArgumentCaptor<SaveAddressDto> saveAddressDtoCaptor;
+    private ArgumentCaptor<AddressDto> saveAddressDtoCaptor;
 
     @Captor
     private ArgumentCaptor<Optional<User>> optionalUserCaptor;
@@ -75,13 +75,12 @@ public class AddressControllerTest {
             .content(requestBody.toString()));
 
         // then
-        verify(addressService, times(1)).saveAddress(saveAddressDtoCaptor.capture(),
-            optionalUserCaptor.capture());
+        verify(addressService, times(1)).saveAddress(saveAddressDtoCaptor.capture(), optionalUserCaptor.capture());
 
         perform.andExpect(status().isCreated());
 
-        SaveAddressDto saveAddressDto = saveAddressDtoCaptor.getValue();
-        assertThat(saveAddressDto.getCity()).isEqualTo(city);
-        assertThat(saveAddressDto.getReceiverName()).isEqualTo(receiverName);
+        AddressDto addressDto = saveAddressDtoCaptor.getValue();
+        assertThat(addressDto.getCity()).isEqualTo(city);
+        assertThat(addressDto.getReceiverName()).isEqualTo(receiverName);
     }
 }
