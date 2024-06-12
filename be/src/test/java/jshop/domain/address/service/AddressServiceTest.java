@@ -10,7 +10,7 @@ import jshop.domain.address.SaveAddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
-import jshop.global.exception.JwtUserNotFoundException;
+import jshop.global.exception.security.JwtUserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -35,11 +35,7 @@ public class AddressServiceTest {
     public void 새주소추가() {
         // given
         String city = "광주시";
-        User user = User
-            .builder()
-            .username("kim")
-            .email("test")
-            .build();
+        User user = User.builder().username("kim").email("test").build();
 
         SaveAddressDto saveAddressDto = SaveAddressDto
             .builder()
@@ -68,9 +64,7 @@ public class AddressServiceTest {
     @Test
     public void 새주소추가_유저없을때() {
         // given
-        SaveAddressDto saveAddressDto = SaveAddressDto
-            .builder()
-            .build();
+        SaveAddressDto saveAddressDto = SaveAddressDto.builder().build();
 
         // when
 

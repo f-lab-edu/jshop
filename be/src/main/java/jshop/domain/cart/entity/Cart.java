@@ -32,12 +32,6 @@ public class Cart extends BaseEntity {
     private Long id;
 
     /**
-     * 유저하나당 하나의 카트를 갖는다. 유저가 삭제되면 카트도 삭제 -> 유저에 Cascade
-     */
-    @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
-    private User user;
-
-    /**
      * 카트물품들은 카트가 삭제되면 같이 삭제
      */
     @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)

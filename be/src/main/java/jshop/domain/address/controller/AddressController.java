@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/address")
 @RequiredArgsConstructor
 public class AddressController {
 
     private final AddressService addressService;
 
-    @PostMapping("/address")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Response saveAddress(@RequestBody @Valid SaveAddressDto saveAddressDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {

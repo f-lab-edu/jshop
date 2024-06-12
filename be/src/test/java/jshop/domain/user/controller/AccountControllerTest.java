@@ -32,10 +32,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class UserControllerTest {
+class AccountControllerTest {
 
     @InjectMocks
-    private UserController userController;
+    private AccountController accountController;
 
     @Mock
     private UserService userService;
@@ -48,7 +48,7 @@ class UserControllerTest {
     @BeforeEach
     public void beforeEach() {
         mockMvc = MockMvcBuilders
-            .standaloneSetup(userController)
+            .standaloneSetup(accountController)
             .setControllerAdvice(GlobalExceptionHandler.class)
             .build();
     }

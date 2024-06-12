@@ -5,7 +5,7 @@ import jshop.domain.address.SaveAddressDto;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
-import jshop.global.exception.JwtUserNotFoundException;
+import jshop.global.exception.security.JwtUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

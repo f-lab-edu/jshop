@@ -10,7 +10,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.utils.DtoBuilder;
 import jshop.domain.utils.EntityBuilder;
-import jshop.global.exception.AlreadyRegisteredEmailException;
+import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -83,6 +83,4 @@ class UserServiceTest {
         // then
         assertThrows(AlreadyRegisteredEmailException.class, () -> userService.joinUser(joinDto));
     }
-
-
 }

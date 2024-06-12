@@ -2,9 +2,7 @@ package jshop.domain.user.controller;
 
 import jakarta.validation.Valid;
 import jshop.domain.user.dto.JoinDto;
-import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.service.UserService;
-import jshop.global.dto.Response;
 import jshop.global.jwt.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,19 +14,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-public class UserController {
+public class AccountController {
 
     private final UserService userService;
 
-    @GetMapping
+    @PostMapping("/join")
     @ResponseStatus(HttpStatus.OK)
-    public Response<UserInfoResponse> join(@AuthenticationPrincipal CustomUserDetails user) {
-        UserInfoResponse userInfoResponse = userService.getUser(user.getId());
+    public void join(@RequestBody @Valid JoinDto joinDto) {
+        userService.joinUser(joinDto);
+    }
 
-        return Response
-            .<UserInfoResponse>builder().message("유저 정보입니다.").data(userInfoResponse).build();
+    @GetMapping("/test")
+    @ResponseStatus(HttpStatus.OK)
+    public String test(@AuthenticationPrincipal CustomUserDetails user) {
+        return "test";
     }
 }
+

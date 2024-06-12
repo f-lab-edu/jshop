@@ -1,23 +1,56 @@
 package jshop.domain.user.service;
 
+import java.util.List;
+import java.util.Optional;
+import jshop.domain.address.entity.Address;
+import jshop.domain.address.repository.AddressRepository;
+import jshop.domain.cart.entity.Cart;
+import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.global.exception.AlreadyRegisteredEmailException;
+import jshop.domain.wallet.entity.Wallet;
+import jshop.domain.wallet.repository.WalletRepository;
+import jshop.global.exception.user.AlreadyRegisteredEmailException;
+import jshop.global.exception.user.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
+
+    public UserInfoResponse getUser(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        User user = optionalUser.orElseThrow(() -> {
+            String errMsg = new StringBuilder().append(id).append(" 유저 아이디를 찾지못했습니다.").toString();
+            log.error(errMsg);
+            throw new UserIdNotFoundException(errMsg);
+        });
+
+        List<Address> addresses = addressRepository.findByUser(user);
+
+        return UserInfoResponse
+            .builder()
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .balance(user.getWallet().getBalance())
+            .userType(user.getUserType())
+            .addresses(addresses)
+            .build();
+    }
 
     public void joinUser(JoinDto joinDto) {
         String username = joinDto.getUsername();
@@ -25,17 +58,27 @@ public class UserService {
         String email = joinDto.getEmail();
         UserType userType = joinDto.getUserType();
 
-        Boolean isExist = userRepository.existsByEmail(email);
-
-        if (isExist) {
+        if (userRepository.existsByEmail(email)) {
             log.info(String.format("%s 는 이미 가입된 이메일입니다.", email));
             throw new AlreadyRegisteredEmailException("이미 가입된 이메일입니다.");
-        } else {
-            User user = User.builder().username(username)
-                .password(bCryptPasswordEncoder.encode(password)).email(email).userType(userType)
-                .role("ROLE_USER").build();
-
-            userRepository.save(user);
         }
+
+        Wallet wallet = Wallet
+            .builder().balance(0).build();
+        Cart cart = Cart
+            .builder().build();
+
+        User user = User
+            .builder()
+            .username(username)
+            .password(bCryptPasswordEncoder.encode(password))
+            .email(email)
+            .userType(userType)
+            .role("ROLE_USER")
+            .wallet(wallet)
+            .cart(cart)
+            .build();
+
+        userRepository.save(user);
     }
 }

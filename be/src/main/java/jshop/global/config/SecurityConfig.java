@@ -36,21 +36,14 @@ public class SecurityConfig {
         http.csrf((auth) -> auth.disable());
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login", "/api/join")
-            .permitAll());
+        http.authorizeHttpRequests(
+            auth -> auth.requestMatchers("/api/login", "/api/join").permitAll());
 
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/admin")
-            .hasRole("ADMIN"));
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
 
-        http.authorizeHttpRequests(auth -> auth
-            .anyRequest()
-            .authenticated());
+        http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
 
-        http.logout(auth -> auth
-            .logoutUrl("/api/logout")
-            .logoutSuccessUrl("/"));
+        http.logout(auth -> auth.logoutUrl("/api/logout").logoutSuccessUrl("/"));
 
         http.sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -59,7 +52,7 @@ public class SecurityConfig {
             new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration),
                 jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+        http.addFilterBefore(new JwtFilter(jwtUtil, objectMapper), LoginFilter.class);
 
         return http.build();
     }

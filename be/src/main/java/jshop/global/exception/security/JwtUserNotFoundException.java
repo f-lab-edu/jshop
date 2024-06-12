@@ -1,4 +1,4 @@
-package jshop.global.exception;
+package jshop.global.exception.security;
 
 public class JwtUserNotFoundException extends RuntimeException {
 

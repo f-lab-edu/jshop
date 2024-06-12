@@ -3,8 +3,9 @@ package jshop.global.controller;
 import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
-import jshop.global.exception.AlreadyRegisteredEmailException;
-import jshop.global.exception.JwtUserNotFoundException;
+import jshop.global.exception.user.AlreadyRegisteredEmailException;
+import jshop.global.exception.security.JwtUserNotFoundException;
+import jshop.global.exception.user.UserIdNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -37,18 +38,14 @@ public class GlobalExceptionHandler {
         String errorMsg = null;
 
         if (bindingResult.hasFieldErrors()) {
-            FieldError fieldError = bindingResult
-                .getFieldErrors()
-                .get(0);
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
             errorMsg = fieldError.getDefaultMessage();
         }
 
         Response response = Response
             .builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
-            .message(Optional
-                .ofNullable(errorMsg)
-                .orElse(ex.getMessage()))
+            .message(Optional.ofNullable(errorMsg).orElse(ex.getMessage()))
             .data(null)
             .build();
 
@@ -62,6 +59,16 @@ public class GlobalExceptionHandler {
             .builder()
             .error(ErrorCode.JWT_USER_NOT_FOUND)
             .message("인증정보가 잘못되었습니다.")
+            .build();
+    }
+
+    @ExceptionHandler(UserIdNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Response handleUserIdNotFoundException(UserIdNotFoundException ex) {
+        return Response
+            .builder()
+            .error(ErrorCode.USERID_NOT_FOUND)
+            .message("유저를 찾지 못했습니다.")
             .build();
     }
 }

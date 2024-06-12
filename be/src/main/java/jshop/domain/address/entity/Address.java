@@ -50,4 +50,24 @@ public class Address extends BaseEntity {
 
     @Column(name = "detail_address2")
     private String detailAddress2;
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Address{");
+        sb.append("id=").append(id);
+        sb.append(", user=").append(user.getUsername());
+        sb.append(", receiverName='").append(receiverName).append('\'');
+        sb.append(", receiverNumber='").append(receiverNumber).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", province='").append(province).append('\'');
+        sb.append(", city='").append(city).append('\'');
+        sb.append(", district='").append(district).append('\'');
+        sb.append(", street='").append(street).append('\'');
+        sb.append(", detailAddress1='").append(detailAddress1).append('\'');
+        sb.append(", detailAddress2='").append(detailAddress2).append('\'');
+        sb.append('}');
+
+        return sb.toString();
+    }
 }
