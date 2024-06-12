@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
@@ -31,10 +30,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -46,13 +41,14 @@ class UserControllerTest {
     private UserService userService;
 
     @Captor
-    private ArgumentCaptor<JoinDto> joinDtoCapture;
+    private ArgumentCaptor<JoinDto> joinDtoCaptor;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void beforeEach() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+        mockMvc = MockMvcBuilders
+            .standaloneSetup(userController)
             .setControllerAdvice(GlobalExceptionHandler.class)
             .build();
     }
@@ -73,14 +69,17 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        verify(userService, times(1)).joinUser(joinDtoCapture.capture());
-        JoinDto capturedJoinDto = joinDtoCapture.getValue();
-        perform.andExpect(MockMvcResultMatchers.status().isOk());
+        verify(userService, times(1)).joinUser(joinDtoCaptor.capture());
+        JoinDto capturedJoinDto = joinDtoCaptor.getValue();
+        perform.andExpect(MockMvcResultMatchers
+            .status()
+            .isOk());
         assertThat(capturedJoinDto).isEqualTo(joinDto);
     }
 
@@ -100,12 +99,14 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일 형식에 맞지않습니다."));
@@ -127,7 +128,8 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
@@ -155,12 +157,14 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
@@ -181,12 +185,14 @@ class UserControllerTest {
         requestBody.put("userType", "USER");
 
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
@@ -208,12 +214,14 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
@@ -235,12 +243,14 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
@@ -262,18 +272,18 @@ class UserControllerTest {
 
         JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/join")
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/join")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+        perform
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
                 MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.anyOf(
-                Matchers.is("비밀번호는 공백일 수 없습니다."),
-                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다.")
-            )));
+            .andExpect(jsonPath("$.message", Matchers.anyOf(Matchers.is("비밀번호는 공백일 수 없습니다."),
+                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다."))));
 
     }
 
@@ -286,9 +296,8 @@ class UserControllerTest {
 
         // then
         perform
-            .andExpect((result) ->
-                assertThat(result.getResolvedException()).isInstanceOf(
-                    HttpMessageNotReadableException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
+                HttpMessageNotReadableException.class))
             .andExpect(status().isBadRequest());
     }
 }

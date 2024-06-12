@@ -41,5 +41,6 @@ public class Cart extends BaseEntity {
      * 카트물품들은 카트가 삭제되면 같이 삭제
      */
     @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)
-    private List<CartProductDetail> cartProductDetails = new ArrayList<>();
+    @Builder.Default
+    private final List<CartProductDetail> cartProductDetails = new ArrayList<>();
 }

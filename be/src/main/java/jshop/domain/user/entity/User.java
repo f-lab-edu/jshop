@@ -32,9 +32,11 @@ public class User extends BaseEntity {
     @GeneratedValue
     @Column(name = "user_id")
     private Long id;
-
+    
     private String username;
     private String password;
+
+    @Column(unique = true)
     private String email;
     private String role;
 

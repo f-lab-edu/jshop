@@ -11,6 +11,7 @@ export default function EditProfile() {
   const addresses: IAddress[] = [] 
 
   addresses.push({
+    id: 1,
     receiverName: "김재현",
     receiverNumber: "010-1234-5678",
     province: "경기도",

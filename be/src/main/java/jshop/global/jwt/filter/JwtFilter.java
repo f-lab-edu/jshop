@@ -26,14 +26,15 @@ public class JwtFilter extends OncePerRequestFilter {
             request.getHeader("Authorization"));
 
         // 토큰이 없거나, Bearer로 시작하지 않을때
-        if (!optionalAuthorization.isPresent() || !optionalAuthorization.map(
-                auth -> auth.startsWith("Bearer "))
+        if (!optionalAuthorization.isPresent() || !optionalAuthorization
+            .map(auth -> auth.startsWith("Bearer "))
             .orElse(false)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = optionalAuthorization.map(authorization -> authorization.substring(7))
+        String token = optionalAuthorization
+            .map(authorization -> authorization.substring(7))
             .get();
 
         if (jwtUtil.isExpired(token)) {
@@ -42,14 +43,18 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String email = jwtUtil.getEmail(token);
+        Long id = jwtUtil.getId(token);
 
-        User user = User.builder()
+        User user = User
+            .builder()
+            .id(id)
             .email(email)
             .build();
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
             customUserDetails.getAuthorities());
-        SecurityContextHolder.getContext()
+        SecurityContextHolder
+            .getContext()
             .setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }

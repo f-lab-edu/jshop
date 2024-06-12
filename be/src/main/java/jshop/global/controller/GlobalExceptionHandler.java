@@ -4,6 +4,7 @@ import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.AlreadyRegisteredEmailException;
+import jshop.global.exception.JwtUserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -19,7 +20,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     protected Response handleCustomException(AlreadyRegisteredEmailException ex) {
 
-        Response response = Response.builder()
+        Response response = Response
+            .builder()
             .error(ErrorCode.ALREADY_REGISTERED_EMAIL)
             .message(ex.getMessage())
             .data(null)
@@ -35,16 +37,31 @@ public class GlobalExceptionHandler {
         String errorMsg = null;
 
         if (bindingResult.hasFieldErrors()) {
-            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            FieldError fieldError = bindingResult
+                .getFieldErrors()
+                .get(0);
             errorMsg = fieldError.getDefaultMessage();
         }
 
-        Response response = Response.builder()
+        Response response = Response
+            .builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
-            .message(Optional.ofNullable(errorMsg).orElse(ex.getMessage()))
+            .message(Optional
+                .ofNullable(errorMsg)
+                .orElse(ex.getMessage()))
             .data(null)
             .build();
 
         return response;
+    }
+
+    @ExceptionHandler(JwtUserNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected Response handleJwtNotFoundException(JwtUserNotFoundException ex) {
+        return Response
+            .builder()
+            .error(ErrorCode.JWT_USER_NOT_FOUND)
+            .message("인증정보가 잘못되었습니다.")
+            .build();
     }
 }

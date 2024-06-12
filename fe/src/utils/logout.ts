@@ -1,7 +1,7 @@
 import apiInstance from "../api/instance";
 
 export default function logout() {
-  apiInstance.post("/api/logout", {}, {headers : {"Authorization" : sessionStorage.getItem("token")}})
+  apiInstance.post("/api/logout")
     .then(d => {
       sessionStorage.removeItem("token"); 
       window.location.href = "/";

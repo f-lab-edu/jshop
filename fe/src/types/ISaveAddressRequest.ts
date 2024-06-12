@@ -1,5 +1,4 @@
-export default interface IAddress {
-  id: number;
+export default interface ISaveAddress {
   receiverName: string;
   receiverNumber: string;
   province: string;
