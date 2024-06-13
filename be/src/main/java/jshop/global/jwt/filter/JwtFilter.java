@@ -26,8 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        Optional<String> optionalAuthorization = Optional.ofNullable(
-            request.getHeader("Authorization"));
+        Optional<String> optionalAuthorization = Optional.ofNullable(request.getHeader("Authorization"));
 
         // 토큰이 없을때
         if (!optionalAuthorization.isPresent()) {
@@ -39,10 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (!optionalAuthorization.map(auth -> auth.startsWith("Bearer ")).orElse(false)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             Response responseDto = Response
-                .builder()
-                .message("Authorizaation 헤더가 잘못되었습니다")
-                .error(ErrorCode.BAD_TOKEN)
-                .build();
+                .builder().message("Authorizaation 헤더가 잘못되었습니다").error(ErrorCode.BAD_TOKEN).build();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(responseDto));
@@ -54,23 +50,21 @@ public class JwtFilter extends OncePerRequestFilter {
         if (jwtUtil.isExpired(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             Response responseDto = Response
-                .builder()
-                .message("토큰이 만료되었습니다.")
-                .error(ErrorCode.TOKEN_EXPIRED)
-                .build();
+                .builder().message("토큰이 만료되었습니다.").error(ErrorCode.TOKEN_EXPIRED).build();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(responseDto));
             return;
         }
 
-        String email = jwtUtil.getEmail(token);
-        Long id = jwtUtil.getId(token);
-
-        User user = User.builder().id(id).email(email).build();
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
-            customUserDetails.getAuthorities());
+        CustomUserDetails customUserDetails = CustomUserDetails
+            .builder()
+            .id(jwtUtil.getId(token))
+            .username(jwtUtil.getEmail(token))
+            .role(jwtUtil.getRole(token))
+            .build();
+        
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }
