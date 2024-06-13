@@ -1,8 +1,7 @@
 package jshop.domain.address.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jakarta.validation.constraints.NotBlank;
+import jshop.domain.address.entity.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,17 +15,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class AddressDto {
-
-    private Long id;
+public class CreateAddressRequest {
 
     @NotBlank(message = "받는 사람은 공백일 수 없습니다.")
     private String receiverName;
 
     @NotBlank(message = "받는 사람 전화번호는 공백일 수 없습니다.")
     private String receiverNumber;
-
-    private String message;
 
     @NotBlank(message = "도 / 시 는 공백일 수 없습니다.")
     private String province;
@@ -42,4 +37,20 @@ public class AddressDto {
 
     private String detailAddress1;
     private String detailAddress2;
+    private String message;
+
+    public static CreateAddressRequest ofAddress(Address address) {
+        return CreateAddressRequest
+            .builder()
+            .receiverName(address.getReceiverName())
+            .receiverNumber(address.getReceiverNumber())
+            .province(address.getProvince())
+            .city(address.getCity())
+            .district(address.getDistrict())
+            .street(address.getStreet())
+            .detailAddress1(address.getDetailAddress1())
+            .detailAddress2(address.getDetailAddress2())
+            .message(address.getMessage())
+            .build();
+    }
 }

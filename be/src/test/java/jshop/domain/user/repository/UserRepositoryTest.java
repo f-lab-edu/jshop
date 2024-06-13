@@ -7,14 +7,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
-import jshop.domain.address.dto.AddressDto;
+import jshop.domain.address.dto.AddressInfoResponse;
+import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.wallet.entity.Wallet;
-import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.config.P6SpyConfig;
 import jshop.global.exception.user.UserIdNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -128,10 +128,10 @@ public class UserRepositoryTest {
         User findUser = optionalFindUser.orElseThrow(UserIdNotFoundException::new);
 
         System.out.println("address 조회 before");
-        List<AddressDto> findAddresses = addressRepository
+        List<AddressInfoResponse> findAddresses = addressRepository
             .findByUser(findUser)
             .stream()
-            .map(Address::getAddressDto)
+            .map(AddressInfoResponse::ofAddress)
             .toList();
         System.out.println("address 조회 after");
 

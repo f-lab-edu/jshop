@@ -1,72 +1,90 @@
 package jshop.domain.address.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
-import jshop.domain.address.dto.AddressDto;
+import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.service.AddressService;
+import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.entity.User;
-import jshop.global.controller.GlobalExceptionHandler;
+import jshop.domain.utils.TestSecurityConfig;
+import jshop.global.jwt.dto.CustomUserDetails;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(AddressController.class)
+@Import(TestSecurityConfig.class)
 public class AddressControllerTest {
 
-    @InjectMocks
-    private AddressController addressController;
-
-    @Mock
+    @MockBean
     private AddressService addressService;
 
-    @Captor
-    private ArgumentCaptor<AddressDto> saveAddressDtoCaptor;
+    @MockBean
+    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 
-    @Captor
-    private ArgumentCaptor<Optional<User>> optionalUserCaptor;
-
+    @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void beforeEach() {
-        mockMvc = MockMvcBuilders
-            .standaloneSetup(addressController)
-            .setControllerAdvice(GlobalExceptionHandler.class)
-            .build();
+    @Captor
+    private ArgumentCaptor<CreateAddressRequest> createAddressRequestCaptor;
+
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
+
+    @Test
+    public void 정상주소추가() throws Exception {
+        // given
+        User u = getUser();
+        CustomUserDetails customUserDetails = new CustomUserDetails(u);
+
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authToken);
+
+        JSONObject requestBody = getCreateAddressRequestJsonObject();
+
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .post("/api/address")
+            .with(securityContext(context))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        verify(addressService, times(1)).saveAddress(createAddressRequestCaptor.capture(), userCaptor.capture());
+        CreateAddressRequest createAddressRequest = createAddressRequestCaptor.getValue();
+        User user = userCaptor.getValue();
+
+        perform.andExpect(status().isCreated());
+        assertThat(user).isEqualTo(u);
+        assertThat(createAddressRequest.getCity()).isEqualTo("광주시");
     }
 
     @Test
-    @WithMockUser
-    public void 정상주소추가() throws Exception {
+    public void 유저정보없이_주소추가_인증안된유저() throws Exception {
         // given
-        String city = "광주시";
-        String receiverName = "김재현";
-
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("receiverName", receiverName);
-        requestBody.put("receiverNumber", "010-1234-1234");
-        requestBody.put("province", "경기도");
-        requestBody.put("city", city);
-        requestBody.put("district", "송정동");
-        requestBody.put("street", "경안천로");
-        requestBody.put("detailAddress1", "상세주소1");
+        JSONObject requestBody = getCreateAddressRequestJsonObject();
 
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
@@ -75,12 +93,30 @@ public class AddressControllerTest {
             .content(requestBody.toString()));
 
         // then
-        verify(addressService, times(1)).saveAddress(saveAddressDtoCaptor.capture(), optionalUserCaptor.capture());
+        perform.andExpect(status().isUnauthorized());
 
-        perform.andExpect(status().isCreated());
+    }
 
-        AddressDto addressDto = saveAddressDtoCaptor.getValue();
-        assertThat(addressDto.getCity()).isEqualTo(city);
-        assertThat(addressDto.getReceiverName()).isEqualTo(receiverName);
+    private JSONObject getCreateAddressRequestJsonObject() throws JSONException {
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("receiverName", "김재현");
+        requestBody.put("receiverNumber", "010-1234-1234");
+        requestBody.put("province", "경기도");
+        requestBody.put("city", "광주시");
+        requestBody.put("district", "송정동");
+        requestBody.put("street", "경안천로");
+        requestBody.put("detailAddress1", "상세주소1");
+        return requestBody;
+    }
+
+    private User getUser() {
+        User u = User
+            .builder()
+            .username("user")
+            .email("email@email.com")
+            .password("password")
+            .role("ROLE_USER")
+            .build();
+        return u;
     }
 }
