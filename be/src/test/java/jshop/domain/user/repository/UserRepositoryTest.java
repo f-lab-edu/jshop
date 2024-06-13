@@ -84,7 +84,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void findById_FetchJoin() {
+    public void 패치조인확인() {
         /**
          * findById의 패치조인 확인.
          */

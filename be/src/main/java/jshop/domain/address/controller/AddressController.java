@@ -6,6 +6,7 @@ import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.service.AddressService;
 import jshop.domain.user.entity.User;
+import jshop.global.annotation.CurrentUserId;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import jshop.global.jwt.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,7 @@ public class AddressController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = Optional
-            .ofNullable(userDetails)
-            .orElseThrow(JwtUserNotFoundException::new)
-            .getId();
-
+        @CurrentUserId Long userId) {
         addressService.saveAddress(createAddressRequest, userId);
     }
 }

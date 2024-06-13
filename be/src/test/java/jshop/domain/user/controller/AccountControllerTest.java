@@ -5,11 +5,13 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import jshop.domain.address.controller.AddressController;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
-import jshop.domain.utils.DtoBuilder;
+import jshop.utils.DtoBuilder;
 import jshop.global.controller.GlobalExceptionHandler;
+import jshop.utils.TestSecurityConfig;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,11 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,27 +38,21 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(AccountController.class)
+@Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
 class AccountControllerTest {
 
-    @InjectMocks
-    private AccountController accountController;
+    @MockBean
+    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 
-    @Mock
+    @MockBean
     private UserService userService;
 
     @Captor
     private ArgumentCaptor<JoinDto> joinDtoCaptor;
 
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    public void beforeEach() {
-        mockMvc = MockMvcBuilders
-            .standaloneSetup(accountController)
-            .setControllerAdvice(GlobalExceptionHandler.class)
-            .build();
-    }
 
     @Test
     public void 정상회원가입() throws Exception {
@@ -77,9 +78,7 @@ class AccountControllerTest {
         // then
         verify(userService, times(1)).joinUser(joinDtoCaptor.capture());
         JoinDto capturedJoinDto = joinDtoCaptor.getValue();
-        perform.andExpect(MockMvcResultMatchers
-            .status()
-            .isOk());
+        perform.andExpect(MockMvcResultMatchers.status().isOk());
         assertThat(capturedJoinDto).isEqualTo(joinDto);
     }
 
@@ -106,8 +105,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일 형식에 맞지않습니다."));
     }
@@ -135,8 +133,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("이메일은 공백일 수 없습니다."));
     }
@@ -164,8 +161,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
     }
@@ -192,8 +188,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("사용자 이름은 2 ~ 10 자리 이내여야 합니다."));
     }
@@ -221,8 +216,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
     }
@@ -250,8 +244,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("비밀번호는 8 ~16 자리 이내여야 합니다."));
     }
@@ -279,11 +272,9 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                MethodArgumentNotValidException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", Matchers.anyOf(Matchers.is("비밀번호는 공백일 수 없습니다."),
-                Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다."))));
+            .andExpect(jsonPath("$.message", Matchers.anyOf(Matchers.is("비밀번호는 공백일 수 없습니다."), Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다."))));
 
     }
 
@@ -296,8 +287,7 @@ class AccountControllerTest {
 
         // then
         perform
-            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(
-                HttpMessageNotReadableException.class))
+            .andExpect((result) -> assertThat(result.getResolvedException()).isInstanceOf(HttpMessageNotReadableException.class))
             .andExpect(status().isBadRequest());
     }
 }

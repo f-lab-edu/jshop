@@ -1,4 +1,4 @@
-package jshop.domain.utils;
+package jshop.utils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

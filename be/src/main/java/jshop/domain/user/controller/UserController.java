@@ -6,6 +6,7 @@ import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.service.UserService;
+import jshop.global.annotation.CurrentUserId;
 import jshop.global.dto.Response;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import jshop.global.jwt.dto.CustomUserDetails;
@@ -25,12 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Response<UserInfoResponse> join(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = Optional
-            .ofNullable(userDetails)
-            .orElseThrow(JwtUserNotFoundException::new)
-            .getId();
+    public Response<UserInfoResponse> join(@CurrentUserId Long userId) {
         UserInfoResponse userInfoResponse = userService.getUser(userId);
 
         return Response
