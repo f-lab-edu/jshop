@@ -6,9 +6,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { UPDATE_USERINFO } from "../redux/Action";
 import State from "../types/State";
 import { isEqual } from "lodash";
+import { useEffect } from "react";
+import apiInstance from "../api/instance";
+import IResponse from "../types/IResponse";
+import IUserInfo from "../types/IUserInfo";
 
 export default function MyPage() {
   const userType = useSelector((state: State) => state.userInfo.userType, isEqual);
+  const updateUserInfo = useSelector((state: State) => state.updateUserInfo, isEqual);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    getUserInfo();
+  }, [updateUserInfo]);
+  function getUserInfo() {
+    apiInstance.get<IResponse<IUserInfo>>("/api/users")
+      .then(d => {
+        dispatch({
+          type: UPDATE_USERINFO,
+          userInfo: d.data.data
+        })
+      })
+      .catch(e => {
+        console.error(e);
+      })
+  }
 
   if (!isAuthenticated()) {
     return <Navigate to="/login" />

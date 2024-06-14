@@ -2,23 +2,17 @@ import * as React from 'react';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useDemoData } from '@mui/x-data-grid-generator';
-import { useState } from 'react';
-import AddProductDialog from '../components/AddProductDialog';
+import { useState, useEffect } from 'react';
 
-export const fetchData = async (pageSize: number, page: number) => {
-    try {
-        return {
-            data: [],
-            total: 10
-        };
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
-    }
-};
+import AddProductDialog from '../components/AddProductDialog';
+import apiInstance from '../api/instance';
+import OwnProductsResponse from '../types/OwnProductsResponse';
+import IResponse from '../types/IResponse';
 
 export default function Product() {
+    const [totalPage, setTotalPage] = useState(0);
     const [addProductDialog, setAddProductDialog] = useState(false);
+    
     function openAddProduct() {
         setAddProductDialog(true);
     }
@@ -29,9 +23,22 @@ export default function Product() {
 
     const columns: GridColDef[] = [
         {
-            "field": "id",            
+            "field": "id",      
+            "headerName": "ID",      
             "hideable": true
         },
+        {
+            "field" : "name",
+            "headerName" : "이름"
+        },
+        {
+            field: "manufacturer",
+            headerName: "제조사"
+        },
+        {
+            field: "description",
+            headerName: "설명"
+        },        
         {
             field: "test",
             headerName: "test",
@@ -42,43 +49,47 @@ export default function Product() {
         }
     ]
 
-    const { data } = useDemoData({
-        dataSet: 'Employee',
-        rowLength: 100,
-        maxColumns: 6,
-    });
-
-    const [paginationModel, setPaginationModel] = React.useState({
+    const [paginationModel, setPaginationModel] = useState({
         page: 0,
-        pageSize: 5,
+        pageSize: 10,
     });
 
     const [rows, setRows] = React.useState<GridRowsProp>([]);
     const [loading, setLoading] = React.useState(false);
 
-    React.useEffect(() => {
-        let active = true;
+    useEffect(() => {
+        // let active = true;
+        setLoading(true);
 
-        (async () => {
-            setLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            if (!active) {
-                return;
-            }
-
-            setRows([
-                {
-                    id: "1",
-                    test: "test"
+        apiInstance.get<IResponse<OwnProductsResponse>>(`/api/products?page=${paginationModel.page}`)
+        .then(d => {                        
+            setTotalPage(d.data.data.totalCount);                        
+            setRows(d.data.data.products.map(product => {
+                return {
+                    id: product.id,
+                    name: product.name,
+                    manufacturer: product.manufacturer,
+                    description: product.description,
+                    attributes: product.attributes
                 }
-            ]);
+            }))
             setLoading(false);
-        })();
+        });
 
-        return () => {
-            active = false;
-        };
-    }, [paginationModel.page, data]);
+        
+        // (async () => {
+            
+        //     await new Promise((resolve) => setTimeout(resolve, 300));
+        //     if (!active) {
+        //         return;
+        //     }
+            
+        // })();
+
+        // return () => {
+        //     active = false;
+        // };
+    }, [paginationModel.page]);
 
     return (
         <Box overflow={"scroll"}>
@@ -86,7 +97,7 @@ export default function Product() {
                 <Typography variant="h4" width={"100%"} marginBottom={3}>프로필</Typography>
 
                 <Typography variant="h5" width={"100%"} marginBottom={3}>상품목록</Typography>
-                <Button variant='contained' onClick={() => setAddProductDialog(true)}>상품 추가</Button>
+                <Button variant='contained' onClick={openAddProduct}>상품 추가</Button>
                 <AddProductDialog open={addProductDialog} close={closeAddProduct}/>
                 <DataGrid
                     disableRowSelectionOnClick                    
@@ -94,8 +105,8 @@ export default function Product() {
                     rows={rows}
 
                     pagination
-                    pageSizeOptions={[5]}
-                    rowCount={100}
+                    pageSizeOptions={[10]}
+                    rowCount={totalPage}
                     loading={loading}
                     paginationMode="server"
 
@@ -104,22 +115,7 @@ export default function Product() {
                 />
 
                 <Typography variant="h5" width={"100%"} marginBottom={3}>상세 상품목록</Typography>
-                <Button variant='contained'>상세 상품 추가</Button>
-                <DataGrid
-                    disableRowSelectionOnClick                    
-                    columns={columns}
-                    rows={rows}
-
-                    pagination
-                    pageSizeOptions={[5]}
-                    rowCount={100}
-                    loading={loading}
-                    paginationMode="server"
-
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={setPaginationModel}
-                />
-
+                <Button variant='contained'>상세 상품 추가</Button>            
             </Stack>
         </Box>
     );

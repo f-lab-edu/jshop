@@ -1,6 +1,9 @@
+import ICategory from "./ICategory";
+
 export default interface IProduct {
-  productName: string;
-  category: string;
+  name: string;
+  categoryId: number;
   manufacturer: string;
   description: string;
+  attributes: {[key: string]: string[]}
 }

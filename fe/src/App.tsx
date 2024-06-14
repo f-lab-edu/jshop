@@ -23,29 +23,6 @@ import Product from "./pages/Product";
 
 function App() {
 
-  const updateUserInfo = useSelector((state: State) => state.updateUserInfo, isEqual);
-
-  const dispatch = useDispatch();
-  
-  useEffect(() => {
-    getUserInfo();
-  }, [updateUserInfo]);
-  function getUserInfo() {
-    /**
-     * TODO address가 추가되면, 유저 페이지에서 업데이트하는 기능
-     */
-    apiInstance.get<IResponse<IUserInfo>>("/api/users")
-      .then(d => {
-        dispatch({
-          type: UPDATE_USERINFO,
-          userInfo: d.data.data
-        })
-      })
-      .catch(e => {
-        console.error(e);
-      })
-  }
-
   return (
     <Box>
       <CssBaseline />
