@@ -48,8 +48,8 @@ export default function MyPage() {
 
             {sidebar.map((item) => {
               return (
-                <Link to={item.path}>
-                  <ListItem key={Math.random()} disablePadding >
+                <Link to={item.path} key={Math.random()}>
+                  <ListItem disablePadding >
                     <ListItemButton>
                       <ListItemIcon>
                         <item.icon />
@@ -63,7 +63,7 @@ export default function MyPage() {
           </List>
 
         </Grid>
-        <Grid item paddingTop={2} marginLeft={3} sx={{ flexGrow: 1 }}>
+        <Grid item width={750} paddingTop={2} marginLeft={2} >
           <Outlet />
         </Grid>
       </Grid>

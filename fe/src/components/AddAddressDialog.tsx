@@ -5,14 +5,17 @@ import IAddress from "../types/IAddress";
 import { useState } from "react";
 import apiInstance from "../api/instance";
 import ISaveAddress from "../types/ISaveAddressRequest";
+import { useDispatch } from "react-redux";
+import { UPDATE_USERINFO_TRIGGER } from "../redux/Action";
 
 export interface SimpleDialogProps {
   open: boolean;
-  closeAddAddress: () => void;
+  close: () => void;
 }
 
 export default function AddAddressDialog(props: SimpleDialogProps) {
-  const { open, closeAddAddress } = props;
+  const dispatch = useDispatch();
+  const { open, close } = props;
   const [receiverName, setReceiverName] = useState("");
   const [receiverNumber, setReceiverNumber] = useState("");
   const [province, setProvince] = useState("");
@@ -37,10 +40,12 @@ export default function AddAddressDialog(props: SimpleDialogProps) {
     }
 
     apiInstance.post("/api/address", newAddress)
-      .then(d => {
-        console.log(d);
+      .then(d => {        
         clear();
-        closeAddAddress();
+        close();
+        dispatch({
+          type: UPDATE_USERINFO_TRIGGER
+        })
       })
       .catch(e => console.error(e))
 
@@ -80,7 +85,7 @@ export default function AddAddressDialog(props: SimpleDialogProps) {
           <Stack direction={"row"} >
             <Button onClick={() => {
               clear();
-              closeAddAddress()
+              close()
             }}>취소</Button>
             <Button variant="contained" onClick={() => submitNewAddress()}>추가</Button>
           </Stack>
