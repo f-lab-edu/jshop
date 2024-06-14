@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
+import jshop.domain.user.repository.UserRepository;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,9 @@ public class AddressServiceTest {
     @Mock
     private AddressRepository addressRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @Captor
     private ArgumentCaptor<Address> addressCaptor;
 
@@ -36,7 +41,7 @@ public class AddressServiceTest {
         // given
         String city = "광주시";
         User user = User
-            .builder().username("kim").email("test").build();
+            .builder().id(1L).username("kim").email("test").build();
 
         CreateAddressRequest createAddressRequest = CreateAddressRequest
             .builder()
@@ -50,8 +55,9 @@ public class AddressServiceTest {
             .message("문앞에 놔주세요")
             .build();
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         // when
-        addressService.saveAddress(createAddressRequest, user);
+        addressService.saveAddress(createAddressRequest, 1L);
 
         // then
         verify(addressRepository, times(1)).save(addressCaptor.capture());

@@ -32,12 +32,12 @@ public class AddressController {
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = Optional
+            .ofNullable(userDetails)
+            .orElseThrow(JwtUserNotFoundException::new)
+            .getId();
 
-        User user = Optional
-            .ofNullable(userDetails.getUser())
-            .orElseThrow(JwtUserNotFoundException::new);
-
-        addressService.saveAddress(createAddressRequest, user);
+        addressService.saveAddress(createAddressRequest, userId);
     }
 }
 

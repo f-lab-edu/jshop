@@ -58,6 +58,7 @@ public class LoginTest {
         BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
         User u = User
             .builder()
+            .id(1L)
             .username("user")
             .email("user")
             .password(bpe.encode("password"))
@@ -65,7 +66,7 @@ public class LoginTest {
             .build();
 
         System.out.println(userDetailsService);
-        UserDetails userDetails = new CustomUserDetails(u);
+        UserDetails userDetails = CustomUserDetails.ofUser(u);
         when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
         when(userDetailsService.loadUserByUsername(not(ArgumentMatchers.eq("user")))).thenThrow(UsernameNotFoundException.class);
 
@@ -110,13 +111,14 @@ public class LoginTest {
         BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
         User u = User
             .builder()
+            .id(1L)
             .username("user")
             .email("user")
             .password(bpe.encode("password"))
             .role("ROLE_USER")
             .build();
 
-        UserDetails userDetails = new CustomUserDetails(u);
+        UserDetails userDetails = CustomUserDetails.ofUser(u);
         when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
 
         JSONObject requestBody = new JSONObject();

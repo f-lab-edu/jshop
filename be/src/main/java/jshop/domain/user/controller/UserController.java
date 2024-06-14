@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +27,11 @@ public class UserController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Response<UserInfoResponse> join(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = Optional
-            .ofNullable(userDetails.getUser())
-            .orElseThrow(JwtUserNotFoundException::new);
-        UserInfoResponse userInfoResponse = userService.getUser(user.getId());
+        Long userId = Optional
+            .ofNullable(userDetails)
+            .orElseThrow(JwtUserNotFoundException::new)
+            .getId();
+        UserInfoResponse userInfoResponse = userService.getUser(userId);
 
         return Response
             .<UserInfoResponse>builder().message("유저 정보입니다.").data(userInfoResponse).build();

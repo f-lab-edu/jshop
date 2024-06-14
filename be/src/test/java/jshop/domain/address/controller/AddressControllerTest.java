@@ -50,13 +50,13 @@ public class AddressControllerTest {
     private ArgumentCaptor<CreateAddressRequest> createAddressRequestCaptor;
 
     @Captor
-    private ArgumentCaptor<User> userCaptor;
+    private ArgumentCaptor<Long> userIdCaptor;
 
     @Test
     public void 정상주소추가() throws Exception {
         // given
         User u = getUser();
-        CustomUserDetails customUserDetails = new CustomUserDetails(u);
+        CustomUserDetails customUserDetails = CustomUserDetails.ofUser(u);
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -72,12 +72,13 @@ public class AddressControllerTest {
             .content(requestBody.toString()));
 
         // then
-        verify(addressService, times(1)).saveAddress(createAddressRequestCaptor.capture(), userCaptor.capture());
+        verify(addressService, times(1)).saveAddress(createAddressRequestCaptor.capture(), userIdCaptor.capture());
+
         CreateAddressRequest createAddressRequest = createAddressRequestCaptor.getValue();
-        User user = userCaptor.getValue();
+        Long userId = userIdCaptor.getValue();
 
         perform.andExpect(status().isCreated());
-        assertThat(user).isEqualTo(u);
+        assertThat(userId).isEqualTo(1L);
         assertThat(createAddressRequest.getCity()).isEqualTo("광주시");
     }
 
@@ -112,6 +113,7 @@ public class AddressControllerTest {
     private User getUser() {
         User u = User
             .builder()
+            .id(1L)
             .username("user")
             .email("email@email.com")
             .password("password")
