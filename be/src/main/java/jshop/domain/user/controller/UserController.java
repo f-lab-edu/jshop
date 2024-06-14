@@ -31,6 +31,6 @@ public class UserController {
         UserInfoResponse userInfoResponse = userService.getUser(userId);
 
         return Response
-            .<UserInfoResponse>builder().message("유저 정보입니다.").data(userInfoResponse).build();
+            .<UserInfoResponse>builder().data(userInfoResponse).build();
     }
 }
