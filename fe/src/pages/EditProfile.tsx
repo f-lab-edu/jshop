@@ -1,4 +1,4 @@
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import UsernameInput from "../components/UsernameInput";
 import { useEffect, useState } from "react";
 import Addresses from "../components/Addresses";
@@ -9,26 +9,42 @@ import IUserInfo from "../types/IUserInfo";
 import IResponse from "../types/IResponse";
 
 export default function EditProfile() {
-  const [username, setUsername] = useState("test");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [selectedAddress, setSelectedAddress] = useState<IAddress>();
   const [addresses, setAddresses] = useState<IAddress[]>([]);
-  
 
-  function updateUserInfo() {
+  useEffect(() => {
+    getUserInfo();
+  }, [])
+
+  function getUserInfo() {
     /**
      * TODO address가 추가되면, 유저 페이지에서 업데이트하는 기능
      */
     apiInstance.get<IResponse<IUserInfo>>("/api/users")
       .then(d => {
-        debugger;
-        console.log(d.data);
         setUsername(d.data.data.username);
+        setEmail(d.data.data.email);
         setAddresses(d.data.data.addresses);
-      });
+      })
+      .catch(e => {
+        console.error(e);
+      })
   }
-  useEffect(() => {
-    updateUserInfo();
-  }, [])
+
+  function updateUserInfo() {
+    const result = window.confirm("변경하시겠습니까?");
+    if (result) {
+      apiInstance.patch("/api/users", { username })
+        .then(d => {
+          getUserInfo();
+        })
+        .catch(e => {
+          console.error(e);
+        })
+    }
+  }
 
   return (
     <Box>
@@ -41,12 +57,16 @@ export default function EditProfile() {
 
         <Box>
           <Typography variant="h5" gutterBottom>이메일</Typography>
-          <TextField label="username" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="email" margin="normal" size="small" fullWidth />
+          <TextField disabled label="username" type="text" value={email} onChange={e => setEmail(e.target.value)} placeholder="email" margin="normal" size="small" fullWidth />
         </Box>
 
-        {selectedAddress && <AddressCard address={selectedAddress} />}        
+        {selectedAddress && <AddressCard address={selectedAddress} />}
         <Box>
           <Addresses addresses={addresses} />
+        </Box>
+
+        <Box>
+          <Button onClick={updateUserInfo} variant="contained">변경</Button>
         </Box>
 
       </Stack>
