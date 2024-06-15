@@ -45,7 +45,7 @@ public class WalletHistory extends BaseEntity {
     @Column(name = "wallet_change_type")
     private WalletChangeType changeType;
 
-    private long change_balance;
-    private long old_balance;
-    private long new_balance;
+    private Long change_balance;
+    private Long old_balance;
+    private Long new_balance;
 }

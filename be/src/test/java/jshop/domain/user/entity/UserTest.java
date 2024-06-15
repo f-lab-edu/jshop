@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class UserTest {
 
     @Test
-    public void updateUserInfo() {
+    public void 유저이름변경() {
         // given
         User user = User
             .builder().username("kim").build();
@@ -20,6 +20,21 @@ class UserTest {
 
         // then
         assertThat(user.getUsername()).isEqualTo("new_username");
+    }
+
+    @Test
+    public void 유저이름변경_null() {
+        // given
+        User user = User
+            .builder().username("user").build();
+        UpdateUserRequest updateUserRequest = UpdateUserRequest
+            .builder().username(null).build();
+
+        // when
+        user.updateUserInfo(updateUserRequest);
+
+        // then
+        assertThat(user.getUsername()).isEqualTo("user");
     }
 
 }

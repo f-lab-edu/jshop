@@ -20,6 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 @Getter
@@ -27,6 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
+@Slf4j
 public class User extends BaseEntity {
 
     @Id
@@ -63,7 +67,12 @@ public class User extends BaseEntity {
     private Wallet wallet;
 
     public void updateUserInfo(UpdateUserRequest updateUserRequest) {
-        this.username = updateUserRequest.getUsername();
+        if (updateUserRequest.getUsername() != null) {
+            this.username = updateUserRequest.getUsername();
+        } else {
+            log.warn("Username은 null 이 될 수 없습니다.");
+        }
+
     }
 
     @Override

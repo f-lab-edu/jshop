@@ -90,7 +90,7 @@ public class UserRepositoryTest {
          */
         // given
         Wallet wallet = Wallet
-            .builder().balance(0).build();
+            .builder().balance(0L).build();
 
         User user = User
             .builder()

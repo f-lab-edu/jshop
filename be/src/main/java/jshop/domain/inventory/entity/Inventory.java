@@ -37,6 +37,6 @@ public class Inventory extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "inventory")
     private ProductDetail productDetail;
 
-    private int quantity;
-    private int min_quantity;
+    private Integer quantity;
+    private Integer min_quantity;
 }

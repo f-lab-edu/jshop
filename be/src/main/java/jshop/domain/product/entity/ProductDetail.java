@@ -57,6 +57,6 @@ public class ProductDetail extends BaseEntity {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
-    private long price;
+    private Long price;
 
 }

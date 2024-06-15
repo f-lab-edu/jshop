@@ -10,7 +10,9 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.global.common.ErrorCode;
 import jshop.global.exception.category.CategoryIdNotFoundException;
+import jshop.global.exception.common.EntityNotFoundException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,19 +31,24 @@ public class ProductService {
 
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(UserIdNotFoundException::new);
+        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
 
         Optional<Category> optionalCategory = categoryRepository.findById(createProductRequest.getCategoryId());
-        Category category = optionalCategory.orElseThrow(CategoryIdNotFoundException::new);
+        Category category = optionalCategory.orElseThrow(() -> new EntityNotFoundException(
+            "ID로 " + "Cateogry를 찾지 못했습니다. : "
+                + createProductRequest.getCategoryId(), ErrorCode.CATEGORYID_NOT_FOUND));
 
         Product newProduct = Product.ofCreateProductRequest(createProductRequest, category, user);
 
         productRepository.save(newProduct);
     }
 
+    @Transactional(readOnly = true)
     public OwnProductsResponse getOwnProducts(Long userId, int pageNumber) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(UserIdNotFoundException::new);
+        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
 
         PageRequest pageRequest = PageRequest.of(pageNumber, 10);
         Page<Product> page = productRepository.findByOwner(user, pageRequest);

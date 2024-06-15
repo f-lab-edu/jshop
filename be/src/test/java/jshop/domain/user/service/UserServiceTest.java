@@ -18,6 +18,7 @@ import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.global.exception.common.EntityNotFoundException;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import jshop.utils.DtoBuilder;
@@ -116,7 +117,7 @@ class UserServiceTest {
 
     @Test
     public void 회원정보가져오기_없는ID() {
-        assertThrows(UserIdNotFoundException.class, () -> userService.getUser(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUser(1L));
     }
 
     @Test
@@ -141,7 +142,7 @@ class UserServiceTest {
         // when
 
         // then
-        assertThrows(UserIdNotFoundException.class, () -> userService.updateUser(1L, UpdateUserRequest
+        assertThrows(EntityNotFoundException.class, () -> userService.updateUser(1L, UpdateUserRequest
             .builder().build()));
     }
 
@@ -155,7 +156,7 @@ class UserServiceTest {
             .email("email@email.com")
             .role("ROLE_USER")
             .wallet(Wallet
-                .builder().balance(0).build())
+                .builder().balance(0L).build())
             .build();
     }
 

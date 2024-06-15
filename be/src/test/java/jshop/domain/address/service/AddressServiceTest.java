@@ -12,6 +12,7 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.global.exception.common.EntityNotFoundException;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ public class AddressServiceTest {
         // when
 
         // then
-        assertThrows(UserIdNotFoundException.class, () -> addressService.saveAddress(createAddressRequest, 1L));
+        assertThrows(EntityNotFoundException.class, () -> addressService.saveAddress(createAddressRequest, 1L));
     }
 
     private CreateAddressRequest getCreateAddressRequest() {

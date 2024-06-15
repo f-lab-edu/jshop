@@ -12,6 +12,8 @@ import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.common.EntityNotFoundException;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +33,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
 
-    public UserInfoResponse getUser(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.orElseThrow(() -> {
-            String errMsg = new StringBuilder().append(id).append(" 유저 아이디를 찾지못했습니다.").toString();
-            log.error(errMsg);
-            throw new UserIdNotFoundException(errMsg);
-        });
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUser(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
 
         List<AddressInfoResponse> addresses = addressRepository
             .findByUser(user)
@@ -60,7 +60,7 @@ public class UserService {
         }
 
         Wallet wallet = Wallet
-            .builder().balance(0).build();
+            .builder().balance(0L).build();
         Cart cart = Cart
             .builder().build();
 
@@ -80,7 +80,8 @@ public class UserService {
 
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(UserIdNotFoundException::new);
+        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
         user.updateUserInfo(updateUserRequest);
     }
 }

@@ -30,5 +30,5 @@ public class Wallet extends BaseEntity {
     @Column(name = "wallet_id")
     private Long id;
 
-    private long balance;
+    private Long balance;
 }

@@ -17,6 +17,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream().map(CategoryResponse::ofCategory).toList();
     }
@@ -25,7 +26,7 @@ public class CategoryService {
         if (categoryRepository.existsByName(createCategoryRequest.getName())) {
             throw new AlreadyExistsNameCategory();
         }
-        
+
         Category category = Category
             .builder().name(createCategoryRequest.getName()).build();
 

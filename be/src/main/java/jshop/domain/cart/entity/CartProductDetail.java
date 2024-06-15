@@ -35,4 +35,6 @@ public class CartProductDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_detail_id")
     private ProductDetail productDetail;
+
+    private Integer quantity;
 }

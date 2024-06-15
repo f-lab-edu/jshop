@@ -41,7 +41,7 @@ public class InventoryHistory extends BaseEntity {
     @Column(name = "inventory_change_type")
     private InventoryChangeType changeType;
 
-    private int old_quantity;
-    private int new_quantity;
-    private int change_quantity;
+    private Integer old_quantity;
+    private Integer new_quantity;
+    private Integer change_quantity;
 }
