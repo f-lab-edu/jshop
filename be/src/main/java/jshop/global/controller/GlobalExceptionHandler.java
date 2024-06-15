@@ -5,6 +5,7 @@ import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.AlreadyRegisteredEmailException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler {
         return response;
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleBindException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
@@ -42,6 +43,18 @@ public class GlobalExceptionHandler {
         Response response = Response.builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
             .message(Optional.ofNullable(errorMsg).orElse(ex.getMessage()))
+            .data(null)
+            .build();
+        return response;
+    }
+
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Response noArgsException(HttpMessageNotReadableException ex) {
+
+        Response response = Response.builder()
+            .error(ErrorCode.INVALID_REQUEST_BODY)
+            .message(ex.getMessage())
             .data(null)
             .build();
 

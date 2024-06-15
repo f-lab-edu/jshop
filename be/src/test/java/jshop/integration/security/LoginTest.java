@@ -192,8 +192,6 @@ public class LoginTest {
             .content(requestBody.toString()));
 
         String token = tokenPerform.andReturn().getResponse().getHeader("Authorization");
-
-        System.out.println(token);
         // when
         ResultActions perform = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/test").header("Authorization", token));
