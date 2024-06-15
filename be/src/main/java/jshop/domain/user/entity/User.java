@@ -11,7 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
+import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.cart.entity.Cart;
+import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.entity.BaseEntity;
@@ -61,4 +64,10 @@ public class User extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
+
+    @Override
+    public String toString() {
+        return "User{" + "username='" + username + '\'' + ", email='" + email + '\'' + ", role='"
+            + role + '\'' + ", userType=" + userType + '}';
+    }
 }

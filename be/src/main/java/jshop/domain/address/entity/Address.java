@@ -8,7 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jshop.domain.address.dto.AddressDto;
+import jshop.domain.address.dto.AddressInfoResponse;
+import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -40,31 +41,34 @@ public class Address extends BaseEntity {
     private String receiverName;
     @Column(name = "receiver_number")
     private String receiverNumber;
-    private String message;
     private String province;
     private String city;
     private String district;
     private String street;
 
-    @Column(name = "detail_address1")
+    @Column(name = "detail_address1", nullable = true)
     private String detailAddress1;
 
-    @Column(name = "detail_address2")
+    @Column(name = "detail_address2", nullable = true)
     private String detailAddress2;
 
-    public AddressDto getAddressDto() {
-        return AddressDto
+    @Column(nullable = true)
+    private String message;
+
+    public static Address ofCreateAddressRequest(CreateAddressRequest createAddressRequest,
+        User user) {
+        return Address
             .builder()
-            .id(id)
-            .receiverName(receiverName)
-            .receiverNumber(receiverNumber)
-            .message(message)
-            .province(province)
-            .city(city)
-            .district(district)
-            .street(street)
-            .detailAddress1(detailAddress1)
-            .detailAddress2(detailAddress2)
+            .receiverName(createAddressRequest.getReceiverName())
+            .receiverNumber(createAddressRequest.getReceiverNumber())
+            .province(createAddressRequest.getProvince())
+            .city(createAddressRequest.getCity())
+            .district(createAddressRequest.getDistrict())
+            .street(createAddressRequest.getStreet())
+            .detailAddress1(createAddressRequest.getDetailAddress1())
+            .detailAddress2(createAddressRequest.getDetailAddress2())
+            .message(createAddressRequest.getMessage())
+            .user(user)
             .build();
     }
 
@@ -73,7 +77,6 @@ public class Address extends BaseEntity {
         StringBuffer sb = new StringBuffer();
         sb.append("Address{");
         sb.append("id=").append(id);
-        sb.append(", user=").append(user.getUsername());
         sb.append(", receiverName='").append(receiverName).append('\'');
         sb.append(", receiverNumber='").append(receiverNumber).append('\'');
         sb.append(", message='").append(message).append('\'');

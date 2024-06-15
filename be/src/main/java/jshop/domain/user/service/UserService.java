@@ -2,18 +2,17 @@ package jshop.domain.user.service;
 
 import java.util.List;
 import java.util.Optional;
-import jshop.domain.address.dto.AddressDto;
+import jshop.domain.address.dto.AddressInfoResponse;
+import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.cart.entity.Cart;
-import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.user.dto.JoinDto;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
-import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -41,20 +40,13 @@ public class UserService {
             throw new UserIdNotFoundException(errMsg);
         });
 
-        List<AddressDto> addresses = addressRepository
+        List<AddressInfoResponse> addresses = addressRepository
             .findByUser(user)
             .stream()
-            .map(Address::getAddressDto)
+            .map(AddressInfoResponse::ofAddress)
             .toList();
 
-        return UserInfoResponse
-            .builder()
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .balance(user.getWallet().getBalance())
-            .userType(user.getUserType())
-            .addresses(addresses)
-            .build();
+        return UserInfoResponse.ofUser(user, addresses);
     }
 
     public void joinUser(JoinDto joinDto) {

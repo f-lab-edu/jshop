@@ -23,13 +23,11 @@ public class AccountController {
     private final UserService userService;
 
     @PostMapping("/join")
-    @ResponseStatus(HttpStatus.OK)
     public void join(@RequestBody @Valid JoinDto joinDto) {
         userService.joinUser(joinDto);
     }
 
     @GetMapping("/test")
-    @ResponseStatus(HttpStatus.OK)
     public String test(@AuthenticationPrincipal CustomUserDetails user) {
         return "test";
     }

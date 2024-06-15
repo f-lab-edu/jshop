@@ -1,4 +1,4 @@
-package jshop.domain.utils;
+package jshop.utils;
 
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
@@ -11,8 +11,14 @@ public class EntityBuilder {
     public static User getJoinUser(String username, String email, String password,
         UserType userType, String role) {
 
-        User testUser = User.builder().password(bCryptPasswordEncoder.encode(password)).email(email)
-            .username(username).userType(userType).role(role).build();
+        User testUser = User
+            .builder()
+            .password(bCryptPasswordEncoder.encode(password))
+            .email(email)
+            .username(username)
+            .userType(userType)
+            .role(role)
+            .build();
         return testUser;
     }
 }

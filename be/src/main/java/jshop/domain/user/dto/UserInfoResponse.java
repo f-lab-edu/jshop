@@ -1,9 +1,9 @@
 package jshop.domain.user.dto;
 
 import java.util.List;
-import jshop.domain.address.dto.AddressDto;
+import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.entity.Address;
-import jshop.domain.wallet.entity.Wallet;
+import jshop.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,5 +23,16 @@ public class UserInfoResponse {
     private String email;
     private UserType userType;
     private Long balance;
-    private List<AddressDto> addresses;
+    private List<AddressInfoResponse> addresses;
+
+    public static UserInfoResponse ofUser(User user, List<AddressInfoResponse> addresses) {
+        return UserInfoResponse
+            .builder()
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .balance(user.getWallet().getBalance())
+            .userType(user.getUserType())
+            .addresses(addresses)
+            .build();
+    }
 }

@@ -7,6 +7,7 @@ import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,23 +53,27 @@ public class GlobalExceptionHandler {
         return response;
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Response handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return Response
+            .builder()
+            .error(ErrorCode.INVALID_REQUEST_BODY)
+            .message("Request Body가 비어있습니다.")
+            .build();
+    }
+
     @ExceptionHandler(JwtUserNotFoundException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected Response handleJwtNotFoundException(JwtUserNotFoundException ex) {
         return Response
-            .builder()
-            .error(ErrorCode.JWT_USER_NOT_FOUND)
-            .message("인증정보가 잘못되었습니다.")
-            .build();
+            .builder().error(ErrorCode.JWT_USER_NOT_FOUND).message("인증정보가 잘못되었습니다.").build();
     }
 
     @ExceptionHandler(UserIdNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleUserIdNotFoundException(UserIdNotFoundException ex) {
         return Response
-            .builder()
-            .error(ErrorCode.USERID_NOT_FOUND)
-            .message("유저를 찾지 못했습니다.")
-            .build();
+            .builder().error(ErrorCode.USERID_NOT_FOUND).message("유저를 찾지 못했습니다.").build();
     }
 }
