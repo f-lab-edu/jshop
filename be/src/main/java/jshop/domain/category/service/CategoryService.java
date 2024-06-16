@@ -11,13 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-
-    @Transactional(readOnly = true)
+    
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream().map(CategoryResponse::ofCategory).toList();
     }

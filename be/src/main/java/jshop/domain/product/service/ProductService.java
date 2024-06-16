@@ -22,13 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
@@ -44,7 +45,7 @@ public class ProductService {
         productRepository.save(newProduct);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public OwnProductsResponse getOwnProducts(Long userId, int pageNumber) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
@@ -57,7 +58,7 @@ public class ProductService {
             .builder()
             .page(page.getNumber())
             .totalPage(page.getTotalPages())
-            .products(page.getContent().stream().map(ProductResponse::ofProduct).toList())
+            .products(page.map(ProductResponse::ofProduct).toList())
             .totalCount(page.getTotalElements())
             .build();
     }

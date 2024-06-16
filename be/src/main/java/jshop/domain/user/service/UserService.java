@@ -26,14 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-
-    @Transactional(readOnly = true)
+    
     public UserInfoResponse getUser(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
@@ -48,6 +47,7 @@ public class UserService {
         return UserInfoResponse.ofUser(user, addresses);
     }
 
+    @Transactional
     public void joinUser(JoinDto joinDto) {
         String username = joinDto.getUsername();
         String password = joinDto.getPassword();
@@ -78,6 +78,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(

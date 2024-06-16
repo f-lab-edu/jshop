@@ -17,12 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class AddressService {
 
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void saveAddress(CreateAddressRequest createAddressRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
