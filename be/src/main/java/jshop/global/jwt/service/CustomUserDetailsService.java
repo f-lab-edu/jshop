@@ -1,14 +1,13 @@
-package jshop.domain.jwt.service;
+package jshop.global.jwt.service;
 
 import java.util.Optional;
-import jshop.domain.jwt.dto.CustomUserDetails;
+import jshop.global.jwt.dto.CustomUserDetails;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service

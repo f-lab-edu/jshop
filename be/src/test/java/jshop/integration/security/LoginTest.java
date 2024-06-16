@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jshop.domain.jwt.dto.CustomUserDetails;
-import jshop.domain.jwt.filter.JwtUtil;
+import jshop.global.jwt.dto.CustomUserDetails;
+import jshop.global.jwt.filter.JwtUtil;
 import jshop.domain.user.entity.User;
 import jshop.global.config.SecurityConfig;
 import org.json.JSONObject;
@@ -121,7 +121,8 @@ public class LoginTest {
 
         // then
         perform.andExpect(result -> {
-            String authorization = result.getResponse().getHeader("Authorization");
+            String authorization = result.getResponse()
+                .getHeader("Authorization");
             assertThat(authorization).contains("Bearer");
             String token = authorization.split(" ")[1];
             assertThat(jwtUtil.validJwt(token)).isTrue();
@@ -191,15 +192,21 @@ public class LoginTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody.toString()));
 
-        String token = tokenPerform.andReturn().getResponse().getHeader("Authorization");
+        String token = tokenPerform.andReturn()
+            .getResponse()
+            .getHeader("Authorization");
+
+        System.out.println(token);
         // when
         ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/test").header("Authorization", token));
+            MockMvcRequestBuilders.get("/api/test")
+                .header("Authorization", token));
 
         // then
         perform.andExpect(status().isOk())
             .andExpect(
-                result -> assertThat(result.getResponse().getContentAsString()).isEqualTo("test"));
+                result -> assertThat(result.getResponse()
+                    .getContentAsString()).isEqualTo("test"));
     }
 
     @Test
@@ -209,7 +216,8 @@ public class LoginTest {
         String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         // when
         ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/test").header("Authorization", token));
+            MockMvcRequestBuilders.get("/api/test")
+                .header("Authorization", token));
 
         // then
         perform.andExpect(status().isForbidden());

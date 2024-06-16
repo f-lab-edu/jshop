@@ -1,13 +1,19 @@
 package jshop.domain.user.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.dto.UserType;
+import jshop.domain.wallet.entity.Wallet;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +29,8 @@ import lombok.NoArgsConstructor;
 public class User extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
+    @Column(name = "user_id")
     private Long id;
 
     private String username;
@@ -31,8 +38,24 @@ public class User extends BaseEntity {
     private String email;
     private String role;
 
+    /**
+     * 사용자는 일반사용자, 판매자 두개의 타입이 있다.
+     */
     @Enumerated(EnumType.STRING)
+    @Column(name = "user_type")
     private UserType userType;
 
+    /**
+     * 사용자는 하나의 카트를 갖는다.
+     */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
+    /**
+     * 사용자는 하나의 지갑을 갖는다.
+     */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id")
+    private Wallet wallet;
 }

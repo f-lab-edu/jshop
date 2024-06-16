@@ -2,9 +2,9 @@ package jshop.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jshop.domain.jwt.filter.JwtFilter;
-import jshop.domain.jwt.filter.JwtUtil;
-import jshop.domain.jwt.filter.LoginFilter;
+import jshop.global.jwt.filter.JwtFilter;
+import jshop.global.jwt.filter.JwtUtil;
+import jshop.global.jwt.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
