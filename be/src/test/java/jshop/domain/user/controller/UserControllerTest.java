@@ -274,7 +274,6 @@ class UserControllerTest {
                 Matchers.is("비밀번호는 공백일 수 없습니다."),
                 Matchers.is("비밀번호는 8 ~16 자리 이내여야 합니다.")
             )));
-
     }
 
     @Test

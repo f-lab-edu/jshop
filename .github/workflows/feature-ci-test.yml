@@ -1,0 +1,29 @@
+name: Test on Feature Branch
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+      
+      - name: Grant execute permission for gradlew
+        working-directory: ./be
+        run: chmod +x gradlew
+
+      - name: Run tests
+        working-directory: ./be
+        run: ./gradlew clean test --info
