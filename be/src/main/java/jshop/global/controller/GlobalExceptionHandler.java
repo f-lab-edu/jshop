@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         return response;
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleBindException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
@@ -49,18 +49,21 @@ public class GlobalExceptionHandler {
             .message(Optional.ofNullable(errorMsg).orElse(ex.getMessage()))
             .data(null)
             .build();
-
         return response;
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected Response handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        return Response
+    protected Response noArgsException(HttpMessageNotReadableException ex) {
+
+        Response response = Response
             .builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
-            .message("Request Body가 비어있습니다.")
+            .message(ex.getMessage())
+            .data(null)
             .build();
+
+        return response;
     }
 
     @ExceptionHandler(JwtUserNotFoundException.class)
