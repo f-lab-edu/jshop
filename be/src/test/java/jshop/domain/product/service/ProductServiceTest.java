@@ -22,7 +22,8 @@ import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.global.exception.common.AlreadyExistsException;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -77,14 +78,16 @@ class ProductServiceTest {
             .build();
 
         User user = User
-            .builder().username("1").build();
+            .builder().id(1L).username("1").build();
 
         Category category = Category
-            .builder().name("category").build();
+            .builder().id(1L).name("category").build();
 
         // when
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
+        when(categoryRepository.existsById(1L)).thenReturn(true);
+        when(categoryRepository.getReferenceById(1L)).thenReturn(category);
+
         productService.createProduct(createProductRequest, 1L);
 
         // then
@@ -110,7 +113,7 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(inventoryService.createInventory()).thenReturn(inventory);
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(false);
@@ -142,14 +145,12 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
+        when(userRepository.getReferenceById(1L)).thenReturn(user2);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
         // then
-        /**TODO
-         * 추후 예외 변경
-         */
-        assertThrows(RuntimeException.class, () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        JshopException jshopException = assertThrows(JshopException.class, () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
     }
 
     @Test
@@ -167,12 +168,13 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
 
         // then
-        assertThrows(AlreadyExistsException.class, () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        JshopException jshopException = assertThrows(JshopException.class, () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
     }
 
     @Test
@@ -190,7 +192,7 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
 

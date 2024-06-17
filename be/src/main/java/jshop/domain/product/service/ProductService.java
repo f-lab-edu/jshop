@@ -1,6 +1,5 @@
 package jshop.domain.product.service;
 
-import java.util.Optional;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.inventory.entity.Inventory;
@@ -16,14 +15,15 @@ import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
-import jshop.global.exception.common.AlreadyExistsException;
-import jshop.global.exception.common.NoSuchEntityException;
+import jshop.global.exception.JshopException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,8 +39,10 @@ public class ProductService {
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);
         Long categoryId = createProductRequest.getCategoryId();
+
         if (!categoryRepository.existsById(categoryId)) {
-            throw new RuntimeException();
+            log.error(ErrorCode.CATEGORYID_NOT_FOUND.getLogMessage(), categoryId);
+            throw JshopException.ofErrorCode(ErrorCode.CATEGORYID_NOT_FOUND);
         }
 
         Category category = categoryRepository.getReferenceById(categoryId);
@@ -69,24 +71,25 @@ public class ProductService {
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest,
         Long userId, Long productId) {
         User user = userRepository.getReferenceById(userId);
-        if (!productRepository.existsById(productId)) {
-            throw new RuntimeException();
-        }
-        Product product = productRepository.getReferenceById(productId);
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> {
+            log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
+            throw JshopException.ofErrorCode(ErrorCode.PRODUCTID_NOT_FOUND);
+        });
 
         if (!product.getOwner().getId().equals(user.getId())) {
-            /**
-             * 예외 변경
-             */
-            throw new RuntimeException("나중에 공통 예외로 yml 처리");
+            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
+            throw JshopException.ofErrorCode(ErrorCode.UNAUTHORIZED);
         }
 
         if (productDetailRepository.existsByAttribute(createProductDetailRequest.getAttribute())) {
-            throw new AlreadyExistsException("동일한 속성의 상세상품이 존재합니다.", ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
+            log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId, createProductDetailRequest.getAttribute());
+            throw JshopException.ofErrorCode(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
         }
 
         if (!product.verifyChildAttribute(createProductDetailRequest.getAttribute())) {
-            throw new RuntimeException("공통 예외 처리");
+            log.error(ErrorCode.INVALID_PRODUCT_ATTRIBUTE.getLogMessage(), product.getAttributes(), createProductDetailRequest.getAttribute());
+            throw JshopException.ofErrorCode(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
         }
 
         Inventory inventory = inventoryService.createInventory();

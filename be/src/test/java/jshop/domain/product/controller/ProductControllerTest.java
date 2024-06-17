@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.service.ProductService;
+import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.TestSecurityConfig;
 import org.json.JSONArray;
@@ -133,7 +134,9 @@ class ProductControllerTest {
             .contentType(MediaType.APPLICATION_JSON));
 
         // then
-        perform.andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value(10001));
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value(ErrorCode.INVALID_REQUEST_BODY.toString()));
     }
 
     @Test
@@ -155,6 +158,8 @@ class ProductControllerTest {
             .content(requestBody.toString()));
 
         // then
-        perform.andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value(10001));
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value(ErrorCode.BAD_REQUEST.toString()));
     }
 }
