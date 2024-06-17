@@ -1,6 +1,7 @@
 package jshop.global.annotation;
 
-import jshop.global.exception.security.JwtUserNotFoundException;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import jshop.global.jwt.dto.CustomUserDetails;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,6 @@ public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResol
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             return userDetails.getId();
         }
-        throw new JwtUserNotFoundException();
+        throw JshopException.ofErrorCode(ErrorCode.JWT_USER_NOT_FOUND);
     }
 }

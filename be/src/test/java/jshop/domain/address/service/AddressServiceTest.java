@@ -12,9 +12,8 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.global.exception.common.EntityNotFoundException;
-import jshop.global.exception.security.JwtUserNotFoundException;
-import jshop.global.exception.user.UserIdNotFoundException;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -43,10 +42,9 @@ public class AddressServiceTest {
         // given
         User user = getUser();
         CreateAddressRequest createAddressRequest = getCreateAddressRequest();
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
+        
         // when
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
         addressService.saveAddress(createAddressRequest, 1L);
 
         // then
@@ -55,18 +53,6 @@ public class AddressServiceTest {
 
         assertThat(capturedAddress.getUser()).isEqualTo(user);
         assertThat(CreateAddressRequest.ofAddress(capturedAddress)).isEqualTo(createAddressRequest);
-    }
-
-    @Test
-    public void saveAddress_유저ID없음() {
-        // given
-        User user = getUser();
-        CreateAddressRequest createAddressRequest = getCreateAddressRequest();
-
-        // when
-
-        // then
-        assertThrows(EntityNotFoundException.class, () -> addressService.saveAddress(createAddressRequest, 1L));
     }
 
     private CreateAddressRequest getCreateAddressRequest() {

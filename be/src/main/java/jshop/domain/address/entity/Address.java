@@ -16,12 +16,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"user"})
 @Table(name = "address")
 public class Address extends BaseEntity {
 
@@ -70,24 +72,5 @@ public class Address extends BaseEntity {
             .message(createAddressRequest.getMessage())
             .user(user)
             .build();
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Address{");
-        sb.append("id=").append(id);
-        sb.append(", receiverName='").append(receiverName).append('\'');
-        sb.append(", receiverNumber='").append(receiverNumber).append('\'');
-        sb.append(", message='").append(message).append('\'');
-        sb.append(", province='").append(province).append('\'');
-        sb.append(", city='").append(city).append('\'');
-        sb.append(", district='").append(district).append('\'');
-        sb.append(", street='").append(street).append('\'');
-        sb.append(", detailAddress1='").append(detailAddress1).append('\'');
-        sb.append(", detailAddress2='").append(detailAddress2).append('\'');
-        sb.append('}');
-
-        return sb.toString();
     }
 }

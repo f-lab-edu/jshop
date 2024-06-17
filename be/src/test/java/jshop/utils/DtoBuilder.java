@@ -1,21 +1,21 @@
 package jshop.utils;
 
-import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UserType;
 
 public class DtoBuilder {
 
-    static public JoinDto getJoinDto(String username, String email, String password,
+    static public JoinUserRequest getJoinDto(String username, String email, String password,
         UserType userType) {
 
-        JoinDto joinDto = JoinDto
+        JoinUserRequest joinUserRequest = JoinUserRequest
             .builder()
             .password(password)
             .email(email)
             .username(username)
             .userType(userType)
             .build();
-        return joinDto;
+        return joinUserRequest;
     }
 
 }
