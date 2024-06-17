@@ -8,7 +8,6 @@ import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
-import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
@@ -40,10 +39,10 @@ public class UserService {
         List<AddressInfoResponse> addresses = addressRepository
             .findByUser(user)
             .stream()
-            .map(AddressInfoResponse::ofAddress)
+            .map(AddressInfoResponse::of)
             .toList();
 
-        return UserInfoResponse.ofUser(user, addresses);
+        return UserInfoResponse.of(user, addresses);
     }
 
     @Transactional

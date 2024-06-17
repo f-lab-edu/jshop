@@ -59,9 +59,8 @@ public class ProductDetail extends BaseEntity {
 
     private Long price;
 
-    public static ProductDetail ofCreateProductDetailRequest(
-        CreateProductDetailRequest createProductDetailRequest, Product product,
-        Inventory inventory) {
+    public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest,
+        Product product, Inventory inventory) {
         return ProductDetail
             .builder()
             .product(product)

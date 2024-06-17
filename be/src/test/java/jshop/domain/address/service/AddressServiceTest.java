@@ -6,14 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.global.common.ErrorCode;
-import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -42,7 +39,7 @@ public class AddressServiceTest {
         // given
         User user = getUser();
         CreateAddressRequest createAddressRequest = getCreateAddressRequest();
-        
+
         // when
         when(userRepository.getReferenceById(1L)).thenReturn(user);
         addressService.saveAddress(createAddressRequest, 1L);
@@ -52,7 +49,7 @@ public class AddressServiceTest {
         Address capturedAddress = addressCaptor.getValue();
 
         assertThat(capturedAddress.getUser()).isEqualTo(user);
-        assertThat(CreateAddressRequest.ofAddress(capturedAddress)).isEqualTo(createAddressRequest);
+        assertThat(CreateAddressRequest.of(capturedAddress)).isEqualTo(createAddressRequest);
     }
 
     private CreateAddressRequest getCreateAddressRequest() {

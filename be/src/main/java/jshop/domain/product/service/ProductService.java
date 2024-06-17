@@ -46,7 +46,7 @@ public class ProductService {
         }
 
         Category category = categoryRepository.getReferenceById(categoryId);
-        Product newProduct = Product.ofCreateProductRequest(createProductRequest, category, user);
+        Product newProduct = Product.of(createProductRequest, category, user);
 
         productRepository.save(newProduct);
     }
@@ -70,14 +70,13 @@ public class ProductService {
     @Transactional
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest,
         Long userId, Long productId) {
-        User user = userRepository.getReferenceById(userId);
-
         Product product = productRepository.findById(productId).orElseThrow(() -> {
             log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
             throw JshopException.ofErrorCode(ErrorCode.PRODUCTID_NOT_FOUND);
         });
+        User user = product.getOwner();
 
-        if (!product.getOwner().getId().equals(user.getId())) {
+        if (!user.getId().equals(userId)) {
             log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
             throw JshopException.ofErrorCode(ErrorCode.UNAUTHORIZED);
         }
@@ -94,6 +93,6 @@ public class ProductService {
 
         Inventory inventory = inventoryService.createInventory();
 
-        productDetailRepository.save(ProductDetail.ofCreateProductDetailRequest(createProductDetailRequest, product, inventory));
+        productDetailRepository.save(ProductDetail.of(createProductDetailRequest, product, inventory));
     }
 }

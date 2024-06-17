@@ -112,7 +112,7 @@ class UserServiceTest {
 
         // then
         assertThat(userInfoResponse).isNotNull();
-        assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.ofAddress(address)));
+        assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.of(address)));
     }
 
     @Test

@@ -1,7 +1,6 @@
 package jshop.domain.category.service;
 
 import java.util.List;
-import jshop.domain.category.controller.CategoryController;
 import jshop.domain.category.dto.CategoryResponse;
 import jshop.domain.category.dto.CreateCategoryRequest;
 import jshop.domain.category.entity.Category;
@@ -22,7 +21,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll().stream().map(CategoryResponse::ofCategory).toList();
+        return categoryRepository.findAll().stream().map(CategoryResponse::of).toList();
     }
 
     @Transactional

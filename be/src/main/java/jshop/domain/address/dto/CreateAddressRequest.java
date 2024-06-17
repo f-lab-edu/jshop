@@ -39,7 +39,7 @@ public class CreateAddressRequest {
     private String detailAddress2;
     private String message;
 
-    public static CreateAddressRequest ofAddress(Address address) {
+    public static CreateAddressRequest of(Address address) {
         return CreateAddressRequest
             .builder()
             .receiverName(address.getReceiverName())

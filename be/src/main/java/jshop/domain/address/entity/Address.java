@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
@@ -57,8 +56,7 @@ public class Address extends BaseEntity {
     @Column(nullable = true)
     private String message;
 
-    public static Address ofCreateAddressRequest(CreateAddressRequest createAddressRequest,
-        User user) {
+    public static Address of(CreateAddressRequest createAddressRequest, User user) {
         return Address
             .builder()
             .receiverName(createAddressRequest.getReceiverName())

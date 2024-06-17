@@ -8,7 +8,6 @@ import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
-import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.product.entity.Product;
@@ -162,7 +161,7 @@ public class UserRepositoryTest {
         List<AddressInfoResponse> findAddresses = addressRepository
             .findByUser(findUser)
             .stream()
-            .map(AddressInfoResponse::ofAddress)
+            .map(AddressInfoResponse::of)
             .toList();
         System.out.println("address 조회 after");
 

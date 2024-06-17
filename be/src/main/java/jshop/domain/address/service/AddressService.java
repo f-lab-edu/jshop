@@ -20,7 +20,7 @@ public class AddressService {
     @Transactional
     public void saveAddress(CreateAddressRequest createAddressRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);
-        Address newAddress = Address.ofCreateAddressRequest(createAddressRequest, user);
+        Address newAddress = Address.of(createAddressRequest, user);
         addressRepository.save(newAddress);
     }
 }
