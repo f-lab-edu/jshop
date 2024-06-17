@@ -37,15 +37,13 @@ public class ProductService {
 
     @Transactional
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> new NoSuchEntityException(
-            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
+        User user = userRepository.getReferenceById(userId);
+        Long categoryId = createProductRequest.getCategoryId();
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new RuntimeException();
+        }
 
-        Optional<Category> optionalCategory = categoryRepository.findById(createProductRequest.getCategoryId());
-        Category category = optionalCategory.orElseThrow(() -> new NoSuchEntityException(
-            "ID로 " + "Cateogry를 찾지 못했습니다. : "
-                + createProductRequest.getCategoryId(), ErrorCode.CATEGORYID_NOT_FOUND));
-
+        Category category = categoryRepository.getReferenceById(categoryId);
         Product newProduct = Product.ofCreateProductRequest(createProductRequest, category, user);
 
         productRepository.save(newProduct);
@@ -53,9 +51,7 @@ public class ProductService {
 
     @Transactional
     public OwnProductsResponse getOwnProducts(Long userId, int pageNumber) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> new NoSuchEntityException(
-            "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
+        User user = userRepository.getReferenceById(userId);
 
         PageRequest pageRequest = PageRequest.of(pageNumber, 10);
         Page<Product> page = productRepository.findByOwner(user, pageRequest);
@@ -72,14 +68,11 @@ public class ProductService {
     @Transactional
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest,
         Long userId, Long productId) {
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() -> new NoSuchEntityException(
-                "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
-        Product product = productRepository
-            .findById(productId)
-            .orElseThrow(() -> new NoSuchEntityException(
-                "ID로 상품을 찾지 못했습니다. : " + productId, ErrorCode.PRODUCTID_NOT_FOUND));
+        User user = userRepository.getReferenceById(userId);
+        if (!productRepository.existsById(productId)) {
+            throw new RuntimeException();
+        }
+        Product product = productRepository.getReferenceById(productId);
 
         if (!product.getOwner().getId().equals(user.getId())) {
             /**

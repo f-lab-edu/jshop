@@ -13,9 +13,8 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
-import jshop.global.exception.common.EntityNotFoundException;
+import jshop.global.exception.common.NoSuchEntityException;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
-import jshop.global.exception.user.UserIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,10 +31,10 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    
+
     public UserInfoResponse getUser(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+        User user = optionalUser.orElseThrow(() -> new NoSuchEntityException(
             "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
 
         List<AddressInfoResponse> addresses = addressRepository
@@ -81,7 +80,7 @@ public class UserService {
     @Transactional
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> new EntityNotFoundException(
+        User user = optionalUser.orElseThrow(() -> new NoSuchEntityException(
             "ID로 유저를 찾지 못했습니다. : " + userId, ErrorCode.USERID_NOT_FOUND));
         user.updateUserInfo(updateUserRequest);
     }
