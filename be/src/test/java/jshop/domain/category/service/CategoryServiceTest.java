@@ -1,6 +1,5 @@
 package jshop.domain.category.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
@@ -10,7 +9,8 @@ import static org.mockito.Mockito.when;
 import jshop.domain.category.dto.CreateCategoryRequest;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
-import jshop.global.exception.category.AlreadyExistsNameCategory;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -59,7 +59,8 @@ class CategoryServiceTest {
         when(categoryRepository.existsByName(categoryRequest2.getName())).thenReturn(true);
 
         // then
-        assertThrows(AlreadyExistsNameCategory.class, () -> categoryService.createCategory(categoryRequest2));
+        JshopException jshopException = assertThrows(JshopException.class, () -> categoryService.createCategory(categoryRequest2));
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXISTS_CATEGORY);
     }
 
 }
