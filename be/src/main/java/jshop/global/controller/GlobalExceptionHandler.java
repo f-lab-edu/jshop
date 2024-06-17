@@ -3,6 +3,7 @@ package jshop.global.controller;
 import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
+import jshop.global.exception.category.AlreadyExistsNameCategory;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.security.JwtUserNotFoundException;
 import jshop.global.exception.user.UserIdNotFoundException;
@@ -56,6 +57,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        System.out.println(ex.getMessage());
         return Response
             .builder()
             .error(ErrorCode.INVALID_REQUEST_BODY)
@@ -75,5 +77,12 @@ public class GlobalExceptionHandler {
     protected Response handleUserIdNotFoundException(UserIdNotFoundException ex) {
         return Response
             .builder().error(ErrorCode.USERID_NOT_FOUND).message("유저를 찾지 못했습니다.").build();
+    }
+
+    @ExceptionHandler(AlreadyExistsNameCategory.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Response handleAlreadyExistsNameCategory(AlreadyExistsNameCategory ex) {
+        return Response
+            .builder().error(ErrorCode.BAD_REQUEST).message("중복된 이름입니다.").build();
     }
 }
