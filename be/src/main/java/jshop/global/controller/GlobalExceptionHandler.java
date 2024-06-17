@@ -1,12 +1,13 @@
 package jshop.global.controller;
 
+import jakarta.persistence.ElementCollection;
 import java.util.Optional;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.exception.category.AlreadyExistsNameCategory;
+import jshop.global.exception.security.UnauthorizedException;
 import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.security.JwtUserNotFoundException;
-import jshop.global.exception.user.UserIdNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -72,17 +73,17 @@ public class GlobalExceptionHandler {
             .builder().error(ErrorCode.JWT_USER_NOT_FOUND).message("인증정보가 잘못되었습니다.").build();
     }
 
-    @ExceptionHandler(UserIdNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected Response handleUserIdNotFoundException(UserIdNotFoundException ex) {
-        return Response
-            .builder().error(ErrorCode.USERID_NOT_FOUND).message("유저를 찾지 못했습니다.").build();
-    }
-
     @ExceptionHandler(AlreadyExistsNameCategory.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Response handleAlreadyExistsNameCategory(AlreadyExistsNameCategory ex) {
         return Response
             .builder().error(ErrorCode.BAD_REQUEST).message("중복된 이름입니다.").build();
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected Response handleUnauthorizedException(UnauthorizedException ex) {
+        return Response
+            .builder().error(ErrorCode.UNAUTHORIZED).message("권한이 없습니다.").build();
     }
 }

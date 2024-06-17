@@ -14,6 +14,8 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.print.DocFlavor.STRING;
 import jshop.domain.category.entity.Category;
 import jshop.domain.manufacturer.entity.Manufacturer;
 import jshop.domain.product.dto.CreateProductRequest;
@@ -93,6 +95,28 @@ public class Product extends BaseEntity {
             .owner(user)
             .attributes(createProductRequest.getAttributes())
             .build();
+    }
+
+    public boolean verifyChildAttribute(Map<String, String> attribute) {
+
+        Set<String> attributesKeySet = attributes.keySet();
+        Set<String> attributeKeySet = attribute.keySet();
+
+        if (attributesKeySet == null && attributeKeySet == null) {
+            return true;
+        }
+
+        if (!attributesKeySet.equals(attributeKeySet)) {
+            return false;
+        }
+
+        for (String key : attributeKeySet) {
+            String attributeValue = attribute.get(key);
+            if (!attributes.get(key).contains(attributeValue)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
