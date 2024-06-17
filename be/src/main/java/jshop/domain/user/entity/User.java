@@ -11,10 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.List;
-import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.cart.entity.Cart;
-import jshop.domain.user.dto.UserInfoResponse;
+import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.entity.BaseEntity;
@@ -22,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -64,6 +61,10 @@ public class User extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
+
+    public void updateUserInfo(UpdateUserRequest updateUserRequest) {
+        this.username = updateUserRequest.getUsername();
+    }
 
     @Override
     public String toString() {

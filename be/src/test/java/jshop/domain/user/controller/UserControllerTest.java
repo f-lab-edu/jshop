@@ -1,17 +1,15 @@
 package jshop.domain.user.controller;
 
 import static jshop.utils.SecurityContextUtil.userSecurityContext;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import jshop.domain.address.controller.AddressController;
-import jshop.domain.user.entity.User;
+import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.TestSecurityConfig;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -47,6 +45,7 @@ class UserControllerTest {
 
         // then
         verify(userService, times(1)).getUser(1L);
+        perform.andExpect(status().isOk());
     }
 
     @Test
@@ -58,5 +57,25 @@ class UserControllerTest {
         // then
         perform.andExpect(status().isUnauthorized());
 
+    }
+
+    @Test
+    public void 유저정보업데이트() throws Exception {
+        // given
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", "김재현");
+
+        UpdateUserRequest updateUserRequest = UpdateUserRequest
+            .builder().username("김재현").build();
+
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+            .patch("/api/users")
+            .with(userSecurityContext())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody.toString()));
+
+        // then
+        perform.andExpect(status().isOk());
     }
 }

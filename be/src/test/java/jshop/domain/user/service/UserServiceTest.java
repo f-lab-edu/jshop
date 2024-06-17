@@ -1,25 +1,27 @@
 package jshop.domain.user.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import javax.swing.text.html.Option;
 import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import jshop.global.exception.user.UserIdNotFoundException;
 import jshop.utils.DtoBuilder;
 import jshop.utils.EntityBuilder;
-import jshop.global.exception.user.AlreadyRegisteredEmailException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,9 +31,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -119,6 +118,33 @@ class UserServiceTest {
     public void 회원정보가져오기_없는ID() {
         assertThrows(UserIdNotFoundException.class, () -> userService.getUser(1L));
     }
+
+    @Test
+    public void 회원정보수정() {
+        // given
+        User user = createUser();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // when
+        userService.updateUser(1L, UpdateUserRequest
+            .builder().username("new_user").build());
+
+        // then
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void 회원정보수정_없는유저() {
+        // given
+
+        // when
+
+        // then
+        assertThrows(UserIdNotFoundException.class, () -> userService.updateUser(1L, UpdateUserRequest
+            .builder().build()));
+    }
+
 
     private User createUser() {
         return User

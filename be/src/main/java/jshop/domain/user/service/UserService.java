@@ -3,11 +3,10 @@ package jshop.domain.user.service;
 import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
-import jshop.domain.address.dto.CreateAddressRequest;
-import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
@@ -77,5 +76,11 @@ public class UserService {
             .build();
 
         userRepository.save(user);
+    }
+
+    public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = optionalUser.orElseThrow(UserIdNotFoundException::new);
+        user.updateUserInfo(updateUserRequest);
     }
 }
