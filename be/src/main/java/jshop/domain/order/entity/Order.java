@@ -54,7 +54,8 @@ public class Order extends BaseEntity {
      * cascade
      */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderProductDetail> productDetails = new ArrayList<>();
+    @Builder.Default
+    private final List<OrderProductDetail> productDetails = new ArrayList<>();
 
     private long price;
     private int quantity;

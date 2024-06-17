@@ -1,35 +1,36 @@
 package jshop.domain.user.controller;
 
 import jakarta.validation.Valid;
-import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.UpdateUserRequest;
+import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.service.UserService;
+import jshop.global.annotation.CurrentUserId;
+import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/join")
-    @ResponseStatus(HttpStatus.OK)
-    public void join(@RequestBody @Valid JoinDto joinDto) {
-        userService.joinUser(joinDto);
+    @PatchMapping
+    public void updateUser(@CurrentUserId Long userId,
+        @RequestBody @Valid UpdateUserRequest updateUserRequest) {
+        userService.updateUser(userId, updateUserRequest);
     }
 
-    @GetMapping("/test")
-    @ResponseStatus(HttpStatus.OK)
-    public String test() {
-        return "test";
+    @GetMapping
+    public Response<UserInfoResponse> getUserInfo(@CurrentUserId Long userId) {
+        UserInfoResponse userInfoResponse = userService.getUser(userId);
+
+        return Response
+            .<UserInfoResponse>builder().message("유저 정보입니다.").data(userInfoResponse).build();
     }
 }
-

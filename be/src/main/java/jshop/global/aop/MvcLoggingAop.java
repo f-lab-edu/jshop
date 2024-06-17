@@ -37,7 +37,9 @@ public class MvcLoggingAop {
     public void logRequest(JoinPoint joinPoint) {
         requestTime = System.currentTimeMillis();
         Map<String, Object> requestLog = new HashMap<>();
-        id = UUID.randomUUID().toString();
+        id = UUID
+            .randomUUID()
+            .toString();
         requestLog.put("id", id);
         requestLog.put("request_time", requestTime);
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -51,7 +53,9 @@ public class MvcLoggingAop {
         }
 
         try {
-            log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestLog));
+            log.info(objectMapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(requestLog));
         } catch (Exception ex) {
             log.info(requestLog.toString());
         }
@@ -68,23 +72,36 @@ public class MvcLoggingAop {
             (ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         optionalAttrivutes.ifPresent((attributes) -> {
-            responseLog.put("status", attributes.getResponse().getStatus());
-            responseLog.put("status", attributes.getResponse().getStatus());
+            responseLog.put("status", attributes
+                .getResponse()
+                .getStatus());
             Map<String, Object> headers = new HashMap<>();
 
-            for (String header : attributes.getResponse().getHeaderNames().stream().toList()) {
-                headers.putIfAbsent(header, attributes.getResponse().getHeaders(header));
-                headers.putIfAbsent(header, attributes.getResponse().getHeader(header));
+            for (String header : attributes
+                .getResponse()
+                .getHeaderNames()
+                .stream()
+                .toList()) {
+                headers.putIfAbsent(header, attributes
+                    .getResponse()
+                    .getHeaders(header));
+                headers.putIfAbsent(header, attributes
+                    .getResponse()
+                    .getHeader(header));
             }
             responseLog.put("headers", headers);
 
-            Optional.ofNullable(response).ifPresent(r -> {
-                responseLog.put("data", r);
-            });
+            Optional
+                .ofNullable(response)
+                .ifPresent(r -> {
+                    responseLog.put("data", r);
+                });
         });
 
         try {
-            log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLog));
+            log.info(objectMapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(responseLog));
         } catch (Exception ex) {
             log.info(responseLog.toString());
         }
