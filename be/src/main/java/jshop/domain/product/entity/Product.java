@@ -20,6 +20,7 @@ import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -69,7 +70,8 @@ public class Product extends BaseEntity {
      * productDetail : 아이폰 15 : {128GB, 화이트}
      */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductDetail> productDetails = new ArrayList<>();
+    @Default
+    private final List<ProductDetail> productDetails = new ArrayList<>();
 
     private String name;
 

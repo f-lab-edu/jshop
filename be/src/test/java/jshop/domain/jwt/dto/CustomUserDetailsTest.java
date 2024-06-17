@@ -11,14 +11,16 @@ class CustomUserDetailsTest {
     @Test
     public void username_이메일리턴() {
         // given
-        User user = User.builder()
+        User user = User
+            .builder()
             .username("kim")
             .email("email")
             .password("password")
+            .role("ROLE_USER")
             .build();
 
         // when
-        CustomUserDetails cud = new CustomUserDetails(user);
+        CustomUserDetails cud = CustomUserDetails.ofUser(user);
 
         // then
         assertThat(cud.getUsername()).isEqualTo(user.getEmail());

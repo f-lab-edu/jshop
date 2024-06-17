@@ -3,14 +3,21 @@ package jshop.global.jwt.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import jshop.domain.user.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    private Long id;
+    private final String username;
+    private final String password;
+    private final String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -19,25 +26,35 @@ public class CustomUserDetails implements UserDetails {
         collection.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return user.getRole();
+                return role;
             }
         });
 
         return collection;
     }
 
+    public static CustomUserDetails ofUser(User user) {
+        return CustomUserDetails
+            .builder()
+            .id(user.getId())
+            .username(user.getEmail())
+            .password(user.getPassword())
+            .role(user.getRole())
+            .build();
+    }
+
     public Long getId() {
-        return user.getId();
+        return id;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return username;
     }
 
     @Override

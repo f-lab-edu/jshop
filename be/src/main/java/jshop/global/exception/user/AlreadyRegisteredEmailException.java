@@ -1,4 +1,4 @@
-package jshop.global.exception;
+package jshop.global.exception.user;
 
 public class AlreadyRegisteredEmailException extends RuntimeException {
 
