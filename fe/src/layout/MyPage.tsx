@@ -1,47 +1,91 @@
 import { alpha, Box, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack } from "@mui/material";
 import { LocalShipping, Edit, ShoppingCart } from '@mui/icons-material';
-import { Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import isAuthenticated from "../utils/isAuthenticated";
-import { goOrders, goMyPage, goCart } from "../utils/route";
+import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_USERINFO } from "../redux/Action";
+import State from "../types/State";
+import { isEqual } from "lodash";
+import { useEffect } from "react";
+import apiInstance from "../api/instance";
+import IResponse from "../types/IResponse";
+import IUserInfo from "../types/IUserInfo";
+
 export default function MyPage() {
+  const userType = useSelector((state: State) => state.userInfo.userType, isEqual);
+  const updateUserInfo = useSelector((state: State) => state.updateUserInfo, isEqual);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    getUserInfo();
+  }, [updateUserInfo]);
+  function getUserInfo() {
+    apiInstance.get<IResponse<IUserInfo>>("/api/users")
+      .then(d => {
+        dispatch({
+          type: UPDATE_USERINFO,
+          userInfo: d.data.data
+        })
+      })
+      .catch(e => {
+        console.error(e);
+      })
+  }
 
   if (!isAuthenticated()) {
     return <Navigate to="/login" />
   }
 
-  return (  
+  const sidebar = [
+    {
+      path: "/mypage/orders",
+      icon: LocalShipping,
+      label: "주문내역"
+    },
+    {
+      path: "/mypage/",
+      icon: Edit,
+      label: "개인정보수정"
+    },
+    {
+      path: "/mypage/cart",
+      icon: ShoppingCart,
+      label: "장바구니"
+    }
+  ];
+
+  if (userType == "SELLER") {
+    sidebar.push({
+      path: "/mypage/products",
+      icon: ShoppingCart,
+      label: "상품관리"
+    })
+  }
+
+  return (
     <Box>
       <Grid container direction={"row"} >
         <Grid item width={200}>
           <List>
-            <ListItem disablePadding onClick={goOrders}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <LocalShipping />
-                </ListItemIcon>
-                <ListItemText primary="주문내역" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding onClick={goMyPage}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <Edit />
-                </ListItemIcon>
-                <ListItemText primary="개인정보수정" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding onClick={goCart}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <ShoppingCart />
-                </ListItemIcon>
-                <ListItemText primary="장바구니" />
-              </ListItemButton>
-            </ListItem>
+
+            {sidebar.map((item) => {
+              return (
+                <Link to={item.path} key={Math.random()}>
+                  <ListItem disablePadding >
+                    <ListItemButton>
+                      <ListItemIcon>
+                        <item.icon />
+                      </ListItemIcon>
+                      <ListItemText primary={item.label} />
+                    </ListItemButton>
+                  </ListItem>
+                </Link>
+              )
+            })}
           </List>
 
         </Grid>
-        <Grid item paddingTop={2} marginLeft={3} sx={{flexGrow: 1}}>
+        <Grid item width={750} paddingTop={2} marginLeft={2} >
           <Outlet />
         </Grid>
       </Grid>

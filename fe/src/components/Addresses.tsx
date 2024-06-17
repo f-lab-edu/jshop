@@ -34,7 +34,7 @@ export default function Addresses(props: Props) {
       <Button fullWidth variant="outlined" onClick={openAddAddress}>추가하기</Button>
       <AddAddressDialog
         open={open}      
-        closeAddAddress={closeAddAddress} />
+        close={closeAddAddress} />
     </Box>
   )
 

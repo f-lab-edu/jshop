@@ -45,5 +45,6 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parent")
     private List<Category> children;
 
+    @Column(unique = true)
     private String name;
 }

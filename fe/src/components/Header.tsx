@@ -1,6 +1,6 @@
 import { AppBar, Box, Button, Drawer, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import { styled, alpha } from '@mui/material/styles';
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { ShoppingCart, Menu, Home, Logout } from "@mui/icons-material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,7 +8,7 @@ import InputBase from '@mui/material/InputBase';
 import isAuthenticated from "../utils/isAuthenticated";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
-import { goCart, goHome, goMyPage, goOrders, signIn } from "../utils/route";
+import { goHome, signIn } from "../utils/route";
 import logout from "../utils/logout";
 
 
@@ -91,34 +91,35 @@ export default function Header() {
             />
           </Search>
         </Stack>
-        {auth ? <IconButton
+        {auth ? <Link to="/mypage/orders" style={{ color: "white" }}><IconButton
           size="large"
           edge="end"
           color="inherit"
           aria-label="user"
           sx={{ mr: 2 }}
-          onClick={goOrders}
         >
           <AccountCircle />
-        </IconButton> : <Button color="inherit" onClick={signIn}>Sign in</Button>}
-        <IconButton
-        size="large"
-        edge="end"
-        color="inherit"
-        aria-label="user"
-        onClick={goCart}
-        sx={{ mr: 2 }}>
-          <ShoppingCart/>
-        </IconButton>
+        </IconButton> </Link> : <Link to="/login" style={{ color: "white" }}><Button color="inherit" onClick={signIn}>Sign in</Button>
+        </Link>}
+        <Link to={"/mypage/cart"} style={{color:"white"}}>
+          <IconButton 
+            size="large"
+            edge="end"
+            color="inherit"
+            aria-label="user"
+            sx={{ mr: 2 }}>
+            <ShoppingCart />
+          </IconButton>
+        </Link>
         {auth && <IconButton
-        size="large"
-        edge="end"
-        color="inherit"
-        aria-label="user"
-        onClick={logout}
-        sx={{ mr: 2 }}>
-          <Logout/>
-        </IconButton>}        
+          size="large"
+          edge="end"
+          color="inherit"
+          aria-label="user"
+          onClick={logout}
+          sx={{ mr: 2 }}>
+          <Logout />
+        </IconButton>}
       </Toolbar>
     </AppBar>
   )

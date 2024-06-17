@@ -33,8 +33,7 @@ export default function AddressCard(props: Props) {
         <Grid item xs={3}>
           <Box justifyContent={"center"} alignItems={"center"} display={"flex"} sx={{ width: "100%", height: "100%" }}>
             <Stack spacing={1} width={"100px"}>
-              <Button fullWidth variant="outlined" style={{ borderColor: red[300], color: red[300] }} >삭제</Button>
-              <Button fullWidth variant="outlined">수정</Button>
+              <Button fullWidth variant="outlined" style={{ borderColor: red[300], color: red[300] }} >삭제</Button>            
               {selectAddres && <Button fullWidth variant="outlined" onClick={() => selectAddres}>선택</Button>}
             </Stack>
           </Box>
