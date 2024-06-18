@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"cart", "wallet", ""})
+@ToString(exclude = {"cart", "wallet"})
 @Table(name = "users")
 public class User extends BaseEntity {
 
