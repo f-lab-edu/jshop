@@ -71,12 +71,12 @@ class ProductControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/products?page=1")
+            .get("/api/products?page=0&size=10")
             .with(userSecurityContext()));
 
         // then
         perform.andExpect(status().isOk());
-        verify(productService, times(1)).getOwnProducts(1L, 1);
+        verify(productService, times(1)).getOwnProducts(1L, 0, 10);
     }
 
     @Test
@@ -90,7 +90,7 @@ class ProductControllerTest {
 
         // then
         perform.andExpect(status().isOk());
-        verify(productService, times(1)).getOwnProducts(1L, 0);
+        verify(productService, times(1)).getOwnProducts(1L, 0, 10);
     }
 
     @Test

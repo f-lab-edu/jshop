@@ -24,7 +24,7 @@ public class ProductResponse {
     private String description;
     private Map<String, List<String>> attributes;
 
-    public static ProductResponse ofProduct(Product product) {
+    public static ProductResponse of(Product product) {
         return ProductResponse
             .builder()
             .id(product.getId())

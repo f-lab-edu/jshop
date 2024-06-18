@@ -113,7 +113,6 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(inventoryService.createInventory()).thenReturn(inventory);
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(false);
@@ -145,11 +144,10 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.getReferenceById(1L)).thenReturn(user2);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
         // then
-        JshopException jshopException = assertThrows(JshopException.class, () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        JshopException jshopException = assertThrows(JshopException.class, () -> productService.createProductDetail(createProductDetailRequest, 2L, 1L));
         assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
     }
 
@@ -168,7 +166,6 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
 
@@ -192,7 +189,6 @@ class ProductServiceTest {
             .builder().price(1000L).attribute(attribute).build();
 
         // when
-        when(userRepository.getReferenceById(1L)).thenReturn(user);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
 

@@ -37,7 +37,7 @@ public class SecurityConfig {
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login", "/api/join")
+            .requestMatchers("/api/login", "/api/join", "/api/search/**")
             .permitAll());
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
