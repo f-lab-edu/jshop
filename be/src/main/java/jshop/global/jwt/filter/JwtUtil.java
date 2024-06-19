@@ -15,15 +15,17 @@ public class JwtUtil {
 
     private final SecretKey secretKey;
 
-    public JwtUtil(@Value("${spring.jwt.secret}") String secretKey) {
-        this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
-            Jwts.SIG.HS256.key()
-                .build()
-                .getAlgorithm());
+    public JwtUtil(
+        @Value("${spring.jwt.secret:default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_}") String secretKey) {
+        this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256
+            .key()
+            .build()
+            .getAlgorithm());
     }
 
     public Long getId(String token) {
-        return Jwts.parser()
+        return Jwts
+            .parser()
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
@@ -32,7 +34,8 @@ public class JwtUtil {
     }
 
     public String getEmail(String token) {
-        return Jwts.parser()
+        return Jwts
+            .parser()
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
@@ -41,7 +44,8 @@ public class JwtUtil {
     }
 
     public String getRole(String token) {
-        return Jwts.parser()
+        return Jwts
+            .parser()
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
@@ -51,15 +55,14 @@ public class JwtUtil {
 
     public boolean isExpired(String token) {
         try {
-            return Jwts.parser()
+            return Jwts
+                .parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration()
-                .before(Date.from(LocalDateTime.now()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()));
+                .before(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
 
         } catch (Exception ex) {
             return true;
@@ -68,10 +71,7 @@ public class JwtUtil {
 
     public Boolean validJwt(String token) {
         try {
-            Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token);
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return !isExpired(token);
         } catch (Exception ex) {
             return false;
@@ -79,7 +79,8 @@ public class JwtUtil {
     }
 
     public String createJwt(Long id, String email, String role, long expiredMs) {
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .claim("id", id)
             .claim("email", email)
             .claim("role", role)

@@ -6,8 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import jshop.domain.user.entity.User;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.global.jwt.dto.CustomUserDetails;
@@ -41,7 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 .builder().message("Authorizaation 헤더가 잘못되었습니다").error(ErrorCode.BAD_TOKEN).build();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(responseDto));
+            String responseDtoStr = objectMapper.writeValueAsString(responseDto);
+            byte[] utf8JsonString = responseDtoStr.getBytes(StandardCharsets.UTF_8);
+            response.getOutputStream().write(utf8JsonString);
             return;
         }
 
@@ -53,7 +55,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 .builder().message("토큰이 만료되었습니다.").error(ErrorCode.TOKEN_EXPIRED).build();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(responseDto));
+            String responseDtoStr = objectMapper.writeValueAsString(responseDto);
+            byte[] utf8JsonString = responseDtoStr.getBytes(StandardCharsets.UTF_8);
+            response.getOutputStream().write(utf8JsonString);
             return;
         }
 
@@ -63,7 +67,7 @@ public class JwtFilter extends OncePerRequestFilter {
             .username(jwtUtil.getEmail(token))
             .role(jwtUtil.getRole(token))
             .build();
-        
+
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);

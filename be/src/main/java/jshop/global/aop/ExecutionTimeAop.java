@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Slf4j
-@Component
+//@Component
 public class ExecutionTimeAop {
 
     private Long startTime;
