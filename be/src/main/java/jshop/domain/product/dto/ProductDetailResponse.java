@@ -10,6 +10,8 @@ import lombok.ToString;
 
 @Getter
 @EqualsAndHashCode
+@Builder
+@AllArgsConstructor
 @ToString
 public class ProductDetailResponse {
 
@@ -19,14 +21,4 @@ public class ProductDetailResponse {
     private String description;
     private Long price;
     private Map<String, String> attribute;
-
-    public ProductDetailResponse(Long id, String name, String manufacturer, String description,
-        Long price, Map<String, String> attribute) {
-        this.id = id;
-        this.name = name;
-        this.manufacturer = manufacturer;
-        this.description = description;
-        this.price = price;
-        this.attribute = attribute;
-    }
 }

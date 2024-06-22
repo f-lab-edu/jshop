@@ -5,6 +5,8 @@ import java.util.List;
 import jshop.domain.category.dto.CategoryResponse;
 import jshop.domain.category.dto.CreateCategoryRequest;
 import jshop.domain.category.service.CategoryService;
+import jshop.global.annotation.CurrentUserId;
+import jshop.global.annotation.CurrentUserRole;
 import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +29,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public void createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest) {
-        categoryService.createCategory(createCategoryRequest);
+    public void createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest,
+        @CurrentUserRole String userRole) {
+        categoryService.createCategory(createCategoryRequest, userRole);
     }
 }

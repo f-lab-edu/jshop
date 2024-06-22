@@ -10,7 +10,6 @@ import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
-import jshop.domain.product.entity.Product;
 import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
@@ -29,7 +28,7 @@ import org.springframework.context.annotation.Import;
 public class UserRepositoryTest {
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
 
     @Autowired
     private ProductRepository productRepository;
@@ -42,40 +41,10 @@ public class UserRepositoryTest {
 
 
     @Test
-    public void test() {
-        User user = User
-            .builder().username("kim").build();
-        userRepository.save(user);
-
-        em.flush();
-        em.clear();
-
-        User referenceById = userRepository.getReferenceById(user.getId());
-        Product product = Product
-            .builder().owner(referenceById).build();
-
-        productRepository.save(product);
-
-        em.flush();
-        em.clear();
-
-        Optional<Product> byId = productRepository.findById(product.getId());
-        byId.ifPresent((p) -> {
-            System.out.println("==================================");
-            System.out.println(p.getOwner().getUsername());
-        });
-    }
-
-    @Test
     public void 회원가입() {
         // given
         User user = User
-            .builder()
-            .email("test")
-            .userType(UserType.USER)
-            .username("kim")
-            .password("kim")
-            .build();
+            .builder().email("test").userType(UserType.USER).username("kim").password("kim").build();
 
         // when
         userRepository.save(user);
@@ -89,20 +58,10 @@ public class UserRepositoryTest {
     public void 중복이메일_제약조건() {
         // given
         User user1 = User
-            .builder()
-            .email("test")
-            .userType(UserType.USER)
-            .username("kim")
-            .password("kim")
-            .build();
+            .builder().email("test").userType(UserType.USER).username("kim").password("kim").build();
 
         User user2 = User
-            .builder()
-            .email("test")
-            .userType(UserType.USER)
-            .username("kim1")
-            .password("kim2")
-            .build();
+            .builder().email("test").userType(UserType.USER).username("kim1").password("kim2").build();
 
         // when
         userRepository.save(user1);
@@ -123,13 +82,7 @@ public class UserRepositoryTest {
             .builder().balance(0L).build();
 
         User user = User
-            .builder()
-            .email("test")
-            .userType(UserType.USER)
-            .username("kim")
-            .password("kim")
-            .wallet(wallet)
-            .build();
+            .builder().email("test").userType(UserType.USER).username("kim").password("kim").wallet(wallet).build();
 
         Address address = Address
             .builder()

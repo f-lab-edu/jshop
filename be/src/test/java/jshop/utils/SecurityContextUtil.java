@@ -23,15 +23,14 @@ public class SecurityContextUtil {
                 .role("ROLE_USER")
                 .build();
             CustomUserDetails customUserDetails = CustomUserDetails.ofUser(u);
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails,
+                null, customUserDetails.getAuthorities());
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authToken);
             context.setAuthentication(authToken);
             SecurityContextHolder.setContext(context);
 
-            return SecurityMockMvcRequestPostProcessors
-                .securityContext(context)
-                .postProcessRequest(request);
+            return SecurityMockMvcRequestPostProcessors.securityContext(context).postProcessRequest(request);
         };
     }
 }

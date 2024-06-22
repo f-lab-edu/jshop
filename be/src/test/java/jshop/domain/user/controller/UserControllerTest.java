@@ -10,6 +10,8 @@ import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.TestSecurityConfig;
 import org.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(UserController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
+@DisplayName("UserController Controller 테스트")
 class UserControllerTest {
 
     @MockBean
@@ -34,48 +37,77 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    public void 회원정보가져오기() throws Exception {
-        // given
+    @Nested
+    @DisplayName("현재 인증된 유저의 정보를 가져옴")
+    class GetUserInfo {
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/users")
-            .with(userSecurityContext()));
+        @Test
+        @DisplayName("토큰에 인증정보가 있다면 회원 정보를 가져올 수 있음")
+        public void getUserInfo_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/users").with(userSecurityContext()));
 
-        // then
-        verify(userService, times(1)).getUser(1L);
-        perform.andExpect(status().isOk());
+            // then
+            verify(userService, times(1)).getUser(1L);
+            perform.andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("토큰에 인증정보가 없다면 회원 정보를 가져올 수 없음")
+        public void getUserInfo_noAuth() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/users"));
+            // then
+            perform.andExpect(status().isUnauthorized());
+
+        }
     }
 
-    @Test
-    public void 회원정보가져오기_인증정보없음() throws Exception {
-        // given
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/users"));
-        // then
-        perform.andExpect(status().isUnauthorized());
+    @Nested
+    @DisplayName("현재 인증된 유저의 정보를 갱신함")
+    class UpdateUser {
 
-    }
+        @Test
+        @DisplayName("현재 인증된 유저의 이름을 갱신할 수 있다.")
+        public void updateUser_success() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("username", "김재현");
 
-    @Test
-    public void 유저정보업데이트() throws Exception {
-        // given
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "김재현");
+            UpdateUserRequest updateUserRequest = UpdateUserRequest
+                .builder().username("김재현").build();
 
-        UpdateUserRequest updateUserRequest = UpdateUserRequest
-            .builder().username("김재현").build();
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/users")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .patch("/api/users")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
+            // then
+            perform.andExpect(status().isOk());
+        }
 
-        // then
-        perform.andExpect(status().isOk());
+        @Test
+        @DisplayName("현재 인증되지 않은 유저의 이름은 갱신할 수 없다.")
+        public void updateUser_noAuth() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("username", "김재현");
+
+            UpdateUserRequest updateUserRequest = UpdateUserRequest
+                .builder().username("김재현").build();
+
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+
+            // then
+            perform.andExpect(status().isUnauthorized());
+        }
     }
 }
