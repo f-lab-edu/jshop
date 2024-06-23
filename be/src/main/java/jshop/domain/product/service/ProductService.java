@@ -114,7 +114,8 @@ public class ProductService {
 
         Inventory inventory = inventoryService.createInventory();
 
-        productDetailRepository.save(ProductDetail.of(createProductDetailRequest, product, inventory));
+        ProductDetail newProductDetail = ProductDetail.of(createProductDetailRequest, product, inventory);
+        productDetailRepository.save(newProductDetail);
     }
 
     public SearchProductDetailsResponse searchProductDetail(long lastProductId, Optional<String> optionalQuery,

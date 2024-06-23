@@ -10,6 +10,7 @@ import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,16 +35,12 @@ public class ProductController {
     public Response<OwnProductsResponse> getOwnProducts(@CurrentUserId Long userId,
         @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return Response
-            .<OwnProductsResponse>builder()
-            .data(productService.getOwnProducts(userId, page, size))
-            .build();
+            .<OwnProductsResponse>builder().data(productService.getOwnProducts(userId, page, size)).build();
     }
 
     @PostMapping("/{product_id}/details")
-    public void createProductDetail(
-        @PathVariable(value = "product_id", required = true) Long productId,
-        @RequestBody @Valid CreateProductDetailRequest createProductDetailRequest,
-        @CurrentUserId Long userId) {
+    public void createProductDetail(@PathVariable(value = "product_id", required = true) Long productId,
+        @RequestBody @Valid CreateProductDetailRequest createProductDetailRequest, @CurrentUserId Long userId) {
         productService.createProductDetail(createProductDetailRequest, userId, productId);
     }
 }

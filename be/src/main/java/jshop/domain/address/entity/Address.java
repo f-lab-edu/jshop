@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jshop.domain.address.dto.CreateAddressRequest;
+import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -70,5 +71,21 @@ public class Address extends BaseEntity {
             .message(createAddressRequest.getMessage())
             .user(user)
             .build();
+    }
+
+    public void deleteUser() {
+        this.user = null;
+    }
+
+    public void update(UpdateAddressRequest updateAddressRequest) {
+        this.receiverName = updateAddressRequest.getReceiverName();
+        this.receiverNumber = updateAddressRequest.getReceiverNumber();
+        this.province = updateAddressRequest.getProvince();
+        this.city = updateAddressRequest.getCity();
+        this.district = updateAddressRequest.getDistrict();
+        this.street = updateAddressRequest.getStreet();
+        this.detailAddress1 = updateAddressRequest.getDetailAddress1();
+        this.detailAddress2 = updateAddressRequest.getDetailAddress2();
+        this.message = updateAddressRequest.getMessage();
     }
 }
