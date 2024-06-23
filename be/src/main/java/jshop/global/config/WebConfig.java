@@ -33,8 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
 
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new LoggingFilter(objectMapper));
-        filterRegistrationBean.addUrlPatterns("/*");
-        filterRegistrationBean.setOrder(-101);
+        filterRegistrationBean.addUrlPatterns("/api/*");
+        filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return filterRegistrationBean;
     }
 }

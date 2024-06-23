@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.assertj.core.util.VisibleForTesting;
 
 @Getter
 @Builder
@@ -39,13 +40,8 @@ public class CreateAddressRequest {
     private String detailAddress2;
     private String message;
 
-    /**
-     * 테스트용 메서드
-     *
-     * @param address
-     *
-     * @return
-     */
+
+    @VisibleForTesting
     public static CreateAddressRequest of(Address address) {
         return CreateAddressRequest
             .builder()

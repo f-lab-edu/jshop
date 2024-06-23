@@ -26,8 +26,7 @@ public class AccountController {
     }
 
     @GetMapping("/test")
-    public String test(@AuthenticationPrincipal CustomUserDetails user) {
-        return "test";
+    public void test(@AuthenticationPrincipal CustomUserDetails user) {
     }
 }
 
