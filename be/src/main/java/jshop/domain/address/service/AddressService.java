@@ -18,7 +18,7 @@ public class AddressService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void saveAddress(CreateAddressRequest createAddressRequest, Long userId) {
+    public void createAddress(CreateAddressRequest createAddressRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);
         Address newAddress = Address.of(createAddressRequest, user);
         addressRepository.save(newAddress);

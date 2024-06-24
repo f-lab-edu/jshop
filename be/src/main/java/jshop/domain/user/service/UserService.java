@@ -33,7 +33,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> {
             log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
+            throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
         });
 
         List<AddressInfoResponse> addresses = addressRepository
@@ -51,7 +51,7 @@ public class UserService {
 
         if (userRepository.existsByEmail(email)) {
             log.error(ErrorCode.ALREADY_REGISTERED_EMAIL.getLogMessage(), email);
-            throw JshopException.ofErrorCode(ErrorCode.ALREADY_REGISTERED_EMAIL);
+            throw JshopException.of(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
         Wallet wallet = Wallet
@@ -78,7 +78,7 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
+            throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
         });
         user.updateUserInfo(updateUserRequest);
     }

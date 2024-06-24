@@ -32,10 +32,10 @@ public class ProductController {
 
     @GetMapping
     public Response<OwnProductsResponse> getOwnProducts(@CurrentUserId Long userId,
-        @RequestParam(defaultValue = "0") int page) {
+        @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return Response
             .<OwnProductsResponse>builder()
-            .data(productService.getOwnProducts(userId, page))
+            .data(productService.getOwnProducts(userId, page, size))
             .build();
     }
 

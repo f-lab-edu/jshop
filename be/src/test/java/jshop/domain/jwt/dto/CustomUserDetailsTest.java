@@ -12,12 +12,7 @@ class CustomUserDetailsTest {
     public void username_이메일리턴() {
         // given
         User user = User
-            .builder()
-            .username("kim")
-            .email("email")
-            .password("password")
-            .role("ROLE_USER")
-            .build();
+            .builder().username("kim").email("email").password("password").role("ROLE_USER").build();
 
         // when
         CustomUserDetails cud = CustomUserDetails.ofUser(user);

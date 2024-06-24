@@ -8,6 +8,7 @@ import jshop.global.jwt.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,7 +38,7 @@ public class SecurityConfig {
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login", "/api/join")
+            .requestMatchers("/api/login", "/api/join", "/api/search/**")
             .permitAll());
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
