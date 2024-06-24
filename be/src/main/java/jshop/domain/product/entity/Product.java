@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import jshop.domain.category.entity.Category;
 import jshop.domain.manufacturer.entity.Manufacturer;
+import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -55,13 +56,7 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    /**
-     * 상품하나당 하나의 제조사가 있다.
-     * 제조사는 여러개의 상품을 갖는다.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manufacturer_id")
-    private Manufacturer manufacturer;
+    private String manufacturer;
 
     /**
      * 상품은 여러개의 detail 상품을 갖는다.
@@ -86,4 +81,19 @@ public class Product extends BaseEntity {
      */
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, List<String>> attributes;
+
+    public static Product ofCreateProductRequest(CreateProductRequest createProductRequest,
+        Category category, User user) {
+        return Product
+            .builder()
+            .name(createProductRequest.getName())
+            .manufacturer(createProductRequest.getManufacturer())
+            .description(createProductRequest.getDescription())
+            .category(category)
+            .owner(user)
+            .attributes(createProductRequest.getAttributes())
+            .build();
+    }
+
+
 }

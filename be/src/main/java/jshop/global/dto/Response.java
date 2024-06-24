@@ -14,13 +14,6 @@ public class Response<T> {
     private final T data;
     private final String message;
     private ErrorCode error;
-
-    public ErrorCode getError() {
-        if (error == null) {
-            return null;
-        }
-        return error;
-    }
 }
 
 
