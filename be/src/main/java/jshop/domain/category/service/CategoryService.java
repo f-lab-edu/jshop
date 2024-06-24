@@ -26,13 +26,6 @@ public class CategoryService {
 
     @Transactional
     public void createCategory(CreateCategoryRequest createCategoryRequest, String userRole) {
-        if (userRole == null) {
-            /**
-             * TODO 권한에 따라 카테고리 생성이 가능함.
-             */
-            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "role", userRole);
-            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-        }
         if (categoryRepository.existsByName(createCategoryRequest.getName())) {
             log.error(ErrorCode.ALREADY_EXISTS_CATEGORY.getLogMessage(), createCategoryRequest.getName());
             throw JshopException.of(ErrorCode.ALREADY_EXISTS_CATEGORY);
