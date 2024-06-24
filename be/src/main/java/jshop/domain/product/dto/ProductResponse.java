@@ -24,13 +24,13 @@ public class ProductResponse {
     private String description;
     private Map<String, List<String>> attributes;
 
-    public static ProductResponse ofProduct(Product product) {
+    public static ProductResponse of(Product product) {
         return ProductResponse
             .builder()
             .id(product.getId())
             .name(product.getName())
             .manufacturer(product.getManufacturer())
-            .description(product.getManufacturer())
+            .description(product.getDescription())
             .attributes(product.getAttributes())
             .build();
     }

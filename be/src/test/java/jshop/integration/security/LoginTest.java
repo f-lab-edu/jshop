@@ -7,11 +7,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jshop.domain.user.controller.AccountController;
+import jshop.domain.user.entity.User;
 import jshop.domain.user.service.UserService;
+import jshop.global.config.SecurityConfig;
 import jshop.global.jwt.dto.CustomUserDetails;
 import jshop.global.jwt.filter.JwtUtil;
-import jshop.domain.user.entity.User;
-import jshop.global.config.SecurityConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,15 +28,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
-@SpringBootTest(classes = {SecurityConfig.class, JwtUtil.class, ObjectMapper.class,
-    AccountController.class})
+@SpringBootTest(classes = {SecurityConfig.class, JwtUtil.class, ObjectMapper.class, AccountController.class})
 @AutoConfigureMockMvc
 public class LoginTest {
 
@@ -57,18 +51,13 @@ public class LoginTest {
     public void init() {
         BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
         User u = User
-            .builder()
-            .id(1L)
-            .username("user")
-            .email("user")
-            .password(bpe.encode("password"))
-            .role("ROLE_USER")
-            .build();
+            .builder().id(1L).username("user").email("user").password(bpe.encode("password")).role("ROLE_USER").build();
 
         System.out.println(userDetailsService);
         UserDetails userDetails = CustomUserDetails.ofUser(u);
         when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
-        when(userDetailsService.loadUserByUsername(not(ArgumentMatchers.eq("user")))).thenThrow(UsernameNotFoundException.class);
+        when(userDetailsService.loadUserByUsername(not(ArgumentMatchers.eq("user")))).thenThrow(
+            UsernameNotFoundException.class);
 
     }
 
@@ -110,13 +99,7 @@ public class LoginTest {
         // given
         BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
         User u = User
-            .builder()
-            .id(1L)
-            .username("user")
-            .email("user")
-            .password(bpe.encode("password"))
-            .role("ROLE_USER")
-            .build();
+            .builder().id(1L).username("user").email("user").password(bpe.encode("password")).role("ROLE_USER").build();
 
         UserDetails userDetails = CustomUserDetails.ofUser(u);
         when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
@@ -147,9 +130,8 @@ public class LoginTest {
         // invalid jwt
         String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/test")
-            .header("Authorization", token));
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/test").header("Authorization", token));
         // then
         perform.andExpect(status().isUnauthorized());
     }
@@ -161,9 +143,8 @@ public class LoginTest {
         // invalid jwt
         String token = "asdf";
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/test")
-            .header("Authorization", token));
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/test").header("Authorization", token));
         // then
         perform.andExpect(status().isUnauthorized());
     }
@@ -175,9 +156,8 @@ public class LoginTest {
         // invalid jwt
         String token = "Bearer invalidtoken";
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/test")
-            .header("Authorization", token));
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/test").header("Authorization", token));
         // then
         perform.andExpect(status().isUnauthorized());
     }
@@ -208,16 +188,12 @@ public class LoginTest {
 
         System.out.println(token);
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/test")
-            .header("Authorization", token));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/test").header("Authorization", token));
 
         // then
         perform
             .andExpect(status().isOk())
-            .andExpect(result -> assertThat(result
-                .getResponse()
-                .getContentAsString()).isEqualTo("test"));
+            .andExpect(result -> assertThat(result.getResponse().getContentAsString()).isEqualTo("test"));
     }
 
     @Test
@@ -226,9 +202,7 @@ public class LoginTest {
         // invalid token
         String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/test")
-            .header("Authorization", token));
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/test").header("Authorization", token));
 
         // then
         perform.andExpect(status().isUnauthorized());

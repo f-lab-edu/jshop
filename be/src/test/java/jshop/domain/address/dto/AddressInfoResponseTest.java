@@ -1,25 +1,22 @@
 package jshop.domain.address.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import jshop.domain.address.entity.Address;
 import jshop.domain.user.entity.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+@DisplayName("AddressInfoResponse DTO 테스트")
 class AddressInfoResponseTest {
 
     @Test
-    void of() {
+    @DisplayName("Address로 AddressInfoResponse 생성 검증")
+    void of_success() {
         // given
         User user = User
-            .builder()
-            .id(1L)
-            .username("user")
-            .password("password")
-            .email("email@email.com")
-            .role("ROLE_USER")
-            .build();
+            .builder().id(1L).username("user").password("password").email("email@email.com").role("ROLE_USER").build();
 
         Address address = Address
             .builder()
@@ -39,14 +36,15 @@ class AddressInfoResponseTest {
         AddressInfoResponse addressInfoResponse = AddressInfoResponse.of(address);
 
         // then
-        assertThat(addressInfoResponse.getReceiverName()).isEqualTo(address.getReceiverName());
-        assertThat(addressInfoResponse.getReceiverNumber()).isEqualTo(address.getReceiverNumber());
-        assertThat(addressInfoResponse.getProvince()).isEqualTo(address.getProvince());
-        assertThat(addressInfoResponse.getCity()).isEqualTo(address.getCity());
-        assertThat(addressInfoResponse.getDistrict()).isEqualTo(address.getDistrict());
-        assertThat(addressInfoResponse.getStreet()).isEqualTo(address.getStreet());
-        assertThat(addressInfoResponse.getDetailAddress1()).isEqualTo(address.getDetailAddress1());
-        assertThat(addressInfoResponse.getDetailAddress2()).isEqualTo(address.getDetailAddress2());
-        assertThat(addressInfoResponse.getMessage()).isEqualTo(address.getMessage());
+        assertAll("AddressInfoResponse  검증",
+            () -> assertThat(addressInfoResponse.getReceiverName()).isEqualTo(address.getReceiverName()),
+            () -> assertThat(addressInfoResponse.getReceiverNumber()).isEqualTo(address.getReceiverNumber()),
+            () -> assertThat(addressInfoResponse.getProvince()).isEqualTo(address.getProvince()),
+            () -> assertThat(addressInfoResponse.getCity()).isEqualTo(address.getCity()),
+            () -> assertThat(addressInfoResponse.getDistrict()).isEqualTo(address.getDistrict()),
+            () -> assertThat(addressInfoResponse.getStreet()).isEqualTo(address.getStreet()),
+            () -> assertThat(addressInfoResponse.getDetailAddress1()).isEqualTo(address.getDetailAddress1()),
+            () -> assertThat(addressInfoResponse.getDetailAddress2()).isEqualTo(address.getDetailAddress2()),
+            () -> assertThat(addressInfoResponse.getMessage()).isEqualTo(address.getMessage()));
     }
 }

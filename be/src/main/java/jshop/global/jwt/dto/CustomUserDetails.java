@@ -47,6 +47,10 @@ public class CustomUserDetails implements UserDetails {
         return id;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     @Override
     public String getPassword() {
         return password;

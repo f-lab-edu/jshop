@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         }
         log.error(errMsg);
         return Response
-            .builder().message(errMsg).error(ErrorCode.BAD_REQUEST).build();
+            .builder().message(errMsg).errorCode(ErrorCode.BAD_REQUEST.getCode()).build();
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -40,14 +40,12 @@ public class GlobalExceptionHandler {
         return Response
             .builder()
             .message(ErrorCode.INVALID_REQUEST_BODY.getMessage())
-            .error(ErrorCode.INVALID_REQUEST_BODY)
+            .errorCode(ErrorCode.INVALID_REQUEST_BODY.getCode())
             .build();
     }
 
     @ExceptionHandler(JshopException.class)
     protected ResponseEntity<Response> handleJshopException(JshopException ex) {
-        return new ResponseEntity<>(Response.ofErrorCode(ex.getErrorCode()), ex
-            .getErrorCode()
-            .getHttpStatus());
+        return new ResponseEntity<>(Response.of(ex.getErrorCode()), ex.getErrorCode().getHttpStatus());
     }
 }

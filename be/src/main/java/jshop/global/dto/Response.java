@@ -13,11 +13,11 @@ public class Response<T> {
 
     private final T data;
     private final String message;
-    private ErrorCode error;
+    private int errorCode;
 
-    public static Response ofErrorCode(ErrorCode errorCode) {
+    public static Response of(ErrorCode errorCode) {
         return Response
-            .builder().error(errorCode).message(errorCode.getMessage()).build();
+            .builder().errorCode(errorCode.getCode()).message(errorCode.getMessage()).build();
     }
 }
 

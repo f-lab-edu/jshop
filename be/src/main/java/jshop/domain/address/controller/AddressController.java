@@ -22,9 +22,9 @@ public class AddressController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
+    public void createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
         @CurrentUserId Long userId) {
-        addressService.saveAddress(createAddressRequest, userId);
+        addressService.createAddress(createAddressRequest, userId);
     }
 }
 

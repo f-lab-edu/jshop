@@ -39,6 +39,13 @@ public class CreateAddressRequest {
     private String detailAddress2;
     private String message;
 
+    /**
+     * 테스트용 메서드
+     *
+     * @param address
+     *
+     * @return
+     */
     public static CreateAddressRequest of(Address address) {
         return CreateAddressRequest
             .builder()
