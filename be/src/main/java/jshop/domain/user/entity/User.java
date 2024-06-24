@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jshop.domain.cart.entity.Cart;
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
@@ -20,12 +21,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"cart", "wallet", ""})
 @Table(name = "users")
 public class User extends BaseEntity {
 
@@ -63,12 +70,12 @@ public class User extends BaseEntity {
     private Wallet wallet;
 
     public void updateUserInfo(UpdateUserRequest updateUserRequest) {
-        this.username = updateUserRequest.getUsername();
+        if (updateUserRequest.getUsername() != null) {
+            this.username = updateUserRequest.getUsername();
+        } else {
+            log.warn("Username은 null 이 될 수 없습니다.");
+        }
+
     }
 
-    @Override
-    public String toString() {
-        return "User{" + "username='" + username + '\'' + ", email='" + email + '\'' + ", role='"
-            + role + '\'' + ", userType=" + userType + '}';
-    }
 }

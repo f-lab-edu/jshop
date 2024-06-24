@@ -1,7 +1,5 @@
 package jshop.domain.address.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import jshop.domain.address.entity.Address;
 import jshop.domain.user.entity.User;
 import org.junit.jupiter.api.Test;
@@ -12,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AddressInfoResponseTest {
 
     @Test
-    void ofAddress() {
+    void of() {
         // given
         User user = User
             .builder()
@@ -38,7 +36,7 @@ class AddressInfoResponseTest {
             .build();
 
         // when
-        AddressInfoResponse addressInfoResponse = AddressInfoResponse.ofAddress(address);
+        AddressInfoResponse addressInfoResponse = AddressInfoResponse.of(address);
 
         // then
         assertThat(addressInfoResponse.getReceiverName()).isEqualTo(address.getReceiverName());

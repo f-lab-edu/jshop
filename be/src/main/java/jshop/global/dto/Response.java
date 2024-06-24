@@ -14,6 +14,11 @@ public class Response<T> {
     private final T data;
     private final String message;
     private ErrorCode error;
+
+    public static Response ofErrorCode(ErrorCode errorCode) {
+        return Response
+            .builder().error(errorCode).message(errorCode.getMessage()).build();
+    }
 }
 
 

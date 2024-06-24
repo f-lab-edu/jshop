@@ -5,71 +5,66 @@ import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.cart.entity.Cart;
-import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
-import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
-import jshop.global.exception.user.AlreadyRegisteredEmailException;
-import jshop.global.exception.user.UserIdNotFoundException;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
 
-    public UserInfoResponse getUser(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    public UserInfoResponse getUser(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.orElseThrow(() -> {
-            String errMsg = new StringBuilder().append(id).append(" 유저 아이디를 찾지못했습니다.").toString();
-            log.error(errMsg);
-            throw new UserIdNotFoundException(errMsg);
+            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
+            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
         });
 
         List<AddressInfoResponse> addresses = addressRepository
             .findByUser(user)
             .stream()
-            .map(AddressInfoResponse::ofAddress)
+            .map(AddressInfoResponse::of)
             .toList();
 
-        return UserInfoResponse.ofUser(user, addresses);
+        return UserInfoResponse.of(user, addresses);
     }
 
-    public void joinUser(JoinDto joinDto) {
-        String username = joinDto.getUsername();
-        String password = joinDto.getPassword();
-        String email = joinDto.getEmail();
-        UserType userType = joinDto.getUserType();
+    @Transactional
+    public void joinUser(JoinUserRequest joinUserRequest) {
+        String email = joinUserRequest.getEmail();
 
         if (userRepository.existsByEmail(email)) {
-            log.info(String.format("%s 는 이미 가입된 이메일입니다.", email));
-            throw new AlreadyRegisteredEmailException("이미 가입된 이메일입니다.");
+            log.error(ErrorCode.ALREADY_REGISTERED_EMAIL.getLogMessage(), email);
+            throw JshopException.ofErrorCode(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
         Wallet wallet = Wallet
-            .builder().balance(0).build();
+            .builder().balance(0L).build();
         Cart cart = Cart
             .builder().build();
 
         User user = User
             .builder()
-            .username(username)
-            .password(bCryptPasswordEncoder.encode(password))
+            .username(joinUserRequest.getUsername())
+            .password(bCryptPasswordEncoder.encode(joinUserRequest.getPassword()))
             .email(email)
-            .userType(userType)
+            .userType(joinUserRequest.getUserType())
             .role("ROLE_USER")
             .wallet(wallet)
             .cart(cart)
@@ -78,9 +73,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(UserIdNotFoundException::new);
+
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
+            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
+        });
         user.updateUserInfo(updateUserRequest);
     }
 }

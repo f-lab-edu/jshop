@@ -19,7 +19,7 @@ public class CategoryResponse {
     private Long id;
     private String name;
 
-    public static CategoryResponse ofCategory(Category category) {
+    public static CategoryResponse of(Category category) {
         return CategoryResponse
             .builder().id(category.getId()).name(category.getName()).build();
     }
