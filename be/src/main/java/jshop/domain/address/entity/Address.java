@@ -58,6 +58,7 @@ public class Address extends BaseEntity {
     private String message;
 
     @Column(name = "is_deleted")
+    @Builder.Default
     private Boolean isDeleted = false;
 
     public static Address of(CreateAddressRequest createAddressRequest, User user) {

@@ -103,6 +103,7 @@ public class AddressServiceTest {
             // then
             addressService.deleteAddress(1L, 1L);
             assertThat(address.getUser()).isNull();
+            assertThat(address.getIsDeleted()).isTrue();
         }
 
         @Test
