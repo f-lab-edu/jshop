@@ -9,12 +9,13 @@ public enum ErrorCode {
     BAD_REQUEST(2030),
     TOKEN_EXPIRED(2011),
     USERID_NOT_FOUND(3001),
-    INVALID_REQUEST_BODY(10001);
+    INVALID_REQUEST_BODY(10001),
+    BAD_REQUEST(10010);
 
 
-    private int code;
+    private final int code;
 
-    private ErrorCode(int code) {
+    ErrorCode(int code) {
         this.code = code;
     }
 
