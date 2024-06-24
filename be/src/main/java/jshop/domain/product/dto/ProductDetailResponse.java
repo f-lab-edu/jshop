@@ -21,4 +21,16 @@ public class ProductDetailResponse {
     private String description;
     private Long price;
     private Map<String, String> attribute;
+
+    public static ProductDetailResponse of(SearchProductDetailQueryResult searchProductDetailQueryResult) {
+        return ProductDetailResponse
+            .builder()
+            .id(searchProductDetailQueryResult.getId())
+            .name(searchProductDetailQueryResult.getName())
+            .manufacturer(searchProductDetailQueryResult.getManufacturer())
+            .description(searchProductDetailQueryResult.getDescription())
+            .price(searchProductDetailQueryResult.getPrice())
+            .attribute(searchProductDetailQueryResult.getAttribute())
+            .build();
+    }
 }
