@@ -13,6 +13,7 @@ import jshop.domain.product.dto.OwnProductsResponse;
 import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.dto.ProductResponse;
 import jshop.domain.product.dto.SearchProductDetailsResponse;
+import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
@@ -114,7 +115,14 @@ public class ProductService {
 
         Inventory inventory = inventoryService.createInventory();
 
-        productDetailRepository.save(ProductDetail.of(createProductDetailRequest, product, inventory));
+        ProductDetail newProductDetail = ProductDetail.of(createProductDetailRequest, product, inventory);
+        productDetailRepository.save(newProductDetail);
+    }
+
+    @Transactional
+    public void updateProductDetail(Long productId, Long detailId, Long userId,
+        UpdateProductDetailRequest updateProductDetailRequest) {
+
     }
 
     public SearchProductDetailsResponse searchProductDetail(long lastProductId, Optional<String> optionalQuery,
