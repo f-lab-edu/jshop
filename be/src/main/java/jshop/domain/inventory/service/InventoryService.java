@@ -73,7 +73,7 @@ public class InventoryService {
         InventoryHistory inventoryHistory = InventoryHistory
             .builder()
             .inventory(inventory)
-            .changeQuantity(-quantity)
+            .changeQuantity(quantity)
             .oldQuantity(oldQuantity)
             .newQuantity(newQuantity)
             .changeType(InventoryChangeType.DECREASE)
@@ -97,8 +97,8 @@ public class InventoryService {
 
         Inventory inventory = productDetail.getInventory();
         if (inventory == null) {
-            log.error(ErrorCode.PRODUCTDETAIL_NO_INVENTORY.getLogMessage(), productDetailId);
-            throw JshopException.of(ErrorCode.PRODUCTDETAIL_NO_INVENTORY);
+            log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), productDetailId);
+            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
         }
 
         return inventory;

@@ -5,6 +5,7 @@ import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
+import jshop.domain.product.dto.UpdateProductDetailStockRequest;
 import jshop.domain.product.service.ProductService;
 import jshop.global.annotation.CurrentUserId;
 import jshop.global.dto.Response;
@@ -53,9 +54,16 @@ public class ProductController {
         productService.updateProductDetail(productId, detailId, userId, updateProductDetailRequest);
     }
 
+    @PatchMapping("/{product_id}/details/{detail_id}")
+    public void updateProductDetailStock(@PathVariable("product_id") Long productId,
+        @PathVariable("detail_id") Long detailId, @CurrentUserId Long userId,
+        @RequestBody @Valid UpdateProductDetailStockRequest updateProductDetailStockRequest) {
+        productService.updateProductDetailStock(detailId, userId, updateProductDetailStockRequest.getQuantity());
+    }
+
     @DeleteMapping("/{product_id}/details/{detail_id}")
     public void deleteProductDetail(@PathVariable("product_id") Long productId,
         @PathVariable("detail_id") Long detailId, @CurrentUserId Long userId) {
-//        productService.deleteProductDetail(productId, detailId, userId);
+        productService.deleteProductDetail(detailId, userId);
     }
 }

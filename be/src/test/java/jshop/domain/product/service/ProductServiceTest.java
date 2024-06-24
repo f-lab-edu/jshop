@@ -21,6 +21,7 @@ import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
 import jshop.domain.product.dto.ProductResponse;
+import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
@@ -31,6 +32,7 @@ import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -214,7 +216,6 @@ class ProductServiceTest {
         }
     }
 
-
     @Nested
     @DisplayName("상세 상품 생성 요청")
     class CreateProductDetail {
@@ -322,6 +323,150 @@ class ProductServiceTest {
             // then
             assertThrows(RuntimeException.class,
                 () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+        }
+    }
+
+    @Nested
+    @DisplayName("상세 상품 재고 변경")
+    class UpdateProductDetailQuantity {
+
+        @Test
+        @DisplayName("변경 수량이 양수면 재고 변경")
+        public void increaseStock() {
+            // when
+            productService.updateProductDetailStock(1L, 1L, 1);
+
+            // then
+            verify(inventoryService, times(1)).increaseStock(1L, 1L, 1);
+        }
+
+        @Test
+        @DisplayName("변경 수량이 음수면 재고 변경")
+        public void decreaseStock() {
+            // when
+            productService.updateProductDetailStock(1L, 1L, -1);
+
+            // then
+            verify(inventoryService, times(1)).decreaseStock(1L, 1L, -1);
+        }
+
+        @Test
+        @DisplayName("변경 수량이 0 이면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION 예외")
+        public void invalid_update_stock() {
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> productService.updateProductDetailStock(1L, 1L, 0));
+
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
+        }
+    }
+
+    @Nested
+    @DisplayName("상세 상품 정보 변경")
+    class UpdateProductDetail {
+
+        private static Product product;
+        private static ProductDetail productDetail;
+        private static User user;
+
+        @BeforeAll
+        public static void init() {
+            user = User
+                .builder().id(1L).username("kim").build();
+            product = Product
+                .builder().id(1L).name("product").owner(user).build();
+            productDetail = ProductDetail
+                .builder().id(1L).price(100L).product(product).build();
+        }
+
+        @Test
+        @DisplayName("사용자는 자신의 상세 상품의 가격을 변경할 수 있다.")
+        public void updateProductDetail_success() {
+            // given
+            UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
+                .builder().price(1000L).build();
+
+            // when
+            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+
+            // then
+            productService.updateProductDetail(1L, 1L, 1L, updateProductDetailRequest);
+            assertThat(productDetail.getPrice()).isEqualTo(1000L);
+        }
+
+        @Test
+        @DisplayName("사용자는 자신의 상세 상품이 아니라면 상세 상품 정보를 변경할 수 없다.")
+        public void updateProductDetail_noAuth() {
+            // given
+            UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
+                .builder().price(1000L).build();
+
+            // when
+            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> productService.updateProductDetail(1L, 1L, 2L, updateProductDetailRequest));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
+        }
+
+        @Test
+        @DisplayName("상세 상품이 전달받은 상품의 ID에 속하지 않는다면 상세 상품 정보를 변경할 수 없다")
+        public void updateProductDetail_invalidProductId() {
+            // given
+            UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
+                .builder().price(1000L).build();
+
+            // when
+            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> productService.updateProductDetail(2L, 1L, 1L, updateProductDetailRequest));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
+        }
+    }
+
+    @Nested
+    @DisplayName("상세 상품 삭제")
+    class DeleteProductDetail {
+
+        private Product product;
+        private ProductDetail productDetail;
+        private User user;
+
+        @BeforeEach
+        public void init() {
+            user = User
+                .builder().id(1L).username("kim").build();
+            product = Product
+                .builder().id(1L).name("product").owner(user).build();
+            productDetail = ProductDetail
+                .builder().id(1L).price(100L).product(product).build();
+        }
+
+        @Test
+        @DisplayName("사용자는 자신의 상세 상품을 삭제할 수 있다")
+        public void deleteProductDetail_success() {
+            // when
+            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+
+            // then
+            productService.deleteProductDetail(1L, 1L);
+            assertThat(productDetail.getProduct()).isNull();
+            assertThat(productDetail.getIsDeleted()).isTrue();
+        }
+
+        @Test
+        @DisplayName("사용자는 자신의 상세 상품이 아니라면 삭제할 수 없다")
+        public void deleteProductDetail_noAuth() {
+            // when
+            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> productService.deleteProductDetail(1L, 2L));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
     }
 

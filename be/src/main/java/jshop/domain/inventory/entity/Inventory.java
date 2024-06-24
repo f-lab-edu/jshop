@@ -41,17 +41,17 @@ public class Inventory extends BaseEntity {
     }
 
     public void decreaseStock(int quantity) {
-        if (quantity < 0) {
+        if (quantity > 0) {
             log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
             throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         }
 
-        if (this.quantity - quantity < 0) {
+        if (this.quantity + quantity < 0) {
             log.error(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION.getLogMessage(), this.quantity - quantity);
             throw JshopException.of(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
         }
 
-        this.quantity -= quantity;
+        this.quantity += quantity;
 
         if (this.quantity < minQuantity) {
             /**

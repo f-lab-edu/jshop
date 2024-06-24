@@ -164,11 +164,11 @@ class InventoryServiceTest {
         }
 
         @Test
-        @DisplayName("감소 재고가 양수고 결과가 0보다 크다면 재고를 감소할 수 있다")
+        @DisplayName("감소 재고가 음수고 결과가 0보다 크다면 재고를 감소할 수 있다")
         public void decreaseStock_success() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.decreaseStock(1L, 1L, 1);
+            inventoryService.decreaseStock(1L, 1L, -1);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(9);
@@ -182,14 +182,14 @@ class InventoryServiceTest {
         }
 
         @Test
-        @DisplayName("감소 재고가 음수면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생")
+        @DisplayName("감소 재고가 양수면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생")
         public void decreaseStock_illegal_quantity() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.decreaseStock(1L, 1L, -10));
+                () -> inventoryService.decreaseStock(1L, 1L, 10));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
             assertThat(inventory.getQuantity()).isEqualTo(10);
         }
@@ -202,7 +202,7 @@ class InventoryServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.decreaseStock(1L, 1L, 11));
+                () -> inventoryService.decreaseStock(1L, 1L, -11));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
             assertThat(inventory.getQuantity()).isEqualTo(10);
         }

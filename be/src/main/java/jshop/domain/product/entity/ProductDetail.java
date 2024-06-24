@@ -13,9 +13,11 @@ import jakarta.persistence.Table;
 import java.util.Map;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.dto.CreateProductDetailRequest;
+import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -59,8 +61,12 @@ public class ProductDetail extends BaseEntity {
 
     private Long price;
 
-    public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest,
-        Product product, Inventory inventory) {
+    @Column(name = "is_deleted")
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+    public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest, Product product,
+        Inventory inventory) {
         return ProductDetail
             .builder()
             .product(product)
@@ -68,5 +74,14 @@ public class ProductDetail extends BaseEntity {
             .attribute(createProductDetailRequest.getAttribute())
             .inventory(inventory)
             .build();
+    }
+
+    public void update(UpdateProductDetailRequest updateProductDetailRequest) {
+        price = updateProductDetailRequest.getPrice();
+    }
+
+    public void delete() {
+        product = null;
+        isDeleted = true;
     }
 }

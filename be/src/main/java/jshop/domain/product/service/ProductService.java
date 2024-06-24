@@ -25,7 +25,6 @@ import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Error;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -122,7 +121,56 @@ public class ProductService {
     @Transactional
     public void updateProductDetail(Long productId, Long detailId, Long userId,
         UpdateProductDetailRequest updateProductDetailRequest) {
+        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
 
+        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
+            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
+            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
+        });
+
+        Product product = productDetail.getProduct();
+        if (product.getId() != productId) {
+            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
+            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
+        }
+
+        if (product.getOwner().getId() != userId) {
+            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
+            throw JshopException.of(ErrorCode.UNAUTHORIZED);
+        }
+
+        productDetail.update(updateProductDetailRequest);
+    }
+
+    @Transactional
+    public void updateProductDetailStock(Long detailId, Long userId, int quantity) {
+        if (quantity > 0) {
+            inventoryService.increaseStock(detailId, userId, quantity);
+        } else if (quantity < 0) {
+            inventoryService.decreaseStock(detailId, userId, quantity);
+        } else {
+            log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
+            throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
+        }
+    }
+
+    @Transactional
+    public void deleteProductDetail(Long detailId, Long userId) {
+        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
+
+        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
+            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
+            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
+        });
+
+        Product product = productDetail.getProduct();
+
+        if (product.getOwner().getId() != userId) {
+            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
+            throw JshopException.of(ErrorCode.UNAUTHORIZED);
+        }
+
+        productDetail.delete();
     }
 
     public SearchProductDetailsResponse searchProductDetail(long lastProductId, Optional<String> optionalQuery,

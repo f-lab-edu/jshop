@@ -1,5 +1,6 @@
 package jshop.domain.product.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class UpdateProductDetailRequest {
+public class UpdateProductDetailStockRequest {
 
-    @NotNull(message = "가격은 공백일 수 없습니다.")
-    private Long price;
-    
+    @NotNull(message = "변경 수량은 공백일 수 없습니다.")
+    private Integer quantity;
 }

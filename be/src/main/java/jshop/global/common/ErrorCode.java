@@ -39,13 +39,15 @@ public enum ErrorCode {
     NO_SEARCH_QUERY(10050, "검색어가 없습니다.", "상품 검색 쿼리는 null일 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 비즈니스 로직 오류
-    ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50_001, "재고 변화는 음수일 수 없습니다.", "재고 변화는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50_001, "재고 변화량이 잘못되었습니다.", "재고 변화량이 잘못되었습니다. [{}]", HttpStatus.BAD_REQUEST),
     NEGATIVE_QUANTITY_EXCEPTION(50_002, "재고는 음수일 수 없습니다.", "재고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
         "상세상품 속성이 상품 속성에 없습니다. [attributes : {}]   [attribute : {}]", HttpStatus.BAD_REQUEST),
-    PRODUCTDETAIL_NO_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Inventory가 없습니다. [{}]",
+    INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Inventory가 잘못되었습니다. [{}]",
+        HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_PRODUCTDETAIL_PRODUCT(100_200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR);
 
 

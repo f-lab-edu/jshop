@@ -54,20 +54,20 @@ class InventoryTest {
                 .builder().quantity(10).minQuantity(0).build();
 
             // when
-            inventory.decreaseStock(5);
+            inventory.decreaseStock(-5);
             // then
             assertThat(inventory.getQuantity()).isEqualTo(5);
         }
 
         @Test
-        @DisplayName("감소 수량이 음수라면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생함")
+        @DisplayName("감소 수량이 양수라면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생함")
         public void removeStock_illegal_quantity() {
             // given
             Inventory inventory = Inventory
                 .builder().quantity(10).minQuantity(0).build();
 
             // then
-            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.decreaseStock(-5));
+            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.decreaseStock(5));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         }
 
@@ -79,7 +79,7 @@ class InventoryTest {
                 .builder().quantity(0).minQuantity(0).build();
 
             // then
-            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.decreaseStock(5));
+            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.decreaseStock(-1));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
         }
 
@@ -91,7 +91,7 @@ class InventoryTest {
                 .builder().quantity(10).minQuantity(8).build();
 
             // when
-            inventory.decreaseStock(5);
+            inventory.decreaseStock(-5);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(5);
