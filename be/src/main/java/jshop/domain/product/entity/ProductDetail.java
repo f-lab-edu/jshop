@@ -10,9 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.List;
 import java.util.Map;
 import jshop.domain.inventory.entity.Inventory;
+import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +48,7 @@ public class ProductDetail extends BaseEntity {
      * color: red, storage: 128gb
      */
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, List<String>> attribute;
+    private Map<String, String> attribute;
 
     /**
      * 인벤토리와 일대일 관계에 있다.
@@ -59,4 +59,14 @@ public class ProductDetail extends BaseEntity {
 
     private Long price;
 
+    public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest,
+        Product product, Inventory inventory) {
+        return ProductDetail
+            .builder()
+            .product(product)
+            .price(createProductDetailRequest.getPrice())
+            .attribute(createProductDetailRequest.getAttribute())
+            .inventory(inventory)
+            .build();
+    }
 }

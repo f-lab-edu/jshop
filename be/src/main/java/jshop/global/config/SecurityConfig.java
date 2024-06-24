@@ -36,21 +36,22 @@ public class SecurityConfig {
         http.csrf((auth) -> auth.disable());
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
-        http.authorizeHttpRequests(
-            auth -> auth.requestMatchers("/api/login", "/api/join").permitAll());
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/login", "/api/join")
+            .permitAll());
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+            .permitAll());
 
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
 
         http.logout(auth -> auth.logoutUrl("/api/logout").logoutSuccessUrl("/"));
 
-        http.sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterAt(
-            new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration),
-                jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore(new JwtFilter(jwtUtil, objectMapper), LoginFilter.class);
 

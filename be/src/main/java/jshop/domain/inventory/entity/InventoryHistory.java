@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -41,7 +40,10 @@ public class InventoryHistory extends BaseEntity {
     @Column(name = "inventory_change_type")
     private InventoryChangeType changeType;
 
-    private Integer old_quantity;
-    private Integer new_quantity;
-    private Integer change_quantity;
+    @Column(nullable = false, name = "old_quantity")
+    private Integer oldQuantity;
+    @Column(nullable = false, name = "new_quantity")
+    private Integer newQuantity;
+    @Column(nullable = false, name = "change_quantity")
+    private Integer changeQuantity;
 }

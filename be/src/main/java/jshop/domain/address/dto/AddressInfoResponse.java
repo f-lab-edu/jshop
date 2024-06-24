@@ -1,6 +1,5 @@
 package jshop.domain.address.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jshop.domain.address.entity.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +27,7 @@ public class AddressInfoResponse {
     private String detailAddress2;
     private String message;
 
-    public static AddressInfoResponse ofAddress(Address address) {
+    public static AddressInfoResponse of(Address address) {
         return AddressInfoResponse
             .builder()
             .receiverName(address.getReceiverName())

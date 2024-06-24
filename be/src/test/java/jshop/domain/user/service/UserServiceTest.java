@@ -11,16 +11,15 @@ import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
-import jshop.domain.user.dto.JoinDto;
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
-import jshop.global.exception.common.EntityNotFoundException;
-import jshop.global.exception.user.AlreadyRegisteredEmailException;
-import jshop.global.exception.user.UserIdNotFoundException;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import jshop.utils.DtoBuilder;
 import jshop.utils.EntityBuilder;
 import org.junit.jupiter.api.Test;
@@ -60,11 +59,11 @@ class UserServiceTest {
         UserType userType = UserType.USER;
         String role = "ROLE_USER";
 
-        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
         User user = EntityBuilder.getJoinUser(username, email, password, userType, role);
 
         // when
-        userService.joinUser(joinDto);
+        userService.joinUser(joinUserRequest);
 
         // then
         verify(userRepository, times(1)).save(userCaptor.capture());
@@ -88,14 +87,15 @@ class UserServiceTest {
         UserType userType = UserType.USER;
         String role = "ROLE_USER";
 
-        JoinDto joinDto = DtoBuilder.getJoinDto(username, email, password, userType);
+        JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
 
         // when
-        userService.joinUser(joinDto);
+        userService.joinUser(joinUserRequest);
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
         // then
-        assertThrows(AlreadyRegisteredEmailException.class, () -> userService.joinUser(joinDto));
+        JshopException jshopException = assertThrows(JshopException.class, () -> userService.joinUser(joinUserRequest));
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_REGISTERED_EMAIL);
     }
 
     @Test
@@ -112,12 +112,13 @@ class UserServiceTest {
 
         // then
         assertThat(userInfoResponse).isNotNull();
-        assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.ofAddress(address)));
+        assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.of(address)));
     }
 
     @Test
     public void 회원정보가져오기_없는ID() {
-        assertThrows(EntityNotFoundException.class, () -> userService.getUser(1L));
+        JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUser(1L));
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
     }
 
     @Test
@@ -142,8 +143,10 @@ class UserServiceTest {
         // when
 
         // then
-        assertThrows(EntityNotFoundException.class, () -> userService.updateUser(1L, UpdateUserRequest
+        JshopException jshopException = assertThrows(JshopException.class, () -> userService.updateUser(1L, UpdateUserRequest
             .builder().build()));
+
+        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
     }
 
 

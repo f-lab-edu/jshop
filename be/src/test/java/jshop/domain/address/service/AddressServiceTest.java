@@ -6,15 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.global.exception.common.EntityNotFoundException;
-import jshop.global.exception.security.JwtUserNotFoundException;
-import jshop.global.exception.user.UserIdNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,9 +40,8 @@ public class AddressServiceTest {
         User user = getUser();
         CreateAddressRequest createAddressRequest = getCreateAddressRequest();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
         // when
+        when(userRepository.getReferenceById(1L)).thenReturn(user);
         addressService.saveAddress(createAddressRequest, 1L);
 
         // then
@@ -54,19 +49,7 @@ public class AddressServiceTest {
         Address capturedAddress = addressCaptor.getValue();
 
         assertThat(capturedAddress.getUser()).isEqualTo(user);
-        assertThat(CreateAddressRequest.ofAddress(capturedAddress)).isEqualTo(createAddressRequest);
-    }
-
-    @Test
-    public void saveAddress_유저ID없음() {
-        // given
-        User user = getUser();
-        CreateAddressRequest createAddressRequest = getCreateAddressRequest();
-
-        // when
-
-        // then
-        assertThrows(EntityNotFoundException.class, () -> addressService.saveAddress(createAddressRequest, 1L));
+        assertThat(CreateAddressRequest.of(capturedAddress)).isEqualTo(createAddressRequest);
     }
 
     private CreateAddressRequest getCreateAddressRequest() {

@@ -8,15 +8,16 @@ import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.dto.AddressInfoResponse;
-import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
+import jshop.domain.product.entity.Product;
+import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.config.P6SpyConfig;
-import jshop.global.exception.user.UserIdNotFoundException;
+import jshop.global.exception.JshopException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,39 @@ public class UserRepositoryTest {
     EntityManager em;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private AddressRepository addressRepository;
+
+
+    @Test
+    public void test() {
+        User user = User
+            .builder().username("kim").build();
+        userRepository.save(user);
+
+        em.flush();
+        em.clear();
+
+        User referenceById = userRepository.getReferenceById(user.getId());
+        Product product = Product
+            .builder().owner(referenceById).build();
+
+        productRepository.save(product);
+
+        em.flush();
+        em.clear();
+
+        Optional<Product> byId = productRepository.findById(product.getId());
+        byId.ifPresent((p) -> {
+            System.out.println("==================================");
+            System.out.println(p.getOwner().getUsername());
+        });
+    }
 
     @Test
     public void 회원가입() {
@@ -125,13 +155,13 @@ public class UserRepositoryTest {
         System.out.println("user 조회 before");
         Optional<User> optionalFindUser = userRepository.findById(user.getId());
         System.out.println("user 조회 after");
-        User findUser = optionalFindUser.orElseThrow(UserIdNotFoundException::new);
+        User findUser = optionalFindUser.orElseThrow(JshopException::new);
 
         System.out.println("address 조회 before");
         List<AddressInfoResponse> findAddresses = addressRepository
             .findByUser(findUser)
             .stream()
-            .map(AddressInfoResponse::ofAddress)
+            .map(AddressInfoResponse::of)
             .toList();
         System.out.println("address 조회 after");
 

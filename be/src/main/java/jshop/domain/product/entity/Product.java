@@ -12,10 +12,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import jshop.domain.category.entity.Category;
-import jshop.domain.manufacturer.entity.Manufacturer;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.user.entity.User;
 import jshop.global.entity.BaseEntity;
@@ -24,7 +26,6 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -82,8 +83,8 @@ public class Product extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, List<String>> attributes;
 
-    public static Product ofCreateProductRequest(CreateProductRequest createProductRequest,
-        Category category, User user) {
+    public static Product of(CreateProductRequest createProductRequest, Category category,
+        User user) {
         return Product
             .builder()
             .name(createProductRequest.getName())
@@ -93,6 +94,33 @@ public class Product extends BaseEntity {
             .owner(user)
             .attributes(createProductRequest.getAttributes())
             .build();
+    }
+
+    public boolean verifyChildAttribute(Map<String, String> attribute) {
+        if (attributes == null && attribute == null) {
+            return true;
+        }
+
+        Set<String> attributesKeySet = Optional
+            .ofNullable(attributes)
+            .orElse(new HashMap<>())
+            .keySet();
+        Set<String> attributeKeySet = Optional
+            .ofNullable(attribute)
+            .orElse(new HashMap<>())
+            .keySet();
+
+        if (!attributesKeySet.equals(attributeKeySet)) {
+            return false;
+        }
+
+        for (String key : attributeKeySet) {
+            String attributeValue = attribute.get(key);
+            if (!attributes.get(key).contains(attributeValue)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

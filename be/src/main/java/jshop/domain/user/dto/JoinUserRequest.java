@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class JoinDto {
+public class JoinUserRequest {
 
     @NotBlank(message = "이메일은 공백일 수 없습니다.")
     @Email(message = "이메일 형식에 맞지않습니다.")
