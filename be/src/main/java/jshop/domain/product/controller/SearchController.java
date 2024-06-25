@@ -19,8 +19,8 @@ public class SearchController {
 
     @GetMapping
     public Response<SearchProductDetailsResponse> searchProductDetail(
-        @RequestParam(defaultValue = "0", name = "cursor") long lastProductId,
-        @RequestParam(defaultValue = "10") int size, @RequestParam Optional<String> query) {
+        @RequestParam(defaultValue = "0", value = "cursor") long lastProductId,
+        @RequestParam(defaultValue = "10", value = "size") int size, @RequestParam("query") Optional<String> query) {
         lastProductId = lastProductId == 0L ? Long.MAX_VALUE : lastProductId;
 
         return Response

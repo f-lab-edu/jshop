@@ -146,9 +146,8 @@ class LoggingFilterTest {
 
         // then
         verify(log, times(2)).info(loggingArgumentCaptor.capture(), loggingArgumentCaptor2.capture());
-        RequestLog requestLog = objectMapper.readValue(loggingArgumentCaptor2.getAllValues().getFirst(),
-            RequestLog.class);
-        ResponseLog responseLog = objectMapper.readValue(loggingArgumentCaptor2.getAllValues().getLast(),
+        RequestLog requestLog = objectMapper.readValue(loggingArgumentCaptor2.getAllValues().get(0), RequestLog.class);
+        ResponseLog responseLog = objectMapper.readValue(loggingArgumentCaptor2.getAllValues().get(1),
             ResponseLog.class);
 
         assertAll("RequestLog 검증", () -> assertThat(requestLog.getProtocol()).isEqualTo("HTTP/1.1"),

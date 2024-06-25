@@ -23,6 +23,8 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.ProductUtils;
+import jshop.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,10 +49,7 @@ public class ProductService {
     @Transactional
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> {
-            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
-        });
+        User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
         if (user.getUserType() != UserType.SELLER) {
             log.error(ErrorCode.USER_NOT_SELLER.getLogMessage(), user.getUserType());
@@ -88,11 +87,9 @@ public class ProductService {
     @Transactional
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long userId,
         Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
 
-        Product product = productRepository.findById(productId).orElseThrow(() -> {
-            log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
-            throw JshopException.of(ErrorCode.PRODUCTID_NOT_FOUND);
-        });
         User owner = product.getOwner();
 
         if (!owner.getId().equals(userId)) {
@@ -121,14 +118,12 @@ public class ProductService {
     @Transactional
     public void updateProductDetail(Long productId, Long detailId, Long userId,
         UpdateProductDetailRequest updateProductDetailRequest) {
-        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
 
-        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
-            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
-            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
-        });
+        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
+        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
 
         Product product = productDetail.getProduct();
+
         if (product.getId() != productId) {
             log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
             throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
@@ -156,10 +151,7 @@ public class ProductService {
     public void deleteProductDetail(Long detailId, Long userId) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
 
-        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
-            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
-            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
-        });
+        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
 
         Product product = productDetail.getProduct();
 
@@ -186,7 +178,7 @@ public class ProductService {
         Long nextCursor = Optional
             .ofNullable(page.getContent())
             .filter(Predicate.not(List::isEmpty))
-            .map(List::getLast)
+            .map(list -> list.get(list.size() - 1))
             .map(ProductDetailResponse::getId)
             .orElse(null);
 

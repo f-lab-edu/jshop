@@ -80,11 +80,11 @@ class ProductDetailRepositoryTest {
             // then
             assertThat(page.getTotalElements()).isEqualTo(2);
             assertThat(page.getTotalPages()).isEqualTo(1);
-            assertThat(page.getContent().getFirst().getName()).isEqualTo("아이폰");
-            assertThat(page.getContent().getFirst().getManufacturer()).isEqualTo("애플");
-            assertThat(page.getContent().getFirst().getDescription()).isEqualTo("아이폰입니다.");
-            assertThat(page.getContent().getFirst().getPrice()).isEqualTo(1_200_000L);
-            assertThat(page.getContent().getFirst().getAttribute()).isEqualTo(attribute2);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("아이폰");
+            assertThat(page.getContent().get(0).getManufacturer()).isEqualTo("애플");
+            assertThat(page.getContent().get(0).getDescription()).isEqualTo("아이폰입니다.");
+            assertThat(page.getContent().get(0).getPrice()).isEqualTo(1_200_000L);
+            assertThat(page.getContent().get(0).getAttribute()).isEqualTo(attribute2);
         }
 
         @Test

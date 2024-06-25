@@ -36,7 +36,8 @@ public class ProductController {
 
     @GetMapping
     public Response<OwnProductsResponse> getOwnProducts(@CurrentUserId Long userId,
-        @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        @RequestParam(defaultValue = "0", value = "page") int page,
+        @RequestParam(defaultValue = "10", value = "size") int size) {
         return Response
             .<OwnProductsResponse>builder().data(productService.getOwnProducts(userId, page, size)).build();
     }
