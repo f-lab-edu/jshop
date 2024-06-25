@@ -17,7 +17,7 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     boolean existsByAttribute(Map<String, String> attribute);
 
-    @Query("select new jshop.domain.product.dto.ProductDetailResponse(pd.id, p.name, p.manufacturer "
+    @Query("select new jshop.domain.product.dto.SearchProductDetailQueryResult(pd.id, p.name, p.manufacturer "
         + ",p.description, pd.price, pd.attribute) from ProductDetail pd "
         + "join pd.product p where pd.id < :lastProductId and p.name like %:name%")
     Page<SearchProductDetailQueryResult> searchProductDetailsByQuery(@Param("lastProductId") Long lastProductId,

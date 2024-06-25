@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jshop.domain.product.dto.ProductDetailResponse;
+import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.global.config.P6SpyConfig;
@@ -74,17 +75,17 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(Long.MAX_VALUE,
-                "아이폰", PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
+                Long.MAX_VALUE, "아이폰", PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(2);
             assertThat(page.getTotalPages()).isEqualTo(1);
-            assertThat(page.getContent().getFirst().getName()).isEqualTo("아이폰");
-            assertThat(page.getContent().getFirst().getManufacturer()).isEqualTo("애플");
-            assertThat(page.getContent().getFirst().getDescription()).isEqualTo("아이폰입니다.");
-            assertThat(page.getContent().getFirst().getPrice()).isEqualTo(1_200_000L);
-            assertThat(page.getContent().getFirst().getAttribute()).isEqualTo(attribute2);
+            assertThat(page.getContent().get(0).getName()).isEqualTo("아이폰");
+            assertThat(page.getContent().get(0).getManufacturer()).isEqualTo("애플");
+            assertThat(page.getContent().get(0).getDescription()).isEqualTo("아이폰입니다.");
+            assertThat(page.getContent().get(0).getPrice()).isEqualTo(1_200_000L);
+            assertThat(page.getContent().get(0).getAttribute()).isEqualTo(attribute2);
         }
 
         @Test
@@ -105,8 +106,8 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(Long.MAX_VALUE, null,
-                PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
+                Long.MAX_VALUE, null, PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(0);

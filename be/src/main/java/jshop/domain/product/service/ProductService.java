@@ -135,7 +135,7 @@ public class ProductService {
         Long nextCursor = Optional
             .ofNullable(page.getContent())
             .filter(Predicate.not(List::isEmpty))
-            .map(List::getLast)
+            .map((list) -> list.get(list.size() - 1))
             .map(SearchProductDetailQueryResult::getId)
             .orElse(null);
 
