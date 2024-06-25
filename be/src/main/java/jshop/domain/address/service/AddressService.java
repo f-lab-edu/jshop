@@ -9,6 +9,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.AddressUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,11 @@ public class AddressService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createAddress(CreateAddressRequest createAddressRequest, Long userId) {
+    public Long createAddress(CreateAddressRequest createAddressRequest, Long userId) {
         User user = userRepository.getReferenceById(userId);
         Address newAddress = Address.of(createAddressRequest, user);
         addressRepository.save(newAddress);
+        return newAddress.getId();
     }
 
     @Transactional
@@ -47,6 +49,7 @@ public class AddressService {
     @Transactional
     public void updateAddress(UpdateAddressRequest updateAddressRequest, Long addressId, Long userId) {
         Address address = getAddress(addressId);
+
         if (address.getUser().getId() != userId) {
             log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "address", addressId, userId);
             throw JshopException.of(ErrorCode.UNAUTHORIZED);
@@ -57,11 +60,6 @@ public class AddressService {
 
     public Address getAddress(Long addressId) {
         Optional<Address> optionalAddress = addressRepository.findById(addressId);
-        Address address = optionalAddress.orElseThrow(() -> {
-            log.error(ErrorCode.ADDRESSID_NOT_FOUND.getLogMessage(), addressId);
-            throw JshopException.of(ErrorCode.ADDRESSID_NOT_FOUND);
-        });
-
-        return address;
+        return AddressUtils.getAddressOrThrow(optionalAddress, addressId);
     }
 }

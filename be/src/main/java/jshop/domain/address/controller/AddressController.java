@@ -3,9 +3,11 @@ package jshop.domain.address.controller;
 
 import jakarta.validation.Valid;
 import jshop.domain.address.dto.CreateAddressRequest;
+import jshop.domain.address.dto.CreateAddressResponse;
 import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
 import jshop.global.annotation.CurrentUserId;
+import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +29,15 @@ public class AddressController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
+    public Response createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
         @CurrentUserId Long userId) {
-        addressService.createAddress(createAddressRequest, userId);
+        Long addressId = addressService.createAddress(createAddressRequest, userId);
+        
+        return Response
+            .<CreateAddressResponse>builder()
+            .data(CreateAddressResponse
+                .builder().id(addressId).build())
+            .build();
     }
 
     @DeleteMapping("/{id}")
