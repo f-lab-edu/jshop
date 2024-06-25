@@ -61,4 +61,11 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            dir('be') {                
+                junit 'build/test-results/test/*.xml'
+            }
+        }
+    }
 }

@@ -45,3 +45,12 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        exceptionFormat "full" // 상세한 예외 정보 포함
+        showStandardStreams = true // 표준 출력 및 표준 에러 스트림을 리포트에 포함
+    }
+}
