@@ -22,6 +22,8 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.ProductUtils;
+import jshop.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Error;
@@ -47,10 +49,7 @@ public class ProductService {
     @Transactional
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> {
-            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
-        });
+        User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
         if (user.getUserType() != UserType.SELLER) {
             log.error(ErrorCode.USER_NOT_SELLER.getLogMessage(), user.getUserType());
@@ -89,10 +88,9 @@ public class ProductService {
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long userId,
         Long productId) {
 
-        Product product = productRepository.findById(productId).orElseThrow(() -> {
-            log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
-            throw JshopException.of(ErrorCode.PRODUCTID_NOT_FOUND);
-        });
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
+        
         User owner = product.getOwner();
 
         if (!owner.getId().equals(userId)) {
