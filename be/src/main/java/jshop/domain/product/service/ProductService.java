@@ -144,13 +144,11 @@ public class ProductService {
 
     @Transactional
     public void updateProductDetailStock(Long detailId, Long userId, int quantity) {
-        if (quantity > 0) {
-            inventoryService.increaseStock(detailId, userId, quantity);
-        } else if (quantity < 0) {
-            inventoryService.decreaseStock(detailId, userId, quantity);
-        } else {
+        if (quantity == 0) {
             log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
             throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
+        } else {
+            inventoryService.changeStock(detailId, userId, quantity);
         }
     }
 

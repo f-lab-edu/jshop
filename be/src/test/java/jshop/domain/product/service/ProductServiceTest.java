@@ -331,23 +331,13 @@ class ProductServiceTest {
     class UpdateProductDetailQuantity {
 
         @Test
-        @DisplayName("변경 수량이 양수면 재고 변경")
+        @DisplayName("변경 수량이 0이 아니면 재고 변경")
         public void increaseStock() {
-            // when
             productService.updateProductDetailStock(1L, 1L, 1);
+            verify(inventoryService, times(1)).changeStock(1L, 1L, 1);
 
-            // then
-            verify(inventoryService, times(1)).increaseStock(1L, 1L, 1);
-        }
-
-        @Test
-        @DisplayName("변경 수량이 음수면 재고 변경")
-        public void decreaseStock() {
-            // when
             productService.updateProductDetailStock(1L, 1L, -1);
-
-            // then
-            verify(inventoryService, times(1)).decreaseStock(1L, 1L, -1);
+            verify(inventoryService, times(1)).changeStock(1L, 1L, -1);
         }
 
         @Test

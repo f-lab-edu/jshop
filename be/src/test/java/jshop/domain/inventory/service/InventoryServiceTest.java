@@ -84,7 +84,7 @@ class InventoryServiceTest {
     }
 
     @Nested
-    @DisplayName("재고 추가 테스트")
+    @DisplayName("재고 변경 테스트")
     class AddStock {
 
         private User user;
@@ -98,7 +98,7 @@ class InventoryServiceTest {
                 .builder().id(1L).username("kim").build();
 
             inventory = Inventory
-                .builder().quantity(0).minQuantity(0).id(1L).build();
+                .builder().quantity(10).minQuantity(5).id(1L).build();
 
             product = Product
                 .builder().id(1L).name("product").owner(user).build();
@@ -108,67 +108,29 @@ class InventoryServiceTest {
         }
 
         @Test
-        @DisplayName("추가 재고가 양수면 재고를 추가할 수 있다")
+        @DisplayName("변경 재고가 양수면 재고를 추가할 수 있다")
         public void addStock_success() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.increaseStock(1L, 1L, 10);
+            inventoryService.changeStock(1L, 1L, 10);
 
             // then
-            assertThat(inventory.getQuantity()).isEqualTo(10);
+            assertThat(inventory.getQuantity()).isEqualTo(20);
             verify(inventoryHistoryRepository, times(1)).save(inventoryHistoryArgumentCaptor.capture());
             InventoryHistory history = inventoryHistoryArgumentCaptor.getValue();
 
-            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(0),
-                () -> assertThat(history.getNewQuantity()).isEqualTo(10),
+            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(10),
+                () -> assertThat(history.getNewQuantity()).isEqualTo(20),
                 () -> assertThat(history.getChangeQuantity()).isEqualTo(10),
                 () -> assertThat(history.getChangeType()).isEqualTo(InventoryChangeType.INCREASE));
         }
 
         @Test
-        @DisplayName("추가 재고가 음수면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생")
-        public void addStock_illegal_quantity() {
-            // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.increaseStock(1L, 1L, -10));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
-            assertThat(inventory.getQuantity()).isEqualTo(0);
-        }
-    }
-
-    @Nested
-    @DisplayName("재고 감소 테스트")
-    class decreaseStock {
-
-        private User user;
-        private Product product;
-        private ProductDetail productDetail;
-        private Inventory inventory;
-
-        @BeforeEach
-        public void init() {
-            user = User
-                .builder().id(1L).username("kim").build();
-
-            inventory = Inventory
-                .builder().quantity(10).minQuantity(8).id(1L).build();
-
-            product = Product
-                .builder().id(1L).name("product").owner(user).build();
-
-            productDetail = ProductDetail
-                .builder().id(1L).product(product).inventory(inventory).build();
-        }
-
-        @Test
         @DisplayName("감소 재고가 음수고 결과가 0보다 크다면 재고를 감소할 수 있다")
-        public void decreaseStock_success() {
+        public void changeStock_success() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.decreaseStock(1L, 1L, -1);
+            inventoryService.changeStock(1L, 1L, -1);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(9);
@@ -182,27 +144,14 @@ class InventoryServiceTest {
         }
 
         @Test
-        @DisplayName("감소 재고가 양수면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION이 발생")
-        public void decreaseStock_illegal_quantity() {
-            // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.decreaseStock(1L, 1L, 10));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
-            assertThat(inventory.getQuantity()).isEqualTo(10);
-        }
-
-        @Test
         @DisplayName("재고 감소 결과가 음수면 NEGATIVE_QUANTITY_EXCEPTION 발생")
-        public void decreaseStock_negative_quantity() {
+        public void changeStock_negative_quantity() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.decreaseStock(1L, 1L, -11));
+                () -> inventoryService.changeStock(1L, 1L, -11));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
             assertThat(inventory.getQuantity()).isEqualTo(10);
         }

@@ -45,10 +45,10 @@ public class InventoryService {
     }
 
     @Transactional
-    public void increaseStock(Long productDetailId, Long userId, int quantity) {
+    public void changeStock(Long productDetailId, Long userId, int quantity) {
         Inventory inventory = getInventory(productDetailId, userId);
         int oldQuantity = inventory.getQuantity();
-        inventory.increaseStock(quantity);
+        inventory.changeStock(quantity);
         int newQuantity = inventory.getQuantity();
 
         InventoryHistory inventoryHistory = InventoryHistory
@@ -57,30 +57,10 @@ public class InventoryService {
             .changeQuantity(quantity)
             .oldQuantity(oldQuantity)
             .newQuantity(newQuantity)
-            .changeType(InventoryChangeType.INCREASE)
+            .changeType(quantity > 0 ? InventoryChangeType.INCREASE : InventoryChangeType.DECREASE)
             .build();
 
         inventoryHistoryRepository.save(inventoryHistory);
-    }
-
-    @Transactional
-    public void decreaseStock(Long productDetailId, Long userId, int quantity) {
-        Inventory inventory = getInventory(productDetailId, userId);
-        int oldQuantity = inventory.getQuantity();
-        inventory.decreaseStock(quantity);
-        int newQuantity = inventory.getQuantity();
-
-        InventoryHistory inventoryHistory = InventoryHistory
-            .builder()
-            .inventory(inventory)
-            .changeQuantity(quantity)
-            .oldQuantity(oldQuantity)
-            .newQuantity(newQuantity)
-            .changeType(InventoryChangeType.DECREASE)
-            .build();
-
-        inventoryHistoryRepository.save(inventoryHistory);
-
     }
 
     public Inventory getInventory(Long productDetailId, Long userId) {
