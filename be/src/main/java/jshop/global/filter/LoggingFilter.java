@@ -50,8 +50,9 @@ public class LoggingFilter implements Filter {
         chain.doFilter(requestWrapper, responseWrapper);
 
         String requestData = new String(requestWrapper.getRequestData(), Charset.defaultCharset());
+
         if (httpRequest.getRequestURI().equals("/api/login")) {
-            requestData = "{}";
+            requestData = "Secure Info";
         }
 
         String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());

@@ -89,7 +89,6 @@ public class ProductService {
         Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
-
         User owner = product.getOwner();
 
         if (!owner.getId().equals(userId)) {

@@ -19,7 +19,8 @@ public enum ErrorCode {
     TOKEN_EXPIRED(2011, "로그인 세션이 만료되었습니다.", "JWT이 만료되었습니다. {}", HttpStatus.UNAUTHORIZED),
 
     // 인가 오류
-    UNAUTHORIZED(2051, "권한이 없습니다.", "접근 권한이 없습니다. [{} : {}] [user : {}]", HttpStatus.BAD_REQUEST), // 자원정보, 자원 ID, 유저 ID
+    UNAUTHORIZED(2051, "권한이 없습니다.", "접근 권한이 없습니다. [{} : {}] [user : {}]",
+        HttpStatus.UNAUTHORIZED), // 자원정보, 자원 ID, 유저 ID
 
     // ENTITY NOT FOUND
     USERID_NOT_FOUND(3010, "유저정보를 찾을 수 없습니다.", "유저 ID[{}]로 정보를 찾을 수 없습니다. ", HttpStatus.BAD_REQUEST),

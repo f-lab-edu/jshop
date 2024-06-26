@@ -27,9 +27,4 @@ public class MockController {
         return response;
     }
 
-    @GetMapping("/test")
-    public Object test3(@RequestBody Object object) {
-        return object;
-    }
-
 }
