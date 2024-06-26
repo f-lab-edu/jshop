@@ -28,6 +28,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
@@ -65,7 +66,7 @@ public class LoginTest {
     public void 정상로그인테스트() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "user");
+        requestBody.put("email", "user");
         requestBody.put("password", "password");
 
         // when
@@ -82,7 +83,7 @@ public class LoginTest {
     public void 비정상로그인테스트() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "unknown_user");
+        requestBody.put("email", "unknown_user");
         requestBody.put("password", "password");
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
@@ -105,7 +106,7 @@ public class LoginTest {
         when(userDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
 
         JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "user");
+        requestBody.put("email", "user");
         requestBody.put("password", "password");
 
         // when
@@ -176,7 +177,7 @@ public class LoginTest {
     public void 인가받은유저_페이지접속() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
-        requestBody.put("username", "user");
+        requestBody.put("email", "user");
         requestBody.put("password", "password");
 
         ResultActions tokenPerform = mockMvc.perform(MockMvcRequestBuilders

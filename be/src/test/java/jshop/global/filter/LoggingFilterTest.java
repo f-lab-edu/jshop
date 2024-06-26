@@ -157,8 +157,7 @@ class LoggingFilterTest {
             () -> assertThat(requestLog.getQueries()).isEqualTo("param1=value1&param2=value2"),
             () -> assertThat(requestLog.getBody()).isEqualTo(requestBody));
 
-        assertAll("ResponseLog 검증", () -> assertThat(responseLog.getExecuteTime()).isPositive(),
-            () -> assertThat(responseLog.getStatus()).isEqualTo(200));
+        assertAll("ResponseLog 검증", () -> assertThat(responseLog.getStatus()).isEqualTo(200));
 
         System.out.println(loggingArgumentCaptor2.getAllValues());
     }

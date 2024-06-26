@@ -2,6 +2,8 @@ package jshop.domain.address.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import jshop.domain.address.entity.Address;
 import jshop.domain.user.entity.User;
@@ -16,6 +18,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 @DisplayName("AddressRepository Repository 테스트")
 public class AddressRepositoryTest {
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Autowired
     private UserRepository userRepository;
@@ -78,6 +83,34 @@ public class AddressRepositoryTest {
             assertThat(addresses.size()).isEqualTo(2);
             assertThat(addresses).contains(address1);
             assertThat(addresses).contains(address2);
+
+        }
+    }
+
+    @Nested
+    @DisplayName("유저가 자신의 주소 삭제 테스트")
+    class DeleteUser {
+
+        @Test
+        @DisplayName("주소는 자신과 연관된 유저를 삭제할 수 있다")
+        public void deleteUser_success() {
+            // given
+            User user = User
+                .builder().username("kim").build();
+
+            Address address = Address
+                .builder().city("광주시").user(user).build();
+
+            // when
+            userRepository.save(user);
+            addressRepository.save(address);
+            address.delete();
+            em.flush();
+            em.clear();
+            // then
+
+            Address findAddress = addressRepository.findById(address.getId()).get();
+            assertThat(findAddress.getUser()).isNull();
 
         }
     }
