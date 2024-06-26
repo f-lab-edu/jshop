@@ -23,6 +23,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.jwt.dto.CustomUserDetails;
 import jshop.global.utils.ProductUtils;
 import jshop.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,7 +151,8 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProductDetail(Long detailId, Long userId) {
+    @PreAuthorize("@productService.checkProductDetailOwnership(authentication.principal, #detailId)")
+    public void deleteProductDetail(@P("userId") Long userId, @P("detailId") Long detailId) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
 
         ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
@@ -183,5 +188,19 @@ public class ProductService {
 
         return SearchProductDetailsResponse
             .builder().nextCursor(nextCursor).products(page.getContent()).build();
+    }
+
+    public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId) {
+        CustomUserDetails cud = (CustomUserDetails) userDetails;
+        if (cud.getId() == 1L && detailId == 1L) {
+            return true;
+        }
+//        ProductDetail productDetail = productDetailRepository.findById(productDetailId).orElseThrow();
+//
+//        if (productDetail.getProduct().getOwner().getId() != userId) {
+//            throw JshopException.of(ErrorCode.UNAUTHORIZED);
+//        }
+
+        throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }
 }

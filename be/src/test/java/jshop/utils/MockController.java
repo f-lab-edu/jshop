@@ -26,5 +26,4 @@ public class MockController {
         response.put("userRole", userRole);
         return response;
     }
-
 }
