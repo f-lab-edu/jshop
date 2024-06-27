@@ -1,6 +1,6 @@
 package jshop.domain.user.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,7 +46,7 @@ class UserControllerTest {
         public void getUserInfo_success() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/users").with(userSecurityContext()));
+                MockMvcRequestBuilders.get("/api/users").with(mockUserSecurityContext()));
 
             // then
             verify(userService, times(1)).getUser(1L);
@@ -82,7 +82,7 @@ class UserControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .patch("/api/users")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody.toString()));
 

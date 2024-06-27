@@ -1,6 +1,6 @@
 package jshop.global.annotation;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,7 +35,7 @@ class CurrentUserRoleArgumentResolverTest {
     public void getUserId() throws Exception {
         // when
         ResultActions perform = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/userrole").with(userSecurityContext()));
+            MockMvcRequestBuilders.get("/api/userrole").with(mockUserSecurityContext()));
 
         // then
         perform.andExpect(status().isOk()).andExpect(jsonPath("$.userRole").value("ROLE_USER"));

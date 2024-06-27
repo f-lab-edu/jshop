@@ -1,6 +1,6 @@
 package jshop.domain.category.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -63,7 +63,7 @@ class CategoryControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/categories")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createCategoryRequestJson.toString()));
 

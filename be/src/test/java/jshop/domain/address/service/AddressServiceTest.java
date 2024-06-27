@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AddressService Service 테스트")
+@DisplayName("[단위 테스트] AddressService")
 public class AddressServiceTest {
 
     @InjectMocks
@@ -101,44 +101,17 @@ public class AddressServiceTest {
             when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
 
             // then
-            addressService.deleteAddress(1L, 1L);
+            addressService.deleteAddress(1L);
             assertThat(address.getUser()).isNull();
             assertThat(address.getIsDeleted()).isTrue();
         }
 
         @Test
-        @DisplayName("주소 ID로 찾을 수 없다면 ADDRESSID_NOT_FOUND 예외를 던짐")
-        public void deleteAddress_addressNotFound() {
-            // given
-            User user = User
-                .builder().username("kim").id(1L).build();
-
-            // when
-            when(addressRepository.findById(1L)).thenReturn(Optional.empty());
-
+        @DisplayName("존재하지 않는 주소를 삭제하면 예외를 던짐")
+        public void deleteAddress_noAddress() {
             // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> addressService.deleteAddress(1L, 1L));
+            JshopException jshopException = assertThrows(JshopException.class, () -> addressService.deleteAddress(1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ADDRESSID_NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("유저는 자신의 주소가 아니라면 삭제할 수 없음")
-        public void deleteAddress_userNotOwner() {
-            // given
-            User user = User
-                .builder().username("kim").id(1L).build();
-
-            Address address = Address
-                .builder().id(1L).city("광주시").user(user).build();
-
-            // when
-            when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> addressService.deleteAddress(1L, 2L));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
     }
 
@@ -163,50 +136,22 @@ public class AddressServiceTest {
             when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
 
             // then
-            addressService.updateAddress(updateAddressRequest, 1L, 1L);
+            addressService.updateAddress(updateAddressRequest, 1L);
             assertThat(address.getCity()).isEqualTo("서울특별시");
 
         }
 
         @Test
-        @DisplayName("주소 ID로 찾을 수 없다면 ADDRESSID_NOT_FOUND 예외를 던짐")
-        public void updateAddress_addressNotFound() {
+        @DisplayName("존재하지 않는 주소를 갱신하면 예외를 던짐")
+        public void deleteAddress_noAddress() {
             // given
-            User user = User
-                .builder().username("kim").id(1L).build();
-
             UpdateAddressRequest updateAddressRequest = UpdateAddressRequest
-                .builder().build();
-
-            // when
-            when(addressRepository.findById(1L)).thenReturn(Optional.empty());
+                .builder().city("서울특별시").build();
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> addressService.updateAddress(updateAddressRequest, 1L, 1L));
+                () -> addressService.updateAddress(updateAddressRequest, 1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ADDRESSID_NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("유저는 자신의 주소가 아니라면 갱신할 수 없음")
-        public void updateAddress_userNotOwner() {
-            // given
-            User user = User
-                .builder().username("kim").id(1L).build();
-
-            UpdateAddressRequest updateAddressRequest = UpdateAddressRequest
-                .builder().build();
-
-            Address address = Address
-                .builder().id(1L).city("광주시").user(user).build();
-
-            // when
-            when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> addressService.updateAddress(updateAddressRequest, 1L, 2L));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
     }
 }

@@ -173,7 +173,7 @@ public class ProductService {
         if (product.getOwner().getId() == userId) {
             return true;
         }
-
+        log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
         throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }
 
@@ -192,7 +192,7 @@ public class ProductService {
         if (product.getOwner().getId() == userId) {
             return true;
         }
-
+        log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
         throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }
 }

@@ -8,7 +8,7 @@ import jshop.domain.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("AddressInfoResponse DTO 테스트")
+@DisplayName("[단위 테스트] ]AddressInfoResponse")
 class AddressInfoResponseTest {
 
     @Test

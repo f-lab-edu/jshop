@@ -1,6 +1,6 @@
 package jshop.domain.product.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -65,7 +65,7 @@ class ProductControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/products")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody.toString()));
 
@@ -83,7 +83,7 @@ class ProductControllerTest {
         public void getOwnProducts() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products?page=0&size=10").with(userSecurityContext()));
+                MockMvcRequestBuilders.get("/api/products?page=0&size=10").with(mockUserSecurityContext()));
 
             // then
             perform.andExpect(status().isOk());
@@ -95,7 +95,7 @@ class ProductControllerTest {
         public void getOwnProducts_defaultValue() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products").with(userSecurityContext()));
+                MockMvcRequestBuilders.get("/api/products").with(mockUserSecurityContext()));
 
             // then
             perform.andExpect(status().isOk());
@@ -129,7 +129,7 @@ class ProductControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/products/1/details")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody.toString()));
             // then
@@ -145,7 +145,7 @@ class ProductControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/products/1/details")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON));
 
             // then
@@ -169,7 +169,7 @@ class ProductControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/products/1/details")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody.toString()));
 

@@ -1,6 +1,6 @@
 package jshop.domain.product.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -56,7 +56,7 @@ public class SearchControllerTest {
             // given
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search?cursor=123&size=20&query=아이폰")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
             // when
@@ -71,7 +71,7 @@ public class SearchControllerTest {
             // given
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search?query=아이폰")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
             // when
@@ -86,7 +86,7 @@ public class SearchControllerTest {
             // given
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
             // when

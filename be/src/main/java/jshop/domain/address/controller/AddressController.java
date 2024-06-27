@@ -10,6 +10,7 @@ import jshop.global.annotation.CurrentUserId;
 import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,14 +40,16 @@ public class AddressController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAddress(@PathVariable("id") Long addressId, @CurrentUserId Long userId) {
-        addressService.deleteAddress(addressId, userId);
+    @PreAuthorize("isAuthenticated() && @addressService.checkAddressOwnership(authentication.principal, #addressId)")
+    public void deleteAddress(@PathVariable("id") @P("addressId") Long addressId) {
+        addressService.deleteAddress(addressId);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated() && @addressService.checkAddressOwnership(authentication.principal, #addressId)")
     public void updateAddress(@RequestBody @Valid UpdateAddressRequest updateAddressRequest,
-        @PathVariable("id") Long addressId, @CurrentUserId Long userId) {
-        addressService.updateAddress(updateAddressRequest, addressId, userId);
+        @PathVariable("id") Long addressId) {
+        addressService.updateAddress(updateAddressRequest, addressId);
     }
 }
 
