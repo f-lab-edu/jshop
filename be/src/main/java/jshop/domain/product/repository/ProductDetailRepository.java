@@ -28,4 +28,8 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     @EntityGraph(attributePaths = {"product"})
     Optional<ProductDetail> findById(Long id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select pd.inventory from ProductDetail pd where pd.id = :detailId")
+    Optional<Inventory> findInventoryByProductDetailId(@Param("detailId") Long detailId);
 }

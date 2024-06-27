@@ -20,10 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] ProductDetailRepository")
+@Transactional
 class ProductDetailRepositoryTest {
 
     @Autowired

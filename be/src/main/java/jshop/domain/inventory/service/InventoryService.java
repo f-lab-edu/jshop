@@ -64,16 +64,12 @@ public class InventoryService {
     }
 
     public Inventory getInventory(Long productDetailId) {
-        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(productDetailId);
-        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
-            log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), productDetailId);
-            throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
-        });
-
-        Inventory inventory = inventoryRepository.findById(productDetail.getInventory().getId()).orElseThrow(() -> {
-            log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), productDetailId);
-            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
-        });
+        Inventory inventory = productDetailRepository
+            .findInventoryByProductDetailId(productDetailId)
+            .orElseThrow(() -> {
+                log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), productDetailId);
+                throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
+            });
 
         return inventory;
     }

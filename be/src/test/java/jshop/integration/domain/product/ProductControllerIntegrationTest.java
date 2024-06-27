@@ -35,6 +35,7 @@ import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.dto.JoinUserResponse;
+import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import org.junit.jupiter.api.Assertions;
@@ -90,8 +91,9 @@ public class ProductControllerIntegrationTest {
 
     @BeforeAll
     public static void init(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper,
-        @Autowired CategoryService categoryService) throws Exception {
+        @Autowired CategoryService categoryService, @Autowired UserRepository userRepository) throws Exception {
 
+        System.out.println("all user : " + userRepository.findAll());
         /**
          * 일반 유저 인증 과정
          */
@@ -695,7 +697,7 @@ public class ProductControllerIntegrationTest {
             ResultActions perform = mockMvc.perform(
                 delete("/api/products/{product_id}/details/{detail_id}", productId, productDetailId).header(
                     "Authorization", anotherSellerUserToken));
-            
+
             // then
             perform.andExpect(status().isUnauthorized());
         }

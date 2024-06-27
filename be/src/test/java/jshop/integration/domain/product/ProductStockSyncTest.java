@@ -66,29 +66,29 @@ public class ProductStockSyncTest {
          * 판매 유저 인증 과정
          */
         TypeReference<Response<JoinUserResponse>> typeReference = new TypeReference<Response<JoinUserResponse>>() {};
-        String joinUser2 = """
-            { "username" : "username2", "email" : "email2@email.com", "password" : "password2", "userType" : "SELLER"}""";
+        String joinUser = """
+            { "username" : "sync_test", "email" : "sync_test_user@email.com", "password" : "password2", "userType" : "SELLER"}""";
 
-        String user2LoginRequest = """
-            { "email" : "email2@email.com", "password" : "password2" }""";
+        String userLoginRequest = """
+            { "email" : "sync_test_user@email.com", "password" : "password2" }""";
 
-        ResultActions perform2 = mockMvc.perform(
-            post("/api/join").contentType(MediaType.APPLICATION_JSON).content(joinUser2));
+        ResultActions perform = mockMvc.perform(
+            post("/api/join").contentType(MediaType.APPLICATION_JSON).content(joinUser));
 
         Response<JoinUserResponse> joinUserResponse2 = objectMapper.readValue(
-            perform2.andReturn().getResponse().getContentAsString(), typeReference);
+            perform.andReturn().getResponse().getContentAsString(), typeReference);
         sellerUserId = joinUserResponse2.getData().getId();
 
-        ResultActions login2 = mockMvc.perform(
-            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(user2LoginRequest));
-        sellerUserToken = login2.andReturn().getResponse().getHeader("Authorization");
+        ResultActions login = mockMvc.perform(
+            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(userLoginRequest));
+        sellerUserToken = login.andReturn().getResponse().getHeader("Authorization");
 
         /**
          * 기초 카테고리 생성
          */
 
         CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
-            .builder().name("전자제품").build();
+            .builder().name("전자제품2").build();
 
         categoryId = categoryService.createCategory(createCategoryRequest);
 
