@@ -113,5 +113,24 @@ class ProductDetailRepositoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("상세 상품 존재 여부 확인")
+    class ExistsProductDetails {
+
+        @Test
+        @DisplayName("is_deleted == true 인 상품은 existsByIdAndIsDeletedFalse 의 결과가 false")
+        public void existsByIdAndIsDeletedFalse_success() {
+            // given
+            ProductDetail productDetail = ProductDetail
+                .builder().isDeleted(true).build();
+
+            // when
+            productDetailRepository.save(productDetail);
+
+            // then
+            boolean result = productDetailRepository.existsByIdAndIsDeletedFalse(productDetail.getId());
+            assertThat(result).isFalse();
+        }
+    }
 
 }
