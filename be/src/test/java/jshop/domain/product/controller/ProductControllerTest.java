@@ -134,7 +134,7 @@ class ProductControllerTest {
                 .content(requestBody.toString()));
             // then
 
-            verify(productService, times(1)).createProductDetail(createProductDetailRequest, 1L, 1L);
+            verify(productService, times(1)).createProductDetail(createProductDetailRequest, 1L);
             perform.andExpect(status().isOk());
         }
 

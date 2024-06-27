@@ -45,8 +45,8 @@ public class InventoryService {
     }
 
     @Transactional
-    public void changeStock(Long productDetailId, Long userId, int quantity) {
-        Inventory inventory = getInventory(productDetailId, userId);
+    public void changeStock(Long productDetailId, int quantity) {
+        Inventory inventory = getInventory(productDetailId);
         int oldQuantity = inventory.getQuantity();
         inventory.changeStock(quantity);
         int newQuantity = inventory.getQuantity();
@@ -63,17 +63,12 @@ public class InventoryService {
         inventoryHistoryRepository.save(inventoryHistory);
     }
 
-    public Inventory getInventory(Long productDetailId, Long userId) {
+    public Inventory getInventory(Long productDetailId) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(productDetailId);
         ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
             log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), productDetailId);
             throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
         });
-
-        if (productDetail.getProduct().getOwner().getId() != userId) {
-            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", productDetailId, userId);
-            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-        }
 
         Inventory inventory = productDetail.getInventory();
         if (inventory == null) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import jshop.domain.product.dto.ProductDetailResponse;
+import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductDetailRepository extends JpaRepository<ProductDetail, Long> {
 
-    boolean existsByAttribute(Map<String, String> attribute);
+
+    boolean existsByAttributeAndProduct(Map<String, String> attribute, Product product);
 
     @Query("select new jshop.domain.product.dto.ProductDetailResponse(pd.id, p.name, p.manufacturer "
         + ",p.description, pd.price, pd.attribute) from ProductDetail pd "

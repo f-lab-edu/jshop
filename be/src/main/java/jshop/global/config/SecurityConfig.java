@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -37,14 +39,11 @@ public class SecurityConfig {
         http.csrf((auth) -> auth.disable());
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/login", "/api/join", "/api/search/**")
-            .permitAll());
+        http.authorizeHttpRequests(
+            auth -> auth.requestMatchers("/api/login", "/api/join", "/api/search/**").permitAll());
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
-            .permitAll());
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
 
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
 
@@ -52,7 +51,8 @@ public class SecurityConfig {
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterAt(new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(objectMapper, authenticationManager(authenticationConfiguration), jwtUtil),
+            UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore(new JwtFilter(jwtUtil, objectMapper), LoginFilter.class);
 
@@ -60,8 +60,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+        throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
