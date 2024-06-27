@@ -186,7 +186,7 @@ public class ProductService {
             .ofNullable(page.getContent())
             .filter(Predicate.not(List::isEmpty))
             .map(list -> list.get(list.size() - 1))
-            .map(ProductDetailResponse::getId)
+            .map(SearchProductDetailQueryResult::getId)
             .orElse(null);
 
         return SearchProductDetailsResponse
