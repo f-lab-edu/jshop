@@ -3,6 +3,7 @@ package jshop.global.annotation;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.global.jwt.dto.CustomUserDetails;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

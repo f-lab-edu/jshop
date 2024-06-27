@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(MockController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("@CurrentUserRole Annotation 테스트")
+@DisplayName("[단위 테스트] @CurrentUserRole")
 class CurrentUserRoleArgumentResolverTest {
 
     @Autowired
