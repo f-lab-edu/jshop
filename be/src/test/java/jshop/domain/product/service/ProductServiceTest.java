@@ -3,6 +3,7 @@ package jshop.domain.product.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -238,10 +239,11 @@ class ProductServiceTest {
             // when
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
             when(inventoryService.createInventory()).thenReturn(inventory);
-            when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(false);
+            when(productDetailRepository.existsByAttributeAndProduct(any(Map.class), any(Product.class))).thenReturn(
+                false);
 
             // then
-            productService.createProductDetail(createProductDetailRequest, 1L, 1L);
+            productService.createProductDetail(createProductDetailRequest, 1L);
             verify(productDetailRepository, times(1)).save(productDetailArgumentCaptor.capture());
 
             ProductDetail argProductDetail = productDetailArgumentCaptor.getValue();
@@ -272,7 +274,7 @@ class ProductServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.createProductDetail(createProductDetailRequest, 2L, 1L));
+                () -> productService.createProductDetail(createProductDetailRequest, 2L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
 
@@ -293,11 +295,12 @@ class ProductServiceTest {
 
             // when
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-            when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
+            when(productDetailRepository.existsByAttributeAndProduct(any(Map.class), any(Product.class))).thenReturn(
+                true);
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+                () -> productService.createProductDetail(createProductDetailRequest, 1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
         }
 
@@ -318,11 +321,12 @@ class ProductServiceTest {
 
             // when
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-            when(productDetailRepository.existsByAttribute(anyMap())).thenReturn(true);
+            when(productDetailRepository.existsByAttributeAndProduct(any(Map.class), any(Product.class))).thenReturn(
+                true);
 
             // then
             assertThrows(RuntimeException.class,
-                () -> productService.createProductDetail(createProductDetailRequest, 1L, 1L));
+                () -> productService.createProductDetail(createProductDetailRequest, 1L));
         }
     }
 
@@ -333,11 +337,11 @@ class ProductServiceTest {
         @Test
         @DisplayName("변경 수량이 0이 아니면 재고 변경")
         public void increaseStock() {
-            productService.updateProductDetailStock(1L, 1L, 1);
-            verify(inventoryService, times(1)).changeStock(1L, 1L, 1);
+            productService.updateProductDetailStock(1L, 1);
+            verify(inventoryService, times(1)).changeStock(1L, 1);
 
-            productService.updateProductDetailStock(1L, 1L, -1);
-            verify(inventoryService, times(1)).changeStock(1L, 1L, -1);
+            productService.updateProductDetailStock(1L, -1);
+            verify(inventoryService, times(1)).changeStock(1L, -1);
         }
 
         @Test
@@ -345,7 +349,7 @@ class ProductServiceTest {
         public void invalid_update_stock() {
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetailStock(1L, 1L, 0));
+                () -> productService.updateProductDetailStock(1L, 0));
 
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         }
@@ -380,7 +384,7 @@ class ProductServiceTest {
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
 
             // then
-            productService.updateProductDetail(1L, 1L, 1L, updateProductDetailRequest);
+            productService.updateProductDetail(1L, updateProductDetailRequest);
             assertThat(productDetail.getPrice()).isEqualTo(1000L);
         }
 
@@ -396,7 +400,7 @@ class ProductServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetail(1L, 1L, 2L, updateProductDetailRequest));
+                () -> productService.updateProductDetail(2L, updateProductDetailRequest));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
 
@@ -412,7 +416,7 @@ class ProductServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetail(2L, 1L, 1L, updateProductDetailRequest));
+                () -> productService.updateProductDetail(1L, updateProductDetailRequest));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
         }
     }
@@ -442,7 +446,7 @@ class ProductServiceTest {
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
 
             // then
-            productService.deleteProductDetail(1L, 1L);
+            productService.deleteProductDetail(1L);
             assertThat(productDetail.getProduct()).isNull();
             assertThat(productDetail.getIsDeleted()).isTrue();
         }
@@ -455,7 +459,7 @@ class ProductServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.deleteProductDetail(1L, 2L));
+                () -> productService.deleteProductDetail(1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
         }
     }

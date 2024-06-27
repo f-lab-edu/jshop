@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(AddressController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("AddressController Controller 테스트")
+@DisplayName("AddressController 단위테스트")
 public class AddressControllerTest {
 
     @MockBean
@@ -60,7 +60,7 @@ public class AddressControllerTest {
 
 
     @Nested
-    @DisplayName("주소 생성 테스트")
+    @DisplayName("주소 생성 파라미터 검증")
     class CreateAddress {
 
         private static final JSONObject createAddressRequestJson = new JSONObject();
@@ -77,7 +77,7 @@ public class AddressControllerTest {
         }
 
         @Test
-        @DisplayName("일반 유저는 주소를 생성할 수 있음")
+        @DisplayName("로그인한 일반 유저는 주소를 생성할 수 있다")
         public void createAddress_success() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
@@ -93,7 +93,7 @@ public class AddressControllerTest {
             CreateAddressRequest createAddressRequest = createAddressRequestCaptor.getValue();
             Long userId = userIdCaptor.getValue();
 
-            perform.andExpect(status().isCreated());
+            perform.andExpect(status().isOk());
             assertThat(userId).isEqualTo(1L);
             assertAll("createAddressRequest 검증",
                 () -> assertThat(createAddressRequest.getReceiverName()).isEqualTo("김재현"),

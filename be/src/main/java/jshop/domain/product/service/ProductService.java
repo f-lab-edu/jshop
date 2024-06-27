@@ -33,6 +33,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -90,18 +92,11 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long userId,
-        Long productId) {
+    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
-        User owner = product.getOwner();
 
-        if (!owner.getId().equals(userId)) {
-            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
-            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-        }
-
-        if (productDetailRepository.existsByAttribute(createProductDetailRequest.getAttribute())) {
+        if (productDetailRepository.existsByAttributeAndProduct(createProductDetailRequest.getAttribute(), product)) {
             log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId,
                 createProductDetailRequest.getAttribute());
             throw JshopException.of(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
@@ -120,50 +115,27 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProductDetail(Long productId, Long detailId, Long userId,
-        UpdateProductDetailRequest updateProductDetailRequest) {
-
+    public void updateProductDetail(Long detailId, UpdateProductDetailRequest updateProductDetailRequest) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
         ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
-
-        Product product = productDetail.getProduct();
-
-        if (product.getId() != productId) {
-            log.error(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT.getLogMessage(), detailId);
-            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
-        }
-
-        if (product.getOwner().getId() != userId) {
-            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
-            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-        }
 
         productDetail.update(updateProductDetailRequest);
     }
 
     @Transactional
-    public void updateProductDetailStock(Long detailId, Long userId, int quantity) {
+    public void updateProductDetailStock(Long detailId, int quantity) {
         if (quantity == 0) {
             log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
             throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         } else {
-            inventoryService.changeStock(detailId, userId, quantity);
+            inventoryService.changeStock(detailId, quantity);
         }
     }
 
     @Transactional
-    @PreAuthorize("@productService.checkProductDetailOwnership(authentication.principal, #detailId)")
-    public void deleteProductDetail(@P("userId") Long userId, @P("detailId") Long detailId) {
+    public void deleteProductDetail(Long detailId) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
-
         ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
-
-        Product product = productDetail.getProduct();
-
-        if (product.getOwner().getId() != userId) {
-            log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
-            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-        }
 
         productDetail.delete();
     }
@@ -193,16 +165,37 @@ public class ProductService {
             .builder().nextCursor(nextCursor).products(contents).build();
     }
 
-    public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId) {
-        CustomUserDetails cud = (CustomUserDetails) userDetails;
-        if (cud.getId() == 1L && detailId == 1L) {
+    public boolean checkProductOwnership(UserDetails userDetails, Long productId) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        Long userId = customUserDetails.getId();
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> {
+            log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
+            throw JshopException.of(ErrorCode.PRODUCTID_NOT_FOUND);
+        });
+
+        if (product.getOwner().getId() == userId) {
             return true;
         }
-//        ProductDetail productDetail = productDetailRepository.findById(productDetailId).orElseThrow();
-//
-//        if (productDetail.getProduct().getOwner().getId() != userId) {
-//            throw JshopException.of(ErrorCode.UNAUTHORIZED);
-//        }
+
+        throw JshopException.of(ErrorCode.UNAUTHORIZED);
+    }
+
+
+    public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        Long userId = customUserDetails.getId();
+
+        ProductDetail productDetail = productDetailRepository.findById(detailId).orElseThrow(() -> {
+            log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), detailId);
+            throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
+        });
+
+        Product product = productDetail.getProduct();
+
+        if (product.getOwner().getId() == userId) {
+            return true;
+        }
 
         throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }

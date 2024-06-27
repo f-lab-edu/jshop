@@ -10,6 +10,7 @@ import jshop.global.annotation.CurrentUserId;
 import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,11 +29,11 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("isAuthenticated()")
     public Response createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest,
         @CurrentUserId Long userId) {
         Long addressId = addressService.createAddress(createAddressRequest, userId);
-        
+
         return Response
             .<CreateAddressResponse>builder()
             .data(CreateAddressResponse

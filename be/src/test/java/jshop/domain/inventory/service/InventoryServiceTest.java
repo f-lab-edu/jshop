@@ -85,7 +85,7 @@ class InventoryServiceTest {
 
     @Nested
     @DisplayName("재고 변경 테스트")
-    class AddStock {
+    class ChangeStock {
 
         private User user;
         private Product product;
@@ -112,7 +112,7 @@ class InventoryServiceTest {
         public void addStock_success() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.changeStock(1L, 1L, 10);
+            inventoryService.changeStock(1L, 10);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(20);
@@ -127,10 +127,10 @@ class InventoryServiceTest {
 
         @Test
         @DisplayName("감소 재고가 음수고 결과가 0보다 크다면 재고를 감소할 수 있다")
-        public void changeStock_success() {
+        public void removeStock_success() {
             // when
             when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.changeStock(1L, 1L, -1);
+            inventoryService.changeStock(1L, -1);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(9);
@@ -151,7 +151,7 @@ class InventoryServiceTest {
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.changeStock(1L, 1L, -11));
+                () -> inventoryService.changeStock(1L, -11));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
             assertThat(inventory.getQuantity()).isEqualTo(10);
         }
