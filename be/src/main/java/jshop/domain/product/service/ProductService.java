@@ -43,7 +43,7 @@ public class ProductService {
     private final InventoryService inventoryService;
 
     @Transactional
-    public void createProduct(CreateProductRequest createProductRequest, Long userId) {
+    public Long createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
@@ -63,6 +63,8 @@ public class ProductService {
         Product newProduct = Product.of(createProductRequest, category, user);
 
         productRepository.save(newProduct);
+
+        return newProduct.getId();
     }
 
     public OwnProductsResponse getOwnProducts(Long userId, int pageNumber, int pageSize) {
@@ -81,7 +83,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
+    public Long createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
         Product product = getProduct(productId);
 
         if (productDetailRepository.existsByAttributeAndProduct(createProductDetailRequest.getAttribute(), product)) {
@@ -100,6 +102,8 @@ public class ProductService {
 
         ProductDetail newProductDetail = ProductDetail.of(createProductDetailRequest, product, inventory);
         productDetailRepository.save(newProductDetail);
+
+        return newProductDetail.getId();
     }
 
     @Transactional

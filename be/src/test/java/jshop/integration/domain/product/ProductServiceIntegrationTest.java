@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @AutoConfigureMockMvc
 @SpringBootTest
-@DisplayName("통합테스트 AddressController")
+@DisplayName("[통합 테스트] ProductService")
 public class ProductServiceIntegrationTest {
 
     @Autowired
