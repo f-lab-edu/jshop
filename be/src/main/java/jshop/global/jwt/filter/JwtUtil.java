@@ -17,20 +17,12 @@ public class JwtUtil {
 
     public JwtUtil(
         @Value("${spring.jwt.secret:default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_default_key_is_secret_key_}") String secretKey) {
-        this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256
-            .key()
-            .build()
-            .getAlgorithm());
+        this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
+            Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
     public Long getId(String token) {
-        return Jwts
-            .parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .get("id", Long.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
     }
 
     public String getEmail(String token) {

@@ -12,6 +12,7 @@ import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
 import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.dto.ProductResponse;
+import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.dto.SearchProductDetailsResponse;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.domain.product.entity.Product;
@@ -176,8 +177,10 @@ public class ProductService {
         });
 
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Direction.DESC, "id"));
-        Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(lastProductId, query,
-            pageRequest);
+        Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(lastProductId,
+            query, pageRequest);
+
+        List<ProductDetailResponse> contents = page.getContent().stream().map(ProductDetailResponse::of).toList();
 
         Long nextCursor = Optional
             .ofNullable(page.getContent())
@@ -187,7 +190,7 @@ public class ProductService {
             .orElse(null);
 
         return SearchProductDetailsResponse
-            .builder().nextCursor(nextCursor).products(page.getContent()).build();
+            .builder().nextCursor(nextCursor).products(contents).build();
     }
 
     public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId) {

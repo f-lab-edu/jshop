@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import jshop.domain.product.dto.ProductDetailResponse;
+import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.ProductDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +18,10 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     boolean existsByAttribute(Map<String, String> attribute);
 
-    @Query("select new jshop.domain.product.dto.ProductDetailResponse(pd.id, p.name, p.manufacturer "
+    @Query("select new jshop.domain.product.dto.SearchProductDetailQueryResult(pd.id, p.name, p.manufacturer "
         + ",p.description, pd.price, pd.attribute) from ProductDetail pd "
         + "join pd.product p where pd.id < :lastProductId and p.name like %:name%")
-    Page<ProductDetailResponse> searchProductDetailsByQuery(@Param("lastProductId") Long lastProductId,
+    Page<SearchProductDetailQueryResult> searchProductDetailsByQuery(@Param("lastProductId") Long lastProductId,
         @Param("name") String name, Pageable pageable);
 
     @EntityGraph(attributePaths = {"inventory", "product"})

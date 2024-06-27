@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jshop.domain.product.dto.ProductDetailResponse;
+import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.global.config.P6SpyConfig;
@@ -74,8 +75,8 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(Long.MAX_VALUE,
-                "아이폰", PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
+                Long.MAX_VALUE, "아이폰", PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(2);
@@ -105,8 +106,8 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(Long.MAX_VALUE, null,
-                PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
+                Long.MAX_VALUE, null, PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(0);
