@@ -18,9 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> optionalUser = Optional.ofNullable(userRepository.findByEmail(email));
-
-        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        User user = Optional
+            .ofNullable(userRepository.findByEmail(email))
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
         return CustomUserDetails
             .builder()

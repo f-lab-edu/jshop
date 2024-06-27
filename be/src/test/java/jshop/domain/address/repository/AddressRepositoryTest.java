@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
-@DisplayName("AddressRepository Repository 테스트")
+@DisplayName("[단위 테스트] AddressRepository")
 public class AddressRepositoryTest {
 
     @PersistenceContext
@@ -69,7 +69,7 @@ public class AddressRepositoryTest {
         }
 
         @Test
-        @DisplayName("하나에 속한 모든 주소를 가져올 수 있다.")
+        @DisplayName("유저에 속한 모든 주소를 가져올 수 있다.")
         public void findByUser() {
             // given
             userRepository.save(user);
@@ -92,7 +92,7 @@ public class AddressRepositoryTest {
     class DeleteUser {
 
         @Test
-        @DisplayName("주소는 자신과 연관된 유저를 삭제할 수 있다")
+        @DisplayName("유저는 자신과 연관된 주소를 삭제할 수 있다")
         public void deleteUser_success() {
             // given
             User user = User

@@ -10,7 +10,7 @@ import jshop.domain.product.entity.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("ProductResponse DTO 테스트")
+@DisplayName("[단위 테스트] ProductResponse")
 class ProductResponseTest {
 
     @Test

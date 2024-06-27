@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("InventoryService Service 테스트")
+@DisplayName("[단위 테스트] InventoryService")
 class InventoryServiceTest {
 
     @InjectMocks
@@ -89,68 +89,99 @@ class InventoryServiceTest {
         private ProductDetail productDetail;
         private Inventory inventory;
 
+        private Long productId = 1L;
+        private Long productDetailId = 1L;
+        private Long inventoryId = 1L;
+
+        private int initQuantity = 10;
+        private int initMinQuantity = 5;
+        private String productName = "product";
+
         @BeforeEach
         public void init() {
-            user = User
-                .builder().id(1L).username("kim").build();
-
             inventory = Inventory
-                .builder().quantity(10).minQuantity(5).id(1L).build();
+                .builder().quantity(initQuantity).minQuantity(initMinQuantity).id(inventoryId).build();
 
             product = Product
-                .builder().id(1L).name("product").owner(user).build();
+                .builder().id(productId).name(productName).build();
 
             productDetail = ProductDetail
-                .builder().id(1L).product(product).inventory(inventory).build();
+                .builder().id(productDetailId).product(product).inventory(inventory).build();
         }
 
         @Test
         @DisplayName("변경 재고가 양수면 재고를 추가할 수 있다")
         public void addStock_success() {
+            // given
+            int changeQuantity = 5;
+
             // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.changeStock(1L, 10);
+            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
+            inventoryService.changeStock(productDetailId, changeQuantity);
 
             // then
-            assertThat(inventory.getQuantity()).isEqualTo(20);
+            assertThat(inventory.getQuantity()).isEqualTo(initQuantity + changeQuantity);
             verify(inventoryHistoryRepository, times(1)).save(inventoryHistoryArgumentCaptor.capture());
             InventoryHistory history = inventoryHistoryArgumentCaptor.getValue();
 
-            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(10),
-                () -> assertThat(history.getNewQuantity()).isEqualTo(20),
-                () -> assertThat(history.getChangeQuantity()).isEqualTo(10),
+            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(initQuantity),
+                () -> assertThat(history.getNewQuantity()).isEqualTo(initQuantity + changeQuantity),
+                () -> assertThat(history.getChangeQuantity()).isEqualTo(changeQuantity),
                 () -> assertThat(history.getChangeType()).isEqualTo(InventoryChangeType.INCREASE));
         }
 
         @Test
         @DisplayName("감소 재고가 음수고 결과가 0보다 크다면 재고를 감소할 수 있다")
         public void removeStock_success() {
+            // given
+            int changeQuantity = -1;
+
             // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-            inventoryService.changeStock(1L, -1);
+            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
+            inventoryService.changeStock(productDetailId, changeQuantity);
 
             // then
-            assertThat(inventory.getQuantity()).isEqualTo(9);
+            assertThat(inventory.getQuantity()).isEqualTo(initQuantity + changeQuantity);
             verify(inventoryHistoryRepository, times(1)).save(inventoryHistoryArgumentCaptor.capture());
             InventoryHistory history = inventoryHistoryArgumentCaptor.getValue();
 
-            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(10),
-                () -> assertThat(history.getNewQuantity()).isEqualTo(9),
-                () -> assertThat(history.getChangeQuantity()).isEqualTo(-1),
+            assertAll("재고 로그 검증", () -> assertThat(history.getOldQuantity()).isEqualTo(initQuantity),
+                () -> assertThat(history.getNewQuantity()).isEqualTo(initQuantity + changeQuantity),
+                () -> assertThat(history.getChangeQuantity()).isEqualTo(changeQuantity),
                 () -> assertThat(history.getChangeType()).isEqualTo(InventoryChangeType.DECREASE));
         }
 
         @Test
         @DisplayName("재고 감소 결과가 음수면 NEGATIVE_QUANTITY_EXCEPTION 발생")
         public void changeStock_negative_quantity() {
+            // given
+            int changeQuantity = -11;
             // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> inventoryService.changeStock(1L, -11));
+                () -> inventoryService.changeStock(productDetailId, changeQuantity));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
-            assertThat(inventory.getQuantity()).isEqualTo(10);
+            assertThat(inventory.getQuantity()).isEqualTo(initQuantity);
+        }
+
+        @Test
+        @DisplayName("상세 상품에 해당하는 인벤토리가 없을경우 INVALID_PRODUCTDETAIL_INVENTORY 예외 발생")
+        public void changeStock_noInventory() {
+            // given
+            ProductDetail noInventoryProductDetail = ProductDetail
+                .builder().id(2L).product(product).build();
+            int changeQuantity = 1;
+
+            // when
+            when(productDetailRepository.findById(2L)).thenReturn(Optional.of(noInventoryProductDetail));
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> inventoryService.changeStock(2L, changeQuantity));
+
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
         }
     }
 }

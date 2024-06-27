@@ -10,7 +10,7 @@ import jshop.domain.product.dto.CreateProductDetailRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("ProductDetail DTO 테스트")
+@DisplayName("[단위 테스트] ProductDetail")
 class ProductDetailTest {
 
     @Test

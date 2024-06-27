@@ -23,7 +23,7 @@ import org.springframework.data.domain.Sort.Direction;
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
-@DisplayName("ProductDetailRepository Repository 테스트")
+@DisplayName("[단위 테스트] ProductDetailRepository")
 class ProductDetailRepositoryTest {
 
     @Autowired

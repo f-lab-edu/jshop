@@ -1,6 +1,7 @@
 package jshop.domain.product.controller;
 
 import jakarta.validation.Valid;
+import java.util.Optional;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
@@ -38,8 +39,11 @@ public class ProductController {
 
     @GetMapping
     public Response<OwnProductsResponse> getOwnProducts(@CurrentUserId Long userId,
-        @RequestParam(defaultValue = "0", value = "page") int page,
-        @RequestParam(defaultValue = "10", value = "size") int size) {
+        @RequestParam("page") Optional<Integer> optionalPage, @RequestParam("size") Optional<Integer> optionalSize) {
+
+        int page = optionalPage.orElse(0);
+        int size = optionalSize.orElse(10);
+
         return Response
             .<OwnProductsResponse>builder().data(productService.getOwnProducts(userId, page, size)).build();
     }
@@ -52,23 +56,28 @@ public class ProductController {
     }
 
     @PutMapping("/{product_id}/details/{detail_id}")
-    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, #detailId)")
-    public void updateProductDetail(@PathVariable("detail_id") @P("detailId") Long detailId,
+    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, "
+        + "#detailId, #productId)")
+    public void updateProductDetail(@PathVariable("product_id") @P("productId") Long productId,
+        @PathVariable("detail_id") @P("detailId") Long detailId,
         @RequestBody @Valid UpdateProductDetailRequest updateProductDetailRequest) {
         productService.updateProductDetail(detailId, updateProductDetailRequest);
     }
 
     @PatchMapping("/{product_id}/details/{detail_id}")
-    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, #detailId)")
-    public void updateProductDetailStock(@PathVariable("detail_id") @P("detailId") Long detailId,
+    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, "
+        + "#detailId, #productId)")
+    public void updateProductDetailStock(@PathVariable("product_id") @P("productId") Long productId,
+        @PathVariable("detail_id") @P("detailId") Long detailId,
         @RequestBody @Valid UpdateProductDetailStockRequest updateProductDetailStockRequest) {
         productService.updateProductDetailStock(detailId, updateProductDetailStockRequest.getQuantity());
     }
 
     @DeleteMapping("/{product_id}/details/{detail_id}")
-    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, #detailId)")
-    public void deleteProductDetail(@PathVariable("product_id") Long productId,
-        @PathVariable("detail_id") Long detailId, @CurrentUserId Long userId) {
+    @PreAuthorize("isAuthenticated() && @productService.checkProductDetailOwnership(authentication.principal, "
+        + "#detailId, #productId)")
+    public void deleteProductDetail(@PathVariable("product_id") @P("productId") Long productId,
+        @PathVariable("detail_id") @P("detailId") Long detailId) {
         productService.deleteProductDetail(detailId);
     }
 }
