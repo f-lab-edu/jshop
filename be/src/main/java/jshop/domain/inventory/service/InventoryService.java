@@ -30,6 +30,8 @@ public class InventoryService {
         Inventory inventory = Inventory
             .builder().quantity(0).minQuantity(0).build();
 
+        inventoryRepository.save(inventory);
+
         InventoryHistory inventoryHistory = InventoryHistory
             .builder()
             .inventory(inventory)
@@ -41,7 +43,7 @@ public class InventoryService {
 
         inventoryHistoryRepository.save(inventoryHistory);
 
-        return inventoryRepository.save(inventory);
+        return inventory;
     }
 
     @Transactional

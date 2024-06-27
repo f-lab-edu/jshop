@@ -169,6 +169,9 @@ public class ProductService {
         Product product = productDetail.getProduct();
 
         if (product.getId() != productId) {
+            System.err.println("productdetail.product.id : " + productDetail.getProduct().getId());
+            System.err.println("productdetail.id : " + productDetail.getId());
+            System.err.println("product.id : " + product.getId());
             log.error("상세 상품이 상품에 속하지 않습니다. 상품 ID : [{}], 상세 상품 ID : [{}]", productId, detailId);
             throw JshopException.of(ErrorCode.BAD_REQUEST);
         }
