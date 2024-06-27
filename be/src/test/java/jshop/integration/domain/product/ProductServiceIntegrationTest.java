@@ -1,7 +1,7 @@
 package jshop.integration.domain.product;
 
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import jshop.domain.product.service.ProductService;
@@ -48,7 +48,7 @@ public class ProductServiceIntegrationTest {
             { "price" : 1000}
             """;
         mockMvc.perform(post("/api/products/1/details")
-            .with(userSecurityContext())
+            .with(mockUserSecurityContext())
             .contentType(MediaType.APPLICATION_JSON)
             .content(str));
     }

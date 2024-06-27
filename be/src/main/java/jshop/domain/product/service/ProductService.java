@@ -1,8 +1,6 @@
 package jshop.domain.product.service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.inventory.entity.Inventory;
@@ -10,10 +8,7 @@ import jshop.domain.inventory.service.InventoryService;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
-import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.dto.ProductResponse;
-import jshop.domain.product.dto.SearchProductDetailQueryResult;
-import jshop.domain.product.dto.SearchProductDetailsResponse;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
@@ -31,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,8 +82,7 @@ public class ProductService {
 
     @Transactional
     public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-        Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
+        Product product = getProduct(productId);
 
         if (productDetailRepository.existsByAttributeAndProduct(createProductDetailRequest.getAttribute(), product)) {
             log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId,
@@ -112,9 +104,7 @@ public class ProductService {
 
     @Transactional
     public void updateProductDetail(Long detailId, UpdateProductDetailRequest updateProductDetailRequest) {
-        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
-        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
-
+        ProductDetail productDetail = getProductDetail(detailId);
         productDetail.update(updateProductDetailRequest);
     }
 
@@ -130,35 +120,20 @@ public class ProductService {
 
     @Transactional
     public void deleteProductDetail(Long detailId) {
-        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
-        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
-
+        ProductDetail productDetail = getProductDetail(detailId);
         productDetail.delete();
     }
 
-    public SearchProductDetailsResponse searchProductDetail(long lastProductId, Optional<String> optionalQuery,
-        int size) {
+    private Product getProduct(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
+        return product;
+    }
 
-        String query = optionalQuery.orElseThrow(() -> {
-            log.error(ErrorCode.NO_SEARCH_QUERY.getLogMessage());
-            throw JshopException.of(ErrorCode.NO_SEARCH_QUERY);
-        });
-
-        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Direction.DESC, "id"));
-        Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(lastProductId,
-            query, pageRequest);
-
-        List<ProductDetailResponse> contents = page.getContent().stream().map(ProductDetailResponse::of).toList();
-
-        Long nextCursor = Optional
-            .ofNullable(page.getContent())
-            .filter(Predicate.not(List::isEmpty))
-            .map(list -> list.get(list.size() - 1))
-            .map(SearchProductDetailQueryResult::getId)
-            .orElse(null);
-
-        return SearchProductDetailsResponse
-            .builder().nextCursor(nextCursor).products(contents).build();
+    private ProductDetail getProductDetail(Long detailId) {
+        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
+        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
+        return productDetail;
     }
 
     public boolean checkProductOwnership(UserDetails userDetails, Long productId) {
@@ -173,12 +148,12 @@ public class ProductService {
         if (product.getOwner().getId() == userId) {
             return true;
         }
-
+        log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
         throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }
 
 
-    public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId) {
+    public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId, Long productId) {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         Long userId = customUserDetails.getId();
 
@@ -189,10 +164,15 @@ public class ProductService {
 
         Product product = productDetail.getProduct();
 
+        if (product.getId() != productId) {
+            log.error("상세 상품이 상품에 속하지 않습니다. 상품 ID : [{}], 상세 상품 ID : [{}]", productId, detailId);
+            throw JshopException.of(ErrorCode.BAD_REQUEST);
+        }
+
         if (product.getOwner().getId() == userId) {
             return true;
         }
-
+        log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);
         throw JshopException.of(ErrorCode.UNAUTHORIZED);
     }
 }

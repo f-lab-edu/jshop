@@ -1,14 +1,14 @@
 package jshop.domain.product.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
-import jshop.domain.product.service.ProductService;
+import jshop.domain.product.service.SearchService;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,13 +27,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(SearchController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("SearchController Serviee 테스트")
+@DisplayName("[단위 테스트] SearchController")
 public class SearchControllerTest {
 
     private static final JSONObject createAddressRequestJson = new JSONObject();
 
     @MockBean
-    private ProductService productService;
+    private SearchService searchService;
 
     @MockBean
     private JpaMetamodelMappingContext jpaMetamodelMappingContext;
@@ -56,43 +56,40 @@ public class SearchControllerTest {
             // given
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search?cursor=123&size=20&query=아이폰")
-                .with(userSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
             // when
 
-            verify(productService, times(1)).searchProductDetail(123L, Optional.of("아이폰"), 20);
+            verify(searchService, times(1)).searchProductDetail(123L, "아이폰", 20);
             // then
         }
 
         @Test
         @DisplayName("상품 검색시 cursor, size 정보가 없다면 기본 값이 사용된다")
         public void searchProduct_defaultValue() throws Exception {
-            // given
+            // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search?query=아이폰")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
-            // when
 
-            verify(productService, times(1)).searchProductDetail(Long.MAX_VALUE, Optional.of("아이폰"), 10);
             // then
+            verify(searchService, times(1)).searchProductDetail(Long.MAX_VALUE, "아이폰", 30);
         }
 
         @Test
-        @DisplayName("상품 검색시 query 정보가 없다면 null 값이 사용된다")
+        @DisplayName("상품 검색시 query 정보가 없다면 NO_SEARCH_QUERY 발생")
         public void searchProduct_defaultQuery() throws Exception {
-            // given
+            // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/search")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
-            // when
 
-            verify(productService, times(1)).searchProductDetail(Long.MAX_VALUE, Optional.empty(), 10);
             // then
+            perform.andExpect(status().isBadRequest());
         }
     }
 }

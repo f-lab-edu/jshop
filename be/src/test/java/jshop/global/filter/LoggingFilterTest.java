@@ -37,7 +37,7 @@ import org.springframework.mock.web.DelegatingServletInputStream;
 import sun.misc.Unsafe;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LogginFilter Filter 테스트")
+@DisplayName("[단위 테스트] LogginFilter")
 class LoggingFilterTest {
 
     @InjectMocks

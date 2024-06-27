@@ -47,7 +47,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProductService Service 테스트")
+@DisplayName("[단위 테스트] ProductService")
 class ProductServiceTest {
 
     @InjectMocks
@@ -212,7 +212,6 @@ class ProductServiceTest {
                 () -> assertThat(ownProducts.getTotalCount()).isEqualTo(10),
                 () -> assertThat(ownProducts.getProducts()).isEqualTo(
                     products.stream().map(ProductResponse::of).toList()));
-
         }
     }
 
@@ -220,14 +219,26 @@ class ProductServiceTest {
     @DisplayName("상세 상품 생성 요청")
     class CreateProductDetail {
 
+        private Product product;
+        private Inventory inventory;
+
+        @BeforeEach
+        public void init() {
+            inventory = Inventory
+                .builder().quantity(0).minQuantity(0).build();
+
+            Map<String, List<String>> attributes = new HashMap<>();
+            attributes.put("size", List.of("90", "95", "100"));
+            attributes.put("color", List.of("red", "blue", "yellow"));
+
+            product = Product
+                .builder().name("test_product").attributes(attributes).build();
+        }
+
         @Test
-        @DisplayName("사용자는 자신이 상품의 주인이면 상세 상품을 생성할 수 있음")
+        @DisplayName("상세 상품의 속성이 이미 등록된 상품이 아니고, 상품에 정의된 속성에 포함된다면 상세 상품 정보와 상품 ID로 상세 상품을 생성할 수 있음")
         public void createProductDetail_success() {
             // given
-            User user = createUser1();
-            Product product = createProduct1(user);
-            Inventory inventory = createInventory();
-
             Map<String, String> attribute = new HashMap<>();
             attribute.put("color", "red");
             attribute.put("size", "100");
@@ -247,44 +258,14 @@ class ProductServiceTest {
 
             ProductDetail argProductDetail = productDetailArgumentCaptor.getValue();
             assertThat(argProductDetail.getProduct()).isEqualTo(product);
-            assertThat(argProductDetail.getProduct().getOwner()).isEqualTo(user);
             assertThat(argProductDetail.getInventory()).isEqualTo(inventory);
             assertThat(product.verifyChildAttribute(argProductDetail.getAttribute())).isTrue();
         }
 
         @Test
-        @DisplayName("사용자는 자신이 상품의 주인이 아니라면 상세 상품을 생성할 수 없음")
-        public void createProductDetail_notOwner() {
-            // given
-            User user = createUser1();
-            User user2 = createUser2();
-            Product product = createProduct1(user);
-            Inventory inventory = createInventory();
-
-            Map<String, String> attribute = new HashMap<>();
-            attribute.put("color", "red");
-            attribute.put("size", "100");
-
-            CreateProductDetailRequest createProductDetailRequest = CreateProductDetailRequest
-                .builder().price(1000L).attribute(attribute).build();
-
-            // when
-            when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.createProductDetail(createProductDetailRequest, 2L));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
-        }
-
-        @Test
-        @DisplayName("동일한 속성을 가진 상세상품이 있다면 상세 상품을 생성할 수 없음")
+        @DisplayName("상품에 동일한 속성을 가진 상세 상품이 존재한다면 상세 상품을 생성할 수 없음")
         public void createProductDetail_dupAttribute() {
             // given
-            User user = createUser1();
-            Product product = createProduct1(user);
-            Inventory inventory = createInventory();
-
             Map<String, String> attribute = new HashMap<>();
             attribute.put("color", "red");
             attribute.put("size", "100");
@@ -304,13 +285,9 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("상품에 정의된 속성에 맞지 않는 속성을 갖는다면 상세 상품을 생성할 수 없음")
+        @DisplayName("상세 상품이 상품에 정의된 속성에 맞지 않는 속성을 갖는다면 생성할 수 없음")
         public void createProductDetail_invalidAttribute() {
             // given
-            User user = createUser1();
-            Product product = createProduct1(user);
-            Inventory inventory = createInventory();
-
             Map<String, String> attribute = new HashMap<>();
             attribute.put("color", "cyan");
             attribute.put("size", "1001");
@@ -326,31 +303,6 @@ class ProductServiceTest {
             // then
             assertThrows(RuntimeException.class,
                 () -> productService.createProductDetail(createProductDetailRequest, 1L));
-        }
-    }
-
-    @Nested
-    @DisplayName("상세 상품 재고 변경")
-    class UpdateProductDetailQuantity {
-
-        @Test
-        @DisplayName("변경 수량이 0이 아니면 재고 변경")
-        public void increaseStock() {
-            productService.updateProductDetailStock(1L, 1);
-            verify(inventoryService, times(1)).changeStock(1L, 1);
-
-            productService.updateProductDetailStock(1L, -1);
-            verify(inventoryService, times(1)).changeStock(1L, -1);
-        }
-
-        @Test
-        @DisplayName("변경 수량이 0 이면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION 예외")
-        public void invalid_update_stock() {
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetailStock(1L, 0));
-
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         }
     }
 
@@ -373,7 +325,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("사용자는 자신의 상세 상품의 가격을 변경할 수 있다.")
+        @DisplayName("사용자는 자신의 상세 상품의 정보(가격)을 변경할 수 있다.")
         public void updateProductDetail_success() {
             // given
             UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
@@ -386,39 +338,48 @@ class ProductServiceTest {
             productService.updateProductDetail(1L, updateProductDetailRequest);
             assertThat(productDetail.getPrice()).isEqualTo(1000L);
         }
+    }
 
-        @Test
-        @DisplayName("사용자는 자신의 상세 상품이 아니라면 상세 상품 정보를 변경할 수 없다.")
-        public void updateProductDetail_noAuth() {
-            // given
-            UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
-                .builder().price(1000L).build();
+    @Nested
+    @DisplayName("상세 상품 재고 변경")
+    class UpdateProductDetailQuantity {
 
-            // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+        private Inventory inventory;
+        private ProductDetail productDetail;
 
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetail(2L, updateProductDetailRequest));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
+        private Long inventoryId = 1L;
+        private Long productDetailId = 1L;
+
+        @BeforeEach
+        public void init() {
+            inventory = Inventory
+                .builder().id(inventoryId).quantity(0).minQuantity(0).build();
+
+            productDetail = ProductDetail
+                .builder().inventory(inventory).id(productDetailId).build();
         }
 
         @Test
-        @DisplayName("상세 상품이 전달받은 상품의 ID에 속하지 않는다면 상세 상품 정보를 변경할 수 없다")
-        public void updateProductDetail_invalidProductId() {
-            // given
-            UpdateProductDetailRequest updateProductDetailRequest = UpdateProductDetailRequest
-                .builder().price(1000L).build();
+        @DisplayName("변경 수량이 0이 아니면 재고 변경을 할 수 있음")
+        public void changeStock() {
+            productService.updateProductDetailStock(productDetailId, 10);
+            verify(inventoryService, times(1)).changeStock(productDetailId, 10);
 
-            // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
+            productService.updateProductDetailStock(productDetailId, -5);
+            verify(inventoryService, times(1)).changeStock(productDetailId, -5);
+        }
 
+        @Test
+        @DisplayName("변경 수량이 0 이면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION 예외")
+        public void invalid_update_stock() {
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetail(1L, updateProductDetailRequest));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCTDETAIL_PRODUCT);
+                () -> productService.updateProductDetailStock(1L, 0));
+
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
         }
     }
+
 
     @Nested
     @DisplayName("상세 상품 삭제")
@@ -449,41 +410,5 @@ class ProductServiceTest {
             assertThat(productDetail.getProduct()).isNull();
             assertThat(productDetail.getIsDeleted()).isTrue();
         }
-
-        @Test
-        @DisplayName("사용자는 자신의 상세 상품이 아니라면 삭제할 수 없다")
-        public void deleteProductDetail_noAuth() {
-            // when
-            when(productDetailRepository.findById(1L)).thenReturn(Optional.of(productDetail));
-
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.deleteProductDetail(1L));
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZED);
-        }
-    }
-
-    private User createUser1() {
-        return User
-            .builder().id(1L).username("user").build();
-    }
-
-    private User createUser2() {
-        return User
-            .builder().id(2L).username("user2").build();
-    }
-
-    private Inventory createInventory() {
-        return Inventory
-            .builder().quantity(0).minQuantity(0).build();
-    }
-
-    private Product createProduct1(User user) {
-        Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put("size", List.of("90", "95", "100"));
-        attributes.put("color", List.of("red", "blue", "yellow"));
-
-        return Product
-            .builder().owner(user).name("test_product").attributes(attributes).build();
     }
 }

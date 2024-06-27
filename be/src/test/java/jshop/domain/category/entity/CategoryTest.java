@@ -6,7 +6,7 @@ import jshop.domain.category.dto.CreateCategoryRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Category 엔티티 테스트")
+@DisplayName("[단위 테스트] Category")
 class CategoryTest {
 
     @Test

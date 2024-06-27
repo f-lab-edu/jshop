@@ -9,19 +9,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-public class SecurityContextUtil {
+public class MockSecurityContextUtil {
 
-    public static RequestPostProcessor userSecurityContext() {
+    private static Long userId = 1L;
+    private static String username = "username";
+    private static String password = "password";
+    private static String role = "ROLE_USER";
+    private static String email = "email@email.com";
+
+    public static RequestPostProcessor mockUserSecurityContext() {
         return request -> {
 
             User u = User
-                .builder()
-                .id(1L)
-                .username("user")
-                .email("email@email.com")
-                .password("password")
-                .role("ROLE_USER")
-                .build();
+                .builder().id(userId).username(username).email(email).password(password).role(role).build();
             CustomUserDetails customUserDetails = CustomUserDetails.ofUser(u);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails,
                 null, customUserDetails.getAuthorities());
@@ -32,5 +32,9 @@ public class SecurityContextUtil {
 
             return SecurityMockMvcRequestPostProcessors.securityContext(context).postProcessRequest(request);
         };
+    }
+
+    public static Long getSecurityContextMockUserId() {
+        return userId;
     }
 }

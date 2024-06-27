@@ -1,13 +1,13 @@
 package jshop.global.annotation;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.MockController;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(MockController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("@CurrentUserId Annotation 테스트")
+@DisplayName("[단위 테스트] @CurrentUserId")
 class CurrentUserIdArgumentResolverTest {
 
     @Autowired
@@ -34,7 +34,8 @@ class CurrentUserIdArgumentResolverTest {
     @DisplayName("JWT에 principal이 있을때 컨트롤러 파라미터에서 userId 제공")
     public void getUserId() throws Exception {
         // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/userid").with(userSecurityContext()));
+        ResultActions perform = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/userid").with(mockUserSecurityContext()));
 
         // then
         perform.andExpect(status().isOk()).andExpect(jsonPath("$.userid").value(1L));

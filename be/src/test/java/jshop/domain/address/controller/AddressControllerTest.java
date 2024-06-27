@@ -1,7 +1,8 @@
 package jshop.domain.address.controller;
 
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.getSecurityContextMockUserId;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.times;
@@ -14,7 +15,8 @@ import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfigWithoutMethodSecurity;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -33,8 +35,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(AddressController.class)
-@Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("AddressController 단위테스트")
+@Import({TestSecurityConfigWithoutMethodSecurity.class, GlobalExceptionHandler.class})
+@DisplayName("[단위 테스트] AddressController 단위테스트")
 public class AddressControllerTest {
 
     @MockBean
@@ -58,9 +60,8 @@ public class AddressControllerTest {
     @Captor
     private ArgumentCaptor<Long> addressIdCaptor;
 
-
     @Nested
-    @DisplayName("주소 생성 파라미터 검증")
+    @DisplayName("주소 생성 리퀘스트 바디 검증")
     class CreateAddress {
 
         private static final JSONObject createAddressRequestJson = new JSONObject();
@@ -82,7 +83,7 @@ public class AddressControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/addresses")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
 
@@ -94,7 +95,7 @@ public class AddressControllerTest {
             Long userId = userIdCaptor.getValue();
 
             perform.andExpect(status().isOk());
-            assertThat(userId).isEqualTo(1L);
+            assertThat(userId).isEqualTo(getSecurityContextMockUserId());
             assertAll("createAddressRequest 검증",
                 () -> assertThat(createAddressRequest.getReceiverName()).isEqualTo("김재현"),
                 () -> assertThat(createAddressRequest.getReceiverNumber()).isEqualTo("010-1234-1234"),
@@ -122,11 +123,11 @@ public class AddressControllerTest {
         }
 
         @Test
-        @DisplayName("주소정보가 없다면 주소를 생성할 수 없음")
+        @DisplayName("인증 정보가 있어도 주소정보가 없다면 주소를 생성할 수 없음")
         public void createAddress_noRequest() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/addresses").with(userSecurityContext()));
+                MockMvcRequestBuilders.post("/api/addresses").with(mockUserSecurityContext()));
 
             // then
             perform
@@ -156,18 +157,17 @@ public class AddressControllerTest {
     }
 
     @Nested
-    @DisplayName("주소 삭제 테스트")
+    @DisplayName("주소 삭제 패스 파라미터 검증")
     class DeleteAddress {
 
         @Test
         @DisplayName("주소 삭제시 PathVariable로 주소의 ID를 받는다")
         public void deleteAddress_success() throws Exception {
             // when
-            ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/addresses/1").with(userSecurityContext()));
+            mockMvc.perform(MockMvcRequestBuilders.delete("/api/addresses/1").with(mockUserSecurityContext()));
 
             // then
-            verify(addressService, times(1)).deleteAddress(1L, 1L);
+            verify(addressService, times(1)).deleteAddress(1L);
         }
 
         @Test
@@ -175,7 +175,7 @@ public class AddressControllerTest {
         public void deleteAddress_noAddressId() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/addresses").with(userSecurityContext()));
+                MockMvcRequestBuilders.delete("/api/addresses").with(mockUserSecurityContext()));
 
             // then
             perform.andExpect(status().isMethodNotAllowed());
@@ -183,7 +183,7 @@ public class AddressControllerTest {
     }
 
     @Nested
-    @DisplayName("주소 갱신 테스트")
+    @DisplayName("주소 갱신 리퀘스트 바디 검증")
     class UpdateAddress {
 
         private static final JSONObject updateAddressRequestJson = new JSONObject();
@@ -205,13 +205,13 @@ public class AddressControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .put("/api/addresses/1")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateAddressRequestJson.toString()));
 
             // then
             verify(addressService, times(1)).updateAddress(updateAddressRequestArgumentCaptor.capture(),
-                addressIdCaptor.capture(), userIdCaptor.capture());
+                addressIdCaptor.capture());
         }
 
         @Test
@@ -219,7 +219,7 @@ public class AddressControllerTest {
         public void updateAddress_noAddressId() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/addresses").with(userSecurityContext()));
+                MockMvcRequestBuilders.put("/api/addresses").with(mockUserSecurityContext()));
 
             // then
             perform.andExpect(status().isMethodNotAllowed());
@@ -230,7 +230,7 @@ public class AddressControllerTest {
         public void updateAddress_noRequestBody() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/addresses/1").with(userSecurityContext()));
+                MockMvcRequestBuilders.put("/api/addresses/1").with(mockUserSecurityContext()));
 
             // then
             perform.andExpect(status().isBadRequest());

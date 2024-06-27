@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CategoryService Service 테스트")
+@DisplayName("[단위 테스트] CategoryService")
 class CategoryServiceTest {
 
     @InjectMocks
@@ -45,8 +45,8 @@ class CategoryServiceTest {
             CreateCategoryRequest categoryRequest = CreateCategoryRequest
                 .builder().name("전자제품").build();
 
-            // when
-            categoryService.createCategory(categoryRequest, "ROLE_USER");
+            // whenㅁ
+            categoryService.createCategory(categoryRequest);
 
             // then
             verify(categoryRepository, times(1)).save(categoryCaptor.capture());
@@ -64,15 +64,13 @@ class CategoryServiceTest {
                 .builder().name("전자제품").build();
 
             // when
-            categoryService.createCategory(categoryRequest1, "ROLE_USER");
+            categoryService.createCategory(categoryRequest1);
             when(categoryRepository.existsByName(categoryRequest2.getName())).thenReturn(true);
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
-                () -> categoryService.createCategory(categoryRequest2, "ROLE_USER"));
+                () -> categoryService.createCategory(categoryRequest2));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_EXISTS_CATEGORY);
         }
     }
-
-
 }

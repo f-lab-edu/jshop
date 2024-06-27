@@ -11,9 +11,10 @@ import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.DtoBuilder;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @WebMvcTest(AccountController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("AccountController Controller 테스트")
+@DisplayName("[단위 테스트] AccountController")
 class AccountControllerTest {
 
     @MockBean
@@ -50,24 +51,29 @@ class AccountControllerTest {
     private MockMvc mockMvc;
 
     @Nested
+    @DisplayName("회원 가입 검증")
     class Join {
+
+        private String username = "test";
+        private String email = "email@email.com";
+        private String password = "testtest";
+        private UserType userType = UserType.USER;
+        private JSONObject requestBody = new JSONObject();
+
+        @BeforeEach
+        public void init() throws Exception {
+            requestBody.put("username", username);
+            requestBody.put("email", email);
+            requestBody.put("password", password);
+            requestBody.put("userType", "USER");
+        }
 
         @Test
         @DisplayName("회원가입 요청으로 유저이름, 이메일, 비밀번호, 유저타입이 들어오면 회원가입")
         public void join_success() throws Exception {
             // given
-            String username = "test";
-            String email = "email@email.com";
-            String password = "testtest";
-            UserType userType = UserType.USER;
-
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("username", username);
-            requestBody.put("email", email);
-            requestBody.put("password", password);
-            requestBody.put("userType", "USER");
-
             JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")

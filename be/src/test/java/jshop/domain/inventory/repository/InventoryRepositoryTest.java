@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
-@DisplayName("InventoryRepository Repository 테스트")
+@DisplayName("[단위 테스트] InventoryRepository")
 class InventoryRepositoryTest {
 
 
@@ -32,15 +32,6 @@ class InventoryRepositoryTest {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
     private static Inventory inventory;
-
-//    @BeforeAll
-//    public static void init(@Autowired InventoryRepository inventoryRepository) {
-//        System.out.println("InventoryRepositoryTest.init");
-//        inventory = Inventory
-//            .builder().quantity(0).build();
-//        inventoryRepository.save(inventory);
-//        System.out.println("InventoryRepositoryTest.init");
-//    }
 
     @BeforeEach
     public void init() {
@@ -57,7 +48,6 @@ class InventoryRepositoryTest {
             System.err.println(e.getMessage());
             transaction.rollback();
         }
-
     }
 
     @Test

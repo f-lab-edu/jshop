@@ -8,6 +8,7 @@ import jshop.domain.category.service.CategoryService;
 import jshop.global.annotation.CurrentUserRole;
 import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,10 +29,9 @@ public class CategoryController {
             .<List<CategoryResponse>>builder().data(categoryService.getAllCategories()).build();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Secured("ROLE_ADMIN")
     @PostMapping
-    public void createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest,
-        @CurrentUserRole String userRole) {
-        categoryService.createCategory(createCategoryRequest, userRole);
+    public void createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest) {
+        categoryService.createCategory(createCategoryRequest);
     }
 }

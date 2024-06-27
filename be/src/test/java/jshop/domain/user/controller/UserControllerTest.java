@@ -1,6 +1,7 @@
 package jshop.domain.user.controller;
 
-import static jshop.utils.SecurityContextUtil.userSecurityContext;
+import static jshop.utils.MockSecurityContextUtil.getSecurityContextMockUserId;
+import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(UserController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
-@DisplayName("UserController Controller 테스트")
+@DisplayName("[단위 테스트] UserController")
 class UserControllerTest {
 
     @MockBean
@@ -38,7 +39,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Nested
-    @DisplayName("현재 인증된 유저의 정보를 가져옴")
+    @DisplayName("현재 인증된 유저 정보 가져오기 검증")
     class GetUserInfo {
 
         @Test
@@ -46,10 +47,10 @@ class UserControllerTest {
         public void getUserInfo_success() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/users").with(userSecurityContext()));
+                MockMvcRequestBuilders.get("/api/users").with(mockUserSecurityContext()));
 
             // then
-            verify(userService, times(1)).getUser(1L);
+            verify(userService, times(1)).getUser(getSecurityContextMockUserId());
             perform.andExpect(status().isOk());
         }
 
@@ -66,7 +67,7 @@ class UserControllerTest {
 
 
     @Nested
-    @DisplayName("현재 인증된 유저의 정보를 갱신함")
+    @DisplayName("현재 인증된 유저의 정보를 갱신 검증")
     class UpdateUser {
 
         @Test
@@ -82,7 +83,7 @@ class UserControllerTest {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .patch("/api/users")
-                .with(userSecurityContext())
+                .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody.toString()));
 
