@@ -11,7 +11,7 @@ import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.DtoBuilder;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;

@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.MockController;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

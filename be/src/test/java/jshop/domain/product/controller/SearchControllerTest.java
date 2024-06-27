@@ -8,7 +8,7 @@ import java.util.Optional;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.product.service.ProductService;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

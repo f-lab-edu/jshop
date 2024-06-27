@@ -25,7 +25,8 @@ public class CategoryService {
     }
 
     @Transactional
-    public void createCategory(CreateCategoryRequest createCategoryRequest, String userRole) {
+    public void createCategory(CreateCategoryRequest createCategoryRequest) {
+        
         if (categoryRepository.existsByName(createCategoryRequest.getName())) {
             log.error(ErrorCode.ALREADY_EXISTS_CATEGORY.getLogMessage(), createCategoryRequest.getName());
             throw JshopException.of(ErrorCode.ALREADY_EXISTS_CATEGORY);

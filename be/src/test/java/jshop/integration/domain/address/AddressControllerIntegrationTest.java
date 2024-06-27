@@ -39,7 +39,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@DisplayName("통합테스트 AddressController")
+@DisplayName("[통합 테스트] AddressController")
 public class AddressControllerIntegrationTest {
 
     @Autowired

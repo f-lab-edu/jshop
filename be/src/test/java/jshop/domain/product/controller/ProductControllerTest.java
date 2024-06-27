@@ -13,7 +13,7 @@ import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.service.ProductService;
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;

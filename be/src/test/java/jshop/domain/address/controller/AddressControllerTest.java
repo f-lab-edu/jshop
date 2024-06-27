@@ -15,7 +15,8 @@ import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfig;
+import jshop.utils.config.TestSecurityConfigWithoutMethodSecurity;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +35,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(AddressController.class)
-@Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
+@Import({TestSecurityConfigWithoutMethodSecurity.class, GlobalExceptionHandler.class})
 @DisplayName("[단위 테스트] AddressController 단위테스트")
 public class AddressControllerTest {
 
