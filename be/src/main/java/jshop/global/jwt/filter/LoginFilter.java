@@ -25,8 +25,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
 
-    public LoginFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager,
-        JwtUtil jwtUtil) {
+    public LoginFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         super.setFilterProcessesUrl("/api/login");
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
@@ -34,29 +33,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-        HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+        throws AuthenticationException {
         String email = null;
         String password = null;
         try {
-            Map<String, String> parameter = objectMapper.readValue(request.getInputStream(),
-                Map.class);
-            email = parameter.get("username");
+            Map<String, String> parameter = objectMapper.readValue(request.getInputStream(), Map.class);
+            email = parameter.get("email");
             password = parameter.get("password");
         } catch (IOException exception) {
-            throw new BadCredentialsException(
-                exception.getMessage() + " | Request Body(JSON) is Empty");
+            throw new BadCredentialsException(exception.getMessage() + " | Request Body(JSON) is Empty");
         }
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            email, password, null);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
         return authenticationManager.authenticate(authToken);
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, FilterChain chain, Authentication authentication)
-        throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+        Authentication authentication) throws IOException, ServletException {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -72,9 +67,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, AuthenticationException failed)
-        throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+        AuthenticationException failed) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

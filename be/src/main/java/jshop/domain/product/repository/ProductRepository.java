@@ -3,6 +3,7 @@ package jshop.domain.product.repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.swing.text.html.Option;
 import jshop.domain.product.entity.Product;
 import jshop.domain.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = "owner")
     Optional<Product> findById(Long productId);
 
-    Product findByAttributes(Map<String, List<String>> attributes);
+    Optional<Product> findByAttributes(Map<String, List<String>> attributes);
 
     Page<Product> findByOwner(User owner, Pageable pageable);
 }

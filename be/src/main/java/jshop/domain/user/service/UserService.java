@@ -13,6 +13,7 @@ import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,10 +32,7 @@ public class UserService {
 
     public UserInfoResponse getUser(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> {
-            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
-        });
+        User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
         List<AddressInfoResponse> addresses = addressRepository
             .findByUser(user)
@@ -46,12 +44,12 @@ public class UserService {
     }
 
     @Transactional
-    public void joinUser(JoinUserRequest joinUserRequest) {
+    public Long joinUser(JoinUserRequest joinUserRequest) {
         String email = joinUserRequest.getEmail();
 
         if (userRepository.existsByEmail(email)) {
             log.error(ErrorCode.ALREADY_REGISTERED_EMAIL.getLogMessage(), email);
-            throw JshopException.ofErrorCode(ErrorCode.ALREADY_REGISTERED_EMAIL);
+            throw JshopException.of(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
         Wallet wallet = Wallet
@@ -71,15 +69,15 @@ public class UserService {
             .build();
 
         userRepository.save(user);
+
+        return user.getId();
     }
 
     @Transactional
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
-
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
-            throw JshopException.ofErrorCode(ErrorCode.USERID_NOT_FOUND);
-        });
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = UserUtils.getUserOrThrow(optionalUser, userId);
+        
         user.updateUserInfo(updateUserRequest);
     }
 }

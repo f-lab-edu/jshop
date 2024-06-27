@@ -3,17 +3,22 @@ package jshop.domain.address.controller;
 
 import static jshop.utils.SecurityContextUtil.userSecurityContext;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jshop.domain.address.dto.CreateAddressRequest;
+import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
-import jshop.domain.user.entity.User;
+import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.TestSecurityConfig;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -29,6 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(AddressController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
+@DisplayName("AddressController Controller 테스트")
 public class AddressControllerTest {
 
     @MockBean
@@ -44,84 +50,191 @@ public class AddressControllerTest {
     private ArgumentCaptor<CreateAddressRequest> createAddressRequestCaptor;
 
     @Captor
+    private ArgumentCaptor<UpdateAddressRequest> updateAddressRequestArgumentCaptor;
+
+    @Captor
     private ArgumentCaptor<Long> userIdCaptor;
 
-    @Test
-    public void 정상주소추가() throws Exception {
-        // given
-        JSONObject requestBody = getCreateAddressRequestJsonObject();
+    @Captor
+    private ArgumentCaptor<Long> addressIdCaptor;
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/address")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
 
-        // then
-        verify(addressService, times(1)).saveAddress(createAddressRequestCaptor.capture(), userIdCaptor.capture());
+    @Nested
+    @DisplayName("주소 생성 테스트")
+    class CreateAddress {
 
-        CreateAddressRequest createAddressRequest = createAddressRequestCaptor.getValue();
-        Long userId = userIdCaptor.getValue();
+        private static final JSONObject createAddressRequestJson = new JSONObject();
 
-        perform.andExpect(status().isCreated());
-        assertThat(userId).isEqualTo(1L);
-        assertThat(createAddressRequest.getCity()).isEqualTo("광주시");
+        @BeforeAll
+        public static void init() throws Exception {
+            createAddressRequestJson.put("receiverName", "김재현");
+            createAddressRequestJson.put("receiverNumber", "010-1234-1234");
+            createAddressRequestJson.put("province", "경기도");
+            createAddressRequestJson.put("city", "광주시");
+            createAddressRequestJson.put("district", "송정동");
+            createAddressRequestJson.put("street", "경안천로");
+            createAddressRequestJson.put("detailAddress1", "상세주소1");
+        }
+
+        @Test
+        @DisplayName("일반 유저는 주소를 생성할 수 있음")
+        public void createAddress_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/addresses")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createAddressRequestJson.toString()));
+
+            // then
+            verify(addressService, times(1)).createAddress(createAddressRequestCaptor.capture(),
+                userIdCaptor.capture());
+
+            CreateAddressRequest createAddressRequest = createAddressRequestCaptor.getValue();
+            Long userId = userIdCaptor.getValue();
+
+            perform.andExpect(status().isCreated());
+            assertThat(userId).isEqualTo(1L);
+            assertAll("createAddressRequest 검증",
+                () -> assertThat(createAddressRequest.getReceiverName()).isEqualTo("김재현"),
+                () -> assertThat(createAddressRequest.getReceiverNumber()).isEqualTo("010-1234-1234"),
+                () -> assertThat(createAddressRequest.getProvince()).isEqualTo("경기도"),
+                () -> assertThat(createAddressRequest.getCity()).isEqualTo("광주시"),
+                () -> assertThat(createAddressRequest.getDistrict()).isEqualTo("송정동"),
+                () -> assertThat(createAddressRequest.getStreet()).isEqualTo("경안천로"),
+                () -> assertThat(createAddressRequest.getDetailAddress1()).isEqualTo("상세주소1"));
+        }
+
+        @Test
+        @DisplayName("인증정보가 없다면 주소를 생성할 수 없음")
+        public void createAddress_noAuth() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/addresses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createAddressRequestJson.toString()));
+
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.JWT_USER_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.JWT_USER_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("주소정보가 없다면 주소를 생성할 수 없음")
+        public void createAddress_noRequest() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/addresses").with(userSecurityContext()));
+
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.INVALID_REQUEST_BODY.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.INVALID_REQUEST_BODY.getMessage()));
+        }
+
+        @Test
+        @DisplayName("요청 정보에서 필수 정보가 없다면 주소를 생성할 수 없음")
+        public void createAddress_noRequiredInfo() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("receiverName", "김재현");
+
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/addresses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.BAD_REQUEST.getCode()));
+        }
     }
 
-    @Test
-    public void 유저정보없이_주소추가_인증안된유저() throws Exception {
-        // given
-        JSONObject requestBody = getCreateAddressRequestJsonObject();
+    @Nested
+    @DisplayName("주소 삭제 테스트")
+    class DeleteAddress {
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/address")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
+        @Test
+        @DisplayName("주소 삭제시 PathVariable로 주소의 ID를 받는다")
+        public void deleteAddress_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/addresses/1").with(userSecurityContext()));
 
-        // then
-        perform.andExpect(status().isUnauthorized());
+            // then
+            verify(addressService, times(1)).deleteAddress(1L, 1L);
+        }
+
+        @Test
+        @DisplayName("주소 삭제시 PathVariable로 주소의 ID를 받지 못하면 405를 내림 (/api/address에는 delete 메서드가 없음)")
+        public void deleteAddress_noAddressId() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/addresses").with(userSecurityContext()));
+
+            // then
+            perform.andExpect(status().isMethodNotAllowed());
+        }
     }
 
-    @Test
-    public void 주소정보없이는요청() throws Exception {
-        // given
+    @Nested
+    @DisplayName("주소 갱신 테스트")
+    class UpdateAddress {
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/address")
-            .with(userSecurityContext()));
+        private static final JSONObject updateAddressRequestJson = new JSONObject();
 
-        // then
-        perform.andExpect(status().isBadRequest());
+        @BeforeAll
+        public static void init() throws Exception {
+            updateAddressRequestJson.put("receiverName", "김재현");
+            updateAddressRequestJson.put("receiverNumber", "010-1234-1234");
+            updateAddressRequestJson.put("province", "경기도");
+            updateAddressRequestJson.put("city", "광주시");
+            updateAddressRequestJson.put("district", "송정동");
+            updateAddressRequestJson.put("street", "경안천로");
+            updateAddressRequestJson.put("detailAddress1", "상세주소1");
+        }
+
+        @Test
+        @DisplayName("주소 갱신시 PathVariable로 주소의 ID를 받는다")
+        public void updateAddress_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .put("/api/addresses/1")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateAddressRequestJson.toString()));
+
+            // then
+            verify(addressService, times(1)).updateAddress(updateAddressRequestArgumentCaptor.capture(),
+                addressIdCaptor.capture(), userIdCaptor.capture());
+        }
+
+        @Test
+        @DisplayName("주소 갱신시 PathVariable로 주소의 ID를 받지 못하면 405를 내림 (/api/address에는 put 메서드가 없음)")
+        public void updateAddress_noAddressId() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/addresses").with(userSecurityContext()));
+
+            // then
+            perform.andExpect(status().isMethodNotAllowed());
+        }
+
+        @Test
+        @DisplayName("주소 갱신시 request body가 없다면 INVALID_REQUEST_BODY 를 내림")
+        public void updateAddress_noRequestBody() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/addresses/1").with(userSecurityContext()));
+
+            // then
+            perform.andExpect(status().isBadRequest());
+        }
     }
 
-    @Test
-    public void 필수정보없이요청() throws Exception {
-        // given
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("receiverName", "김재현");
-
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/address")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
-
-        // then
-        perform.andExpect(status().isBadRequest());
-    }
-
-    private JSONObject getCreateAddressRequestJsonObject() throws JSONException {
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("receiverName", "김재현");
-        requestBody.put("receiverNumber", "010-1234-1234");
-        requestBody.put("province", "경기도");
-        requestBody.put("city", "광주시");
-        requestBody.put("district", "송정동");
-        requestBody.put("street", "경안천로");
-        requestBody.put("detailAddress1", "상세주소1");
-        return requestBody;
-    }
 }

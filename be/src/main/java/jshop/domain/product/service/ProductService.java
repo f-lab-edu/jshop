@@ -17,12 +17,16 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
+import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.ProductUtils;
+import jshop.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Error;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -44,12 +48,19 @@ public class ProductService {
 
     @Transactional
     public void createProduct(CreateProductRequest createProductRequest, Long userId) {
-        User user = userRepository.getReferenceById(userId);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = UserUtils.getUserOrThrow(optionalUser, userId);
+
+        if (user.getUserType() != UserType.SELLER) {
+            log.error(ErrorCode.USER_NOT_SELLER.getLogMessage(), user.getUserType());
+            throw JshopException.of(ErrorCode.USER_NOT_SELLER);
+        }
+
         Long categoryId = createProductRequest.getCategoryId();
 
         if (!categoryRepository.existsById(categoryId)) {
             log.error(ErrorCode.CATEGORYID_NOT_FOUND.getLogMessage(), categoryId);
-            throw JshopException.ofErrorCode(ErrorCode.CATEGORYID_NOT_FOUND);
+            throw JshopException.of(ErrorCode.CATEGORYID_NOT_FOUND);
         }
 
         Category category = categoryRepository.getReferenceById(categoryId);
@@ -58,11 +69,10 @@ public class ProductService {
         productRepository.save(newProduct);
     }
 
-    @Transactional
-    public OwnProductsResponse getOwnProducts(Long userId, int pageNumber, int size) {
+    public OwnProductsResponse getOwnProducts(Long userId, int pageNumber, int pageSize) {
         User user = userRepository.getReferenceById(userId);
 
-        PageRequest pageRequest = PageRequest.of(pageNumber, size);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         Page<Product> page = productRepository.findByOwner(user, pageRequest);
 
         return OwnProductsResponse
@@ -75,27 +85,29 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest,
-        Long userId, Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> {
-            log.error(ErrorCode.PRODUCTID_NOT_FOUND.getLogMessage(), productId);
-            throw JshopException.ofErrorCode(ErrorCode.PRODUCTID_NOT_FOUND);
-        });
-        User user = product.getOwner();
+    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long userId,
+        Long productId) {
 
-        if (!user.getId().equals(userId)) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
+        
+        User owner = product.getOwner();
+
+        if (!owner.getId().equals(userId)) {
             log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
-            throw JshopException.ofErrorCode(ErrorCode.UNAUTHORIZED);
+            throw JshopException.of(ErrorCode.UNAUTHORIZED);
         }
 
         if (productDetailRepository.existsByAttribute(createProductDetailRequest.getAttribute())) {
-            log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId, createProductDetailRequest.getAttribute());
-            throw JshopException.ofErrorCode(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
+            log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId,
+                createProductDetailRequest.getAttribute());
+            throw JshopException.of(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
         }
 
         if (!product.verifyChildAttribute(createProductDetailRequest.getAttribute())) {
-            log.error(ErrorCode.INVALID_PRODUCT_ATTRIBUTE.getLogMessage(), product.getAttributes(), createProductDetailRequest.getAttribute());
-            throw JshopException.ofErrorCode(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
+            log.error(ErrorCode.INVALID_PRODUCT_ATTRIBUTE.getLogMessage(), product.getAttributes(),
+                createProductDetailRequest.getAttribute());
+            throw JshopException.of(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
         }
 
         Inventory inventory = inventoryService.createInventory();
@@ -103,9 +115,18 @@ public class ProductService {
         productDetailRepository.save(ProductDetail.of(createProductDetailRequest, product, inventory));
     }
 
-    public SearchProductDetailsResponse searchProductDetail(Long cursor, String query, int size) {
-        Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(cursor, query, PageRequest.of(0, size, Sort.by(Direction.DESC, "id")));
-        System.out.println(page.getContent());
+    public SearchProductDetailsResponse searchProductDetail(long lastProductId, Optional<String> optionalQuery,
+        int size) {
+
+        String query = optionalQuery.orElseThrow(() -> {
+            log.error(ErrorCode.NO_SEARCH_QUERY.getLogMessage());
+            throw JshopException.of(ErrorCode.NO_SEARCH_QUERY);
+        });
+
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Direction.DESC, "id"));
+        Page<ProductDetailResponse> page = productDetailRepository.searchProductDetailsByQuery(lastProductId, query,
+            pageRequest);
+
         Long nextCursor = Optional
             .ofNullable(page.getContent())
             .filter(Predicate.not(List::isEmpty))

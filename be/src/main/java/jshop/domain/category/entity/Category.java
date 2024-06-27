@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
+import jshop.domain.category.dto.CreateCategoryRequest;
 import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,4 +48,9 @@ public class Category extends BaseEntity {
 
     @Column(unique = true)
     private String name;
+
+    public static Category of(CreateCategoryRequest createCategoryRequest) {
+        return Category
+            .builder().name(createCategoryRequest.getName()).build();
+    }
 }

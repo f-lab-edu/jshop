@@ -26,9 +26,11 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -83,8 +85,7 @@ public class Product extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, List<String>> attributes;
 
-    public static Product of(CreateProductRequest createProductRequest, Category category,
-        User user) {
+    public static Product of(CreateProductRequest createProductRequest, Category category, User user) {
         return Product
             .builder()
             .name(createProductRequest.getName())
@@ -96,27 +97,33 @@ public class Product extends BaseEntity {
             .build();
     }
 
-    public boolean verifyChildAttribute(Map<String, String> attribute) {
-        if (attributes == null && attribute == null) {
+    /**
+     * 상품에 정의된 속성과, 상세 상품의 속성을 비교합니다.
+     * 상세 상품의 속성이 상품에 정의되어있지 않거나, 속성 값이 상품에 정의되어 있지 않다면 false
+     *
+     * @param detailAttribute
+     *
+     * @return
+     */
+    public boolean verifyChildAttribute(Map<String, String> detailAttribute) {
+        if (attributes == null && detailAttribute == null) {
             return true;
         }
 
-        Set<String> attributesKeySet = Optional
-            .ofNullable(attributes)
-            .orElse(new HashMap<>())
-            .keySet();
-        Set<String> attributeKeySet = Optional
-            .ofNullable(attribute)
-            .orElse(new HashMap<>())
-            .keySet();
+        Set<String> attributesKeySet = Optional.ofNullable(attributes).orElse(new HashMap<>()).keySet();
+        Set<String> detailAttributeKeySet = Optional.ofNullable(detailAttribute).orElse(new HashMap<>()).keySet();
 
-        if (!attributesKeySet.equals(attributeKeySet)) {
+        if (!attributesKeySet.equals(detailAttributeKeySet)) {
+            log.warn("상품의 속성과, 상세 상품의 속성이 일치하지 않습니다. 상품의 속성 : {}, 상세 상품의 속성 : {}", attributesKeySet,
+                detailAttributeKeySet);
             return false;
         }
 
-        for (String key : attributeKeySet) {
-            String attributeValue = attribute.get(key);
+        for (String key : detailAttributeKeySet) {
+            String attributeValue = detailAttribute.get(key);
             if (!attributes.get(key).contains(attributeValue)) {
+                log.warn("상세 상품의 속성값이 상품에 정의되지 않았습니다. 상세 상품의 속성 : {}, 상품에 정의된 속성 : {}", attributeValue,
+                    attributes.get(key));
                 return false;
             }
         }

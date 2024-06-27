@@ -2,7 +2,9 @@ package jshop.domain.user.controller;
 
 import jakarta.validation.Valid;
 import jshop.domain.user.dto.JoinUserRequest;
+import jshop.domain.user.dto.JoinUserResponse;
 import jshop.domain.user.service.UserService;
+import jshop.global.dto.Response;
 import jshop.global.jwt.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,8 +23,14 @@ public class AccountController {
     private final UserService userService;
 
     @PostMapping("/join")
-    public void join(@RequestBody @Valid JoinUserRequest joinUserRequest) {
-        userService.joinUser(joinUserRequest);
+    public Response<JoinUserResponse> join(@RequestBody @Valid JoinUserRequest joinUserRequest) {
+        Long userId = userService.joinUser(joinUserRequest);
+
+        return Response
+            .<JoinUserResponse>builder()
+            .data(JoinUserResponse
+                .builder().id(userId).build())
+            .build();
     }
 
     @GetMapping("/test")

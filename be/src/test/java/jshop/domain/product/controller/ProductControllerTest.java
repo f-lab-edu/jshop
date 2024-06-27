@@ -16,6 +16,8 @@ import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.TestSecurityConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(ProductController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
+@DisplayName("ProductController Controller 테스트")
 class ProductControllerTest {
 
     @MockBean
@@ -41,125 +44,139 @@ class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    public void 상품추가() throws Exception {
-        // given
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("name", "test");
-        requestBody.put("categoryId", 1L);
-        requestBody.put("manufacturer", "apple");
-        requestBody.put("description", "asdf");
+    @Nested
+    @DisplayName("상품 생성 검증")
+    class CreateProduct {
 
-        JSONObject attributes = new JSONObject();
-        attributes.put("attr1", new JSONArray(List.of("1", "2")));
-        requestBody.put("attributes", attributes);
+        @Test
+        @DisplayName("상품 추가시 상품생성 서비스로 요청을 넘겨준다")
+        public void createProduct() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("name", "test");
+            requestBody.put("categoryId", 1L);
+            requestBody.put("manufacturer", "apple");
+            requestBody.put("description", "asdf");
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/products")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
+            JSONObject attributes = new JSONObject();
+            attributes.put("attr1", new JSONArray(List.of("1", "2")));
+            requestBody.put("attributes", attributes);
 
-        // then
-        perform.andExpect(status().isOk());
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/products")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+
+            // then
+            perform.andExpect(status().isOk());
+        }
     }
 
-    @Test
-    public void 유저상품가져오기() throws Exception {
-        // given
+    @Nested
+    @DisplayName("자신 상품 가져오기 검증")
+    class GetOwnProducts {
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/products?page=0&size=10")
-            .with(userSecurityContext()));
+        @Test
+        @DisplayName("상품 페이지와 페이지 크기를 서비스로 넘겨준다.")
+        public void getOwnProducts() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products?page=0&size=10").with(userSecurityContext()));
 
-        // then
-        perform.andExpect(status().isOk());
-        verify(productService, times(1)).getOwnProducts(1L, 0, 10);
+            // then
+            perform.andExpect(status().isOk());
+            verify(productService, times(1)).getOwnProducts(1L, 0, 10);
+        }
+
+        @Test
+        @DisplayName("상품 페이지와 페이지 크기가 없다면 기본 값을 넘겨준다.")
+        public void getOwnProducts_defaultValue() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products").with(userSecurityContext()));
+
+            // then
+            perform.andExpect(status().isOk());
+            verify(productService, times(1)).getOwnProducts(1L, 0, 10);
+        }
     }
 
-    @Test
-    public void 유저상품가져오기_페이지번호없을때() throws Exception {
-        // given
+    @Nested
+    @DisplayName("상세 상품 추가하기 검증")
+    class CreateProductDetail {
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .get("/api/products")
-            .with(userSecurityContext()));
+        @Test
+        @DisplayName("사용자는 자신의 상품에 상세 상품을 추가할 수 있다.")
+        public void createProductDetail_success() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
 
-        // then
-        perform.andExpect(status().isOk());
-        verify(productService, times(1)).getOwnProducts(1L, 0, 10);
-    }
+            requestBody.put("price", 1000L);
+            JSONObject attribute = new JSONObject();
+            attribute.put("color", "red");
+            attribute.put("size", "95");
+            requestBody.put("attribute", attribute);
 
-    @Test
-    public void 상세상품추가() throws Exception {
-        // given
-        JSONObject requestBody = new JSONObject();
+            Map<String, String> attributeMap = new HashMap<>();
+            attributeMap.put("color", "red");
+            attributeMap.put("size", "95");
 
-        requestBody.put("price", 1000L);
-        JSONObject attribute = new JSONObject();
-        attribute.put("color", "red");
-        attribute.put("size", "95");
-        requestBody.put("attribute", attribute);
+            CreateProductDetailRequest createProductDetailRequest = CreateProductDetailRequest
+                .builder().attribute(attributeMap).price(1000L).build();
 
-        Map<String, String> attributeMap = new HashMap<>();
-        attributeMap.put("color", "red");
-        attributeMap.put("size", "95");
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/products/1/details")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
+            // then
 
-        CreateProductDetailRequest createProductDetailRequest = CreateProductDetailRequest
-            .builder().attribute(attributeMap).price(1000L).build();
+            verify(productService, times(1)).createProductDetail(createProductDetailRequest, 1L, 1L);
+            perform.andExpect(status().isOk());
+        }
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/products/1/details")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
-        // then
+        @Test
+        @DisplayName("상세 상품 추가시 바디가 없다면 INVALID_REQUEST_BODY 예외가 터진다.")
+        public void createProductDetail_noBody() throws Exception {
 
-        verify(productService, times(1)).createProductDetail(createProductDetailRequest, 1L, 1L);
-        perform.andExpect(status().isOk());
-    }
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/products/1/details")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON));
 
-    @Test
-    public void 상세상품추가_잘못된요청_바디없음() throws Exception {
-        // given
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.INVALID_REQUEST_BODY.getCode()));
+        }
 
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/products/1/details")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON));
+        @Test
+        @DisplayName("상세상품 추가시 바디 타입이 잘못되면 BAD_REQUEST가 터진다.")
+        public void createProductDetail_invalidBody() throws Exception {
+            // given
+            JSONObject requestBody = new JSONObject();
 
-        // then
-        perform
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value(ErrorCode.INVALID_REQUEST_BODY.toString()));
-    }
+            requestBody.put("id", 1000L);
+            JSONObject attribute = new JSONObject();
+            attribute.put("color", "red");
+            attribute.put("size", "95");
+            requestBody.put("attribute", attribute);
 
-    @Test
-    public void 상세상품추가_잘못된요청_잘못된바디() throws Exception {
-        // given
-        JSONObject requestBody = new JSONObject();
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/products/1/details")
+                .with(userSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody.toString()));
 
-        requestBody.put("id", 1000L);
-        JSONObject attribute = new JSONObject();
-        attribute.put("color", "red");
-        attribute.put("size", "95");
-        requestBody.put("attribute", attribute);
-
-        // when
-        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-            .post("/api/products/1/details")
-            .with(userSecurityContext())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody.toString()));
-
-        // then
-        perform
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value(ErrorCode.BAD_REQUEST.toString()));
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.BAD_REQUEST.getCode()));
+        }
     }
 }

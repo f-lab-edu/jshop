@@ -3,21 +3,27 @@ package jshop.global.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import jshop.global.common.ErrorCode;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Builder
 @JsonInclude(Include.NON_NULL)
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Response<T> {
 
-    private final T data;
-    private final String message;
-    private ErrorCode error;
+    private T data;
+    private String message;
+    private Integer errorCode;
 
-    public static Response ofErrorCode(ErrorCode errorCode) {
+    public static Response of(ErrorCode errorCode) {
         return Response
-            .builder().error(errorCode).message(errorCode.getMessage()).build();
+            .builder().errorCode(errorCode.getCode()).message(errorCode.getMessage()).build();
     }
 }
 

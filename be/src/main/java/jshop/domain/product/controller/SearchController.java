@@ -1,5 +1,6 @@
 package jshop.domain.product.controller;
 
+import java.util.Optional;
 import jshop.domain.product.dto.SearchProductDetailsResponse;
 import jshop.domain.product.service.ProductService;
 import jshop.global.dto.Response;
@@ -18,13 +19,13 @@ public class SearchController {
 
     @GetMapping
     public Response<SearchProductDetailsResponse> searchProductDetail(
-        @RequestParam(defaultValue = "9223372036854775807") long cursor,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "") String query) {
+        @RequestParam(defaultValue = "0", name = "cursor") long lastProductId,
+        @RequestParam(defaultValue = "10") int size, @RequestParam Optional<String> query) {
+        lastProductId = lastProductId == 0L ? Long.MAX_VALUE : lastProductId;
 
         return Response
             .<SearchProductDetailsResponse>builder()
-            .data(productService.searchProductDetail(cursor, query, size))
+            .data(productService.searchProductDetail(lastProductId, query, size))
             .build();
     }
 }

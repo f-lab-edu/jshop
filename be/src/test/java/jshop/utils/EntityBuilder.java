@@ -8,8 +8,7 @@ public class EntityBuilder {
 
     private static BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-    public static User getJoinUser(String username, String email, String password,
-        UserType userType, String role) {
+    public static User getJoinUser(String username, String email, String password, UserType userType, String role) {
 
         User testUser = User
             .builder()

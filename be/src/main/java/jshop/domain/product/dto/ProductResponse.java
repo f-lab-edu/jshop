@@ -30,7 +30,7 @@ public class ProductResponse {
             .id(product.getId())
             .name(product.getName())
             .manufacturer(product.getManufacturer())
-            .description(product.getManufacturer())
+            .description(product.getDescription())
             .attributes(product.getAttributes())
             .build();
     }

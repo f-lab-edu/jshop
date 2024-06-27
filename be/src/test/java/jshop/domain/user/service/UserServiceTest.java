@@ -22,6 +22,8 @@ import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.utils.DtoBuilder;
 import jshop.utils.EntityBuilder;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -50,103 +52,124 @@ class UserServiceTest {
     @Captor
     private ArgumentCaptor<User> userCaptor;
 
-    @Test
-    public void 회원가입() {
-        // given
-        String username = "test";
-        String email = "email@email.com";
-        String password = "test";
-        UserType userType = UserType.USER;
-        String role = "ROLE_USER";
+    @Nested
+    @DisplayName("회원 가입 검증")
+    class JoinUser {
 
-        JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
-        User user = EntityBuilder.getJoinUser(username, email, password, userType, role);
+        @Test
+        @DisplayName("중복된 이메일이 없다면 회원가입이 가능")
+        public void joinUser_success() {
+            // given
+            String username = "test";
+            String email = "email@email.com";
+            String password = "test";
+            UserType userType = UserType.USER;
+            String role = "ROLE_USER";
 
-        // when
-        userService.joinUser(joinUserRequest);
+            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            User user = EntityBuilder.getJoinUser(username, email, password, userType, role);
 
-        // then
-        verify(userRepository, times(1)).save(userCaptor.capture());
-        User capturedUser = userCaptor.getValue();
+            // when
+            userService.joinUser(joinUserRequest);
 
-        assertThat(capturedUser.getUsername()).isEqualTo(user.getUsername());
-        assertThat(bCryptPasswordEncoder.matches(password, capturedUser.getPassword())).isTrue();
-        assertThat(capturedUser.getEmail()).isEqualTo(user.getEmail());
-        assertThat(capturedUser.getUserType()).isEqualTo(user.getUserType());
-        assertThat(capturedUser.getWallet().getBalance()).isEqualTo(0);
-        assertThat(capturedUser.getCart()).isNotNull();
-        // 여기서 선언한 `user` 객체는 영속성 컨텍스트에서 가져온 엔티티가 아니기 때문에 둘은 다른 엔티티임
+            // then
+            verify(userRepository, times(1)).save(userCaptor.capture());
+            User capturedUser = userCaptor.getValue();
+
+            assertThat(capturedUser.getUsername()).isEqualTo(user.getUsername());
+            assertThat(bCryptPasswordEncoder.matches(password, capturedUser.getPassword())).isTrue();
+            assertThat(capturedUser.getEmail()).isEqualTo(user.getEmail());
+            assertThat(capturedUser.getUserType()).isEqualTo(user.getUserType());
+            assertThat(capturedUser.getWallet().getBalance()).isEqualTo(0);
+            assertThat(capturedUser.getCart()).isNotNull();
+            // 여기서 선언한 `user` 객체는 영속성 컨텍스트에서 가져온 엔티티가 아니기 때문에 둘은 다른 엔티티임
+        }
+
+        @Test
+        @DisplayName("중복된 이메일이 있다면 회원 가입이 불가능")
+        public void joinUser_dupEmail() {
+            // given
+            String username = "test";
+            String email = "email@email.com";
+            String password = "test";
+            UserType userType = UserType.USER;
+            String role = "ROLE_USER";
+
+            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+
+            // when
+            userService.joinUser(joinUserRequest);
+            when(userRepository.existsByEmail(email)).thenReturn(true);
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> userService.joinUser(joinUserRequest));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_REGISTERED_EMAIL);
+        }
     }
 
-    @Test
-    public void 중복회원가입() {
-        // given
-        String username = "test";
-        String email = "email@email.com";
-        String password = "test";
-        UserType userType = UserType.USER;
-        String role = "ROLE_USER";
+    @Nested
+    @DisplayName("회원 정보 가져오기 검증")
+    class GetUser {
 
-        JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+        @Test
+        @DisplayName("회원 정보가 있다면 회원 정보를 가져올 수 있음")
+        public void getUser_success() {
+            // given
+            User user = createUser();
+            Address address = createAddress(user);
 
-        // when
-        userService.joinUser(joinUserRequest);
-        when(userRepository.existsByEmail(email)).thenReturn(true);
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(addressRepository.findByUser(user)).thenReturn(List.of(address));
 
-        // then
-        JshopException jshopException = assertThrows(JshopException.class, () -> userService.joinUser(joinUserRequest));
-        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_REGISTERED_EMAIL);
+            // when
+            UserInfoResponse userInfoResponse = userService.getUser(1L);
+
+            // then
+            assertThat(userInfoResponse).isNotNull();
+            assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.of(address)));
+        }
+
+        @Test
+        @DisplayName("회원 정보가 없다면 회원 정보를 가져올 수 없다")
+        public void getUser_noSuchUser() {
+            JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUser(1L));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
+        }
     }
 
-    @Test
-    public void 회원정보가져오기() {
-        // given
-        User user = createUser();
-        Address address = createAddress(user);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(addressRepository.findByUser(user)).thenReturn(List.of(address));
+    @Nested
+    @DisplayName("회원 정보 수정 검증")
+    class UpdateUser {
 
-        // when
-        UserInfoResponse userInfoResponse = userService.getUser(1L);
+        @Test
+        @DisplayName("회원 정보가 있다면 수정할 수 있음")
+        public void updateUser_success() {
+            // given
+            User user = createUser();
 
-        // then
-        assertThat(userInfoResponse).isNotNull();
-        assertThat(userInfoResponse.getAddresses()).isEqualTo(List.of(AddressInfoResponse.of(address)));
-    }
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-    @Test
-    public void 회원정보가져오기_없는ID() {
-        JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUser(1L));
-        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
-    }
+            // when
+            userService.updateUser(1L, UpdateUserRequest
+                .builder().username("new_user").build());
 
-    @Test
-    public void 회원정보수정() {
-        // given
-        User user = createUser();
+            // then
+            verify(userRepository, times(1)).findById(1L);
+        }
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        // when
-        userService.updateUser(1L, UpdateUserRequest
-            .builder().username("new_user").build());
+        @Test
+        @DisplayName("일치하는 회원 정보가 없다면 수정할 수 없음")
+        public void updateUser_noSuchUser() {
+            // then
+            JshopException jshopException = assertThrows(JshopException.class, () -> userService.updateUser(1L,
+                UpdateUserRequest
+                    .builder().build()));
 
-        // then
-        verify(userRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    public void 회원정보수정_없는유저() {
-        // given
-
-        // when
-
-        // then
-        JshopException jshopException = assertThrows(JshopException.class, () -> userService.updateUser(1L, UpdateUserRequest
-            .builder().build()));
-
-        assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
+        }
     }
 
 

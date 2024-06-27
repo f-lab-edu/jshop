@@ -7,10 +7,12 @@ import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +50,11 @@ public class LoggingFilter implements Filter {
         chain.doFilter(requestWrapper, responseWrapper);
 
         String requestData = new String(requestWrapper.getRequestData(), Charset.defaultCharset());
+
         if (httpRequest.getRequestURI().equals("/api/login")) {
-            requestData = "{}";
+            requestData = "Secure Info";
         }
-        
+
         String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());
 
         // 로그에 기록
@@ -60,8 +63,9 @@ public class LoggingFilter implements Filter {
 
         while (requestHeaderNames.hasMoreElements()) {
             String header = requestHeaderNames.nextElement();
-            if (requestHeaders.get(header) != null) {
-                requestHeaders.put(header, httpRequest.getHeaders(header).toString());
+            if (requestHeaders.get(header) == null) {
+                requestHeaders.put(header,
+                    Collections.list(httpRequest.getHeaders(header)).stream().collect(Collectors.joining(",")));
             }
         }
 
@@ -74,7 +78,7 @@ public class LoggingFilter implements Filter {
             .protocol(httpRequest.getProtocol())
             .headers(requestHeaders)
             .queries(httpRequest.getQueryString())
-            .body(objectMapper.readTree(requestData))
+            .body(requestData)
             .build();
 
         ResponseLog responseLog = ResponseLog
@@ -86,18 +90,13 @@ public class LoggingFilter implements Filter {
                 .getHeaderNames()
                 .stream()
                 .distinct()
-                .collect(Collectors.toMap((header) -> header, (header) -> httpResponse
-                    .getHeaders(header)
-                    .toString())))
-            .body(objectMapper.readTree(responseData))
+                .collect(Collectors.toMap((header) -> header,
+                    (header) -> httpResponse.getHeaders(header).stream().collect(Collectors.joining(",")))))
+            .body(responseData)
             .build();
 
-        log.info("Request Log\n{}", objectMapper
-            .writerWithDefaultPrettyPrinter()
-            .writeValueAsString(requestLog));
-        log.info("Response Log\n{}", objectMapper
-            .writerWithDefaultPrettyPrinter()
-            .writeValueAsString(responseLog));
+        log.info("Request Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestLog));
+        log.info("Response Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLog));
     }
 
     @Override
