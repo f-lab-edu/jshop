@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jshop.domain.cart.entity.Cart;
-import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
@@ -23,8 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 @Entity

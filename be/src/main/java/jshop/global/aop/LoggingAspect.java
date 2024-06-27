@@ -1,18 +1,14 @@
 package jshop.global.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -32,8 +28,9 @@ public class LoggingAspect {
         HttpServletRequest request = attributes.getRequest();
         logger.info("Request URL: " + request.getRequestURL().toString());
         logger.info("HTTP Method: " + request.getMethod());
-        logger.info("Class Method: " + joinPoint.getSignature().getDeclaringTypeName() + "."
-            + joinPoint.getSignature().getName());
+        logger.info("Class Method: " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint
+            .getSignature()
+            .getName());
         logger.info("IP: " + request.getRemoteAddr());
         logger.info("Request Args: " + joinPoint.getArgs()[0]);
     }

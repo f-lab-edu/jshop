@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;

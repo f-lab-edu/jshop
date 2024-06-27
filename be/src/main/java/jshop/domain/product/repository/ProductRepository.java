@@ -3,7 +3,6 @@ package jshop.domain.product.repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.swing.text.html.Option;
 import jshop.domain.product.entity.Product;
 import jshop.domain.user.entity.User;
 import org.springframework.data.domain.Page;

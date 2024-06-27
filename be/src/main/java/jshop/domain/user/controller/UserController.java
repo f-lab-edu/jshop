@@ -21,8 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PatchMapping
-    public void updateUser(@CurrentUserId Long userId,
-        @RequestBody @Valid UpdateUserRequest updateUserRequest) {
+    public void updateUser(@CurrentUserId Long userId, @RequestBody @Valid UpdateUserRequest updateUserRequest) {
         userService.updateUser(userId, updateUserRequest);
     }
 

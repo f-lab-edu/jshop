@@ -77,7 +77,7 @@ public class UserService {
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = UserUtils.getUserOrThrow(optionalUser, userId);
-        
+
         user.updateUserInfo(updateUserRequest);
     }
 }

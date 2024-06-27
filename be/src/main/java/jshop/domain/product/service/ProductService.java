@@ -1,7 +1,7 @@
 package jshop.domain.product.service;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
@@ -33,10 +33,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

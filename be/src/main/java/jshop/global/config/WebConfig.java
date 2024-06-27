@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import java.util.List;
 import jshop.global.annotation.CurrentUserIdArgumentResolver;
+import jshop.global.annotation.CurrentUserRoleArgumentResolver;
 import jshop.global.filter.LoggingFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import jshop.global.annotation.CurrentUserRoleArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 

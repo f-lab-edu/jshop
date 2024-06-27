@@ -1,7 +1,6 @@
 package jshop.global.dto;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

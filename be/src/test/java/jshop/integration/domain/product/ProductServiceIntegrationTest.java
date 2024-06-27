@@ -4,7 +4,6 @@ package jshop.integration.domain.product;
 import static jshop.utils.SecurityContextUtil.userSecurityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import java.security.Security;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.jwt.dto.CustomUserDetails;
@@ -17,9 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 

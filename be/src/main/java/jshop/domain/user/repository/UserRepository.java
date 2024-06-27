@@ -1,7 +1,6 @@
 package jshop.domain.user.repository;
 
 
-import jakarta.persistence.Entity;
 import java.util.Optional;
 import jshop.domain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
