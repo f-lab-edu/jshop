@@ -1,4 +1,4 @@
-package jshop.domain.jwt.filter;
+package jshop.global.jwt.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

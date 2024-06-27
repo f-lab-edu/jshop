@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Inventory entity 테스트")
+@DisplayName("[단위 테스트] Inventory")
 class InventoryTest {
 
     @Nested

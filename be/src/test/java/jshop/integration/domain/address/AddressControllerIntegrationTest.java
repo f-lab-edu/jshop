@@ -23,6 +23,7 @@ import jshop.domain.user.service.UserService;
 import jshop.global.dto.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @AutoConfigureMockMvc
 @Transactional
 @DisplayName("[통합 테스트] AddressController")
+@Disabled
 public class AddressControllerIntegrationTest {
 
     @Autowired

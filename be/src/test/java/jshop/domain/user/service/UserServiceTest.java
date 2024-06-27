@@ -22,6 +22,7 @@ import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.utils.DtoBuilder;
 import jshop.utils.EntityBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("[단위 테스트] UserService")
 class UserServiceTest {
 
     @InjectMocks
@@ -56,16 +58,16 @@ class UserServiceTest {
     @DisplayName("회원 가입 검증")
     class JoinUser {
 
+        private String username = "test";
+        private String email = "email@email.com";
+        private String password = "test";
+        private UserType userType = UserType.USER;
+        private String role = "ROLE_USER";
+
         @Test
         @DisplayName("중복된 이메일이 없다면 회원가입이 가능")
         public void joinUser_success() {
             // given
-            String username = "test";
-            String email = "email@email.com";
-            String password = "test";
-            UserType userType = UserType.USER;
-            String role = "ROLE_USER";
-
             JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
             User user = EntityBuilder.getJoinUser(username, email, password, userType, role);
 
@@ -89,12 +91,6 @@ class UserServiceTest {
         @DisplayName("중복된 이메일이 있다면 회원 가입이 불가능")
         public void joinUser_dupEmail() {
             // given
-            String username = "test";
-            String email = "email@email.com";
-            String password = "test";
-            UserType userType = UserType.USER;
-            String role = "ROLE_USER";
-
             JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
 
             // when
@@ -112,17 +108,43 @@ class UserServiceTest {
     @DisplayName("회원 정보 가져오기 검증")
     class GetUser {
 
+        private User user;
+        private Address address;
+
+        @BeforeEach
+        public void init() {
+            user = User
+                .builder()
+                .id(1L)
+                .username("user")
+                .password("password")
+                .email("email@email.com")
+                .role("ROLE_USER")
+                .wallet(Wallet
+                    .builder().balance(0L).build())
+                .build();
+
+            address = Address
+                .builder()
+                .receiverName("김재현")
+                .receiverNumber("010-1234-5678")
+                .province("경기도")
+                .city("광주시")
+                .district("송정동")
+                .street("경안천로")
+                .detailAddress1("123-1234")
+                .detailAddress2(null)
+                .message("문앞에 놔주세요")
+                .user(user)
+                .build();
+        }
+
         @Test
         @DisplayName("회원 정보가 있다면 회원 정보를 가져올 수 있음")
         public void getUser_success() {
-            // given
-            User user = createUser();
-            Address address = createAddress(user);
-
+            // when
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
             when(addressRepository.findByUser(user)).thenReturn(List.of(address));
-
-            // when
             UserInfoResponse userInfoResponse = userService.getUser(1L);
 
             // then
@@ -131,7 +153,7 @@ class UserServiceTest {
         }
 
         @Test
-        @DisplayName("회원 정보가 없다면 회원 정보를 가져올 수 없다")
+        @DisplayName("현재 세션에서 인증된 회원 정보가 없다면 회원 정보를 가져올 수 없다")
         public void getUser_noSuchUser() {
             JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUser(1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
@@ -143,12 +165,26 @@ class UserServiceTest {
     @DisplayName("회원 정보 수정 검증")
     class UpdateUser {
 
+        private User user;
+
+        @BeforeEach
+        public void init() {
+            user = User
+                .builder()
+                .id(1L)
+                .username("user")
+                .password("password")
+                .email("email@email.com")
+                .role("ROLE_USER")
+                .wallet(Wallet
+                    .builder().balance(0L).build())
+                .build();
+        }
+
         @Test
         @DisplayName("회원 정보가 있다면 수정할 수 있음")
         public void updateUser_success() {
             // given
-            User user = createUser();
-
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
             // when
@@ -157,6 +193,7 @@ class UserServiceTest {
 
             // then
             verify(userRepository, times(1)).findById(1L);
+            assertThat(user.getUsername()).isEqualTo("new_user");
         }
 
 
@@ -170,35 +207,5 @@ class UserServiceTest {
 
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
         }
-    }
-
-
-    private User createUser() {
-        return User
-            .builder()
-            .id(1L)
-            .username("user")
-            .password("password")
-            .email("email@email.com")
-            .role("ROLE_USER")
-            .wallet(Wallet
-                .builder().balance(0L).build())
-            .build();
-    }
-
-    private Address createAddress(User user) {
-        return Address
-            .builder()
-            .receiverName("김재현")
-            .receiverNumber("010-1234-5678")
-            .province("경기도")
-            .city("광주시")
-            .district("송정동")
-            .street("경안천로")
-            .detailAddress1("123-1234")
-            .detailAddress2(null)
-            .message("문앞에 놔주세요")
-            .user(user)
-            .build();
     }
 }

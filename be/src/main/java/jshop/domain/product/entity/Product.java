@@ -114,7 +114,7 @@ public class Product extends BaseEntity {
         Set<String> detailAttributeKeySet = Optional.ofNullable(detailAttribute).orElse(new HashMap<>()).keySet();
 
         if (!attributesKeySet.equals(detailAttributeKeySet)) {
-            log.warn("상품의 속성과, 상세 상품의 속성이 일치하지 않습니다. 상품의 속성 : {}, 상세 상품의 속성 : {}", attributesKeySet,
+            log.error("상품의 속성과, 상세 상품의 속성이 일치하지 않습니다. 상품의 속성 : {}, 상세 상품의 속성 : {}", attributesKeySet,
                 detailAttributeKeySet);
             return false;
         }
@@ -122,7 +122,7 @@ public class Product extends BaseEntity {
         for (String key : detailAttributeKeySet) {
             String attributeValue = detailAttribute.get(key);
             if (!attributes.get(key).contains(attributeValue)) {
-                log.warn("상세 상품의 속성값이 상품에 정의되지 않았습니다. 상세 상품의 속성 : {}, 상품에 정의된 속성 : {}", attributeValue,
+                log.error("상세 상품의 속성값이 상품에 정의되지 않았습니다. 상세 상품의 속성 : {}, 상품에 정의된 속성 : {}", attributeValue,
                     attributes.get(key));
                 return false;
             }

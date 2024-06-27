@@ -18,6 +18,7 @@ import jshop.domain.wallet.entity.Wallet;
 import jshop.global.config.P6SpyConfig;
 import jshop.global.exception.JshopException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Import;
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
+@DisplayName("[단위 테스트] UserRepository")
 public class UserRepositoryTest {
 
     @PersistenceContext

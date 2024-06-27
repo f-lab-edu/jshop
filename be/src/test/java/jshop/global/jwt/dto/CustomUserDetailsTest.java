@@ -1,4 +1,4 @@
-package jshop.domain.jwt.dto;
+package jshop.global.jwt.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
