@@ -78,6 +78,38 @@ class CartServiceTest {
         }
 
         @Test
+        @DisplayName("추가하려는 상품이 기존 장바구니에 추가되어 있다면, 추가 수량만큼 더한다")
+        public void addCart_addQuantity() {
+            // given
+            Long userId = 1L;
+            Long detailId = 1L;
+
+            ProductDetail productDetail = ProductDetail
+                .builder().id(detailId).build();
+            Cart cart = Cart
+                .builder().build();
+
+            AddCartRequest addCartRequest = AddCartRequest
+                .builder().productDetailId(detailId).quantity(1).build();
+
+            CartProductDetail cartProductDetail = CartProductDetail
+                .builder().cart(cart).productDetail(productDetail).quantity(10).build();
+
+            // when
+            when(cartRepository.findCartByUserId(userId)).thenReturn(Optional.of(cart));
+            when(productDetailRepository.existsByIdAndIsDeletedFalse(detailId)).thenReturn(true);
+            when(productDetailRepository.getReferenceById(detailId)).thenReturn(productDetail);
+
+            cartService.addCart(addCartRequest, userId);
+
+            when(cartProductDetailRepository.findByCartAndProductDetail(cart, productDetail)).thenReturn(
+                Optional.of(cartProductDetail));
+            cartService.addCart(addCartRequest, userId);
+            // then
+            assertThat(cartProductDetail.getQuantity()).isEqualTo(11);
+        }
+
+        @Test
         @DisplayName("추가하려는 상품에 문제가 있다면 장바구니에 추가할 수 없다")
         public void addCart_noSuchProduct() {
             // given

@@ -1,7 +1,6 @@
 package jshop.domain.cart.service;
 
 import java.util.Optional;
-import jshop.domain.address.entity.Address;
 import jshop.domain.cart.dto.AddCartRequest;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.cart.entity.CartProductDetail;
@@ -12,7 +11,6 @@ import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.global.jwt.dto.CustomUserDetails;
-import jshop.global.utils.AddressUtils;
 import jshop.global.utils.CartUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +41,16 @@ public class CartService {
 
         ProductDetail productDetail = productDetailRepository.getReferenceById(detailId);
 
-        CartProductDetail cartProductDetail = CartProductDetail
-            .builder().cart(cart).productDetail(productDetail).quantity(addCartRequest.getQuantity()).build();
+        cartProductDetailRepository
+            .findByCartAndProductDetail(cart, productDetail)
+            .ifPresentOrElse(cartProductDetail -> {
+                cartProductDetail.addQuantity(addCartRequest.getQuantity());
+            }, () -> {
+                CartProductDetail cartProductDetail = CartProductDetail
+                    .builder().cart(cart).productDetail(productDetail).quantity(addCartRequest.getQuantity()).build();
 
-        cartProductDetailRepository.save(cartProductDetail);
+                cartProductDetailRepository.save(cartProductDetail);
+            });
     }
 
     @Transactional

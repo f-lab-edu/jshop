@@ -37,4 +37,8 @@ public class CartProductDetail extends BaseEntity {
     private ProductDetail productDetail;
 
     private Integer quantity;
+
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
+    }
 }
