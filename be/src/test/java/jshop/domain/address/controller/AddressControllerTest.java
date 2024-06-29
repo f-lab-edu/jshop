@@ -36,7 +36,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(AddressController.class)
 @Import({TestSecurityConfigWithoutMethodSecurity.class, GlobalExceptionHandler.class})
-@DisplayName("[단위 테스트] AddressController 단위테스트")
+@DisplayName("[단위 테스트] AddressController")
 public class AddressControllerTest {
 
     @MockBean

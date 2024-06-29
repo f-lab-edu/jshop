@@ -43,11 +43,11 @@ public class ProductService {
     private final InventoryService inventoryService;
 
     @Transactional
-    public void createProduct(CreateProductRequest createProductRequest, Long userId) {
+    public Long createProduct(CreateProductRequest createProductRequest, Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
-        if (user.getUserType() != UserType.SELLER) {
+        if (!user.getUserType().equals(UserType.SELLER)) {
             log.error(ErrorCode.USER_NOT_SELLER.getLogMessage(), user.getUserType());
             throw JshopException.of(ErrorCode.USER_NOT_SELLER);
         }
@@ -63,6 +63,8 @@ public class ProductService {
         Product newProduct = Product.of(createProductRequest, category, user);
 
         productRepository.save(newProduct);
+
+        return newProduct.getId();
     }
 
     public OwnProductsResponse getOwnProducts(Long userId, int pageNumber, int pageSize) {
@@ -81,7 +83,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
+    public Long createProductDetail(CreateProductDetailRequest createProductDetailRequest, Long productId) {
         Product product = getProduct(productId);
 
         if (productDetailRepository.existsByAttributeAndProduct(createProductDetailRequest.getAttribute(), product)) {
@@ -100,6 +102,8 @@ public class ProductService {
 
         ProductDetail newProductDetail = ProductDetail.of(createProductDetailRequest, product, inventory);
         productDetailRepository.save(newProductDetail);
+
+        return newProductDetail.getId();
     }
 
     @Transactional
@@ -145,7 +149,7 @@ public class ProductService {
             throw JshopException.of(ErrorCode.PRODUCTID_NOT_FOUND);
         });
 
-        if (product.getOwner().getId() == userId) {
+        if (product.getOwner().getId().equals(userId)) {
             return true;
         }
         log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "Product", productId, userId);
@@ -164,12 +168,12 @@ public class ProductService {
 
         Product product = productDetail.getProduct();
 
-        if (product.getId() != productId) {
+        if (!product.getId().equals(productId)) {
             log.error("상세 상품이 상품에 속하지 않습니다. 상품 ID : [{}], 상세 상품 ID : [{}]", productId, detailId);
             throw JshopException.of(ErrorCode.BAD_REQUEST);
         }
 
-        if (product.getOwner().getId() == userId) {
+        if (product.getOwner().getId().equals(userId)) {
             return true;
         }
         log.error(ErrorCode.UNAUTHORIZED.getLogMessage(), "ProductDetail", detailId, userId);

@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "cart_product_detail")
+@ToString
 public class CartProductDetail extends BaseEntity {
 
     @Id
@@ -37,4 +39,8 @@ public class CartProductDetail extends BaseEntity {
     private ProductDetail productDetail;
 
     private Integer quantity;
+
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
+    }
 }

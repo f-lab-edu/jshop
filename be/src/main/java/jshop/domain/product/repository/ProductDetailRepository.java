@@ -26,5 +26,6 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
     @EntityGraph(attributePaths = {"inventory", "product"})
     Optional<ProductDetail> findById(Long id);
 
+    boolean existsByIdAndIsDeletedFalse(Long productDetailId);
 
 }
