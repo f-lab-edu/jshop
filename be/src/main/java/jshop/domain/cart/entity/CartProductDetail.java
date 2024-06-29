@@ -9,13 +9,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jshop.domain.product.entity.ProductDetail;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -40,7 +44,11 @@ public class CartProductDetail extends BaseEntity {
 
     private Integer quantity;
 
-    public void addQuantity(int quantity) {
+    public void changeQuantity(int quantity) {
+        if (this.quantity + quantity <= 0) {
+            log.error(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), this.quantity + quantity);
+            throw JshopException.of(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION);
+        }
         this.quantity += quantity;
     }
 }

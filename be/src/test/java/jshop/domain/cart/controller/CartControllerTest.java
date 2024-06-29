@@ -53,6 +53,44 @@ class CartControllerTest {
     private ArgumentCaptor<Long> userIdCaptor;
 
     @Nested
+    @DisplayName("장바구니 가져오기 검증")
+    class GetCartList {
+
+        @Test
+        @DisplayName("로그인한 유저는 페이지 정보를 통해 자신의 장바구니의 상품을 가져올 수 있다.")
+        public void getCart_success() throws Exception {
+            // when
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/cart?page=1&size=10").with(mockUserSecurityContext()));
+
+            // then
+            verify(cartService, times(1)).getCartPage(getSecurityContextMockUserId(), 1, 10);
+        }
+
+        @Test
+        @DisplayName("페이지 정보를 넘기지 않는다면 기본 값이 사용된다")
+        public void getCart_default() throws Exception {
+            // when
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/cart").with(mockUserSecurityContext()));
+
+            // then
+            verify(cartService, times(1)).getCartPage(getSecurityContextMockUserId(), 0, 30);
+        }
+
+        @Test
+        @DisplayName("페이지 정보가 잘못되었다면 ILLEGAL_PAGE_REQUEST를 날린다")
+        public void addCart_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/cart?page=1&size=-10").with(mockUserSecurityContext()));
+
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.ILLEGAL_PAGE_REQUEST.getCode()));
+        }
+    }
+
+    @Nested
     @DisplayName("장바구니 추가 검증")
     class AddCart {
 
