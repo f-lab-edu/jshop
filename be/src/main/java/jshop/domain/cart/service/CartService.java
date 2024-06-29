@@ -1,7 +1,12 @@
 package jshop.domain.cart.service;
 
+import java.util.List;
 import java.util.Optional;
 import jshop.domain.cart.dto.AddCartRequest;
+import jshop.domain.cart.dto.CartProductQueryResult;
+import jshop.domain.cart.dto.CartProductResponse;
+import jshop.domain.cart.dto.OwnCartInfoResponse;
+import jshop.domain.cart.dto.UpdateCartRequest;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.cart.entity.CartProductDetail;
 import jshop.domain.cart.repository.CartProductDetailRepository;
@@ -14,6 +19,10 @@ import jshop.global.jwt.dto.CustomUserDetails;
 import jshop.global.utils.CartUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +37,21 @@ public class CartService {
     private final ProductDetailRepository productDetailRepository;
     private final CartProductDetailRepository cartProductDetailRepository;
 
+    public OwnCartInfoResponse getCartPage(Long userId, int pageNumber, int pageSize) {
+        Cart cart = getCart(userId);
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Direction.DESC, "createdAt"));
+        Page<CartProductQueryResult> page = cartProductDetailRepository.findCartProductInfoByQuery(cart, pageRequest);
+
+        return OwnCartInfoResponse
+            .builder()
+            .page(page.getNumber())
+            .totalPage(page.getTotalPages())
+            .totalCount(page.getTotalElements())
+            .products(page.getContent().stream().map(CartProductResponse::of).toList())
+            .build();
+    }
+
     @Transactional
     public void addCart(AddCartRequest addCartRequest, Long userId) {
 
@@ -39,12 +63,17 @@ public class CartService {
             throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
         }
 
+        if (addCartRequest.getQuantity() <= 0) {
+            log.error(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), addCartRequest.getQuantity());
+            throw JshopException.of(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION);
+        }
+
         ProductDetail productDetail = productDetailRepository.getReferenceById(detailId);
 
         cartProductDetailRepository
             .findByCartAndProductDetail(cart, productDetail)
             .ifPresentOrElse(cartProductDetail -> {
-                cartProductDetail.addQuantity(addCartRequest.getQuantity());
+                cartProductDetail.changeQuantity(addCartRequest.getQuantity());
             }, () -> {
                 CartProductDetail cartProductDetail = CartProductDetail
                     .builder().cart(cart).productDetail(productDetail).quantity(addCartRequest.getQuantity()).build();
@@ -56,6 +85,12 @@ public class CartService {
     @Transactional
     public void deleteCart(Long cartProductDetailId) {
         cartProductDetailRepository.deleteById(cartProductDetailId);
+    }
+
+    @Transactional
+    public void updateCart(Long cartProductDetailId, UpdateCartRequest updateCartRequest) {
+        CartProductDetail cartProductDetail = getCartProductDetail(cartProductDetailId);
+        cartProductDetail.changeQuantity(updateCartRequest.getQuantity());
     }
 
     public boolean checkCartProductOwnership(Long cartProductDetailid, UserDetails userDetails) {

@@ -45,6 +45,10 @@ public enum ErrorCode {
     // 비즈니스 로직 오류
     ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50_001, "재고 변화량이 잘못되었습니다.", "재고 변화량이 잘못되었습니다. [{}]", HttpStatus.BAD_REQUEST),
     NEGATIVE_QUANTITY_EXCEPTION(50_002, "재고는 음수일 수 없습니다.", "재고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_PAGE_REQUEST(60_001, "요청할 수 없는 페이지 입니다.", "요청할 수 없는 페이지 입니다. pageNumber : [{}], pageSize : [{}]",
+        HttpStatus.BAD_REQUEST),
+    ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION(70_001, "장바구니 수량이 잘못되었습니다.", "장바구니 수량은 1 이상이여야 합니다. [{}]",
+        HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",

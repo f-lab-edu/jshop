@@ -1,9 +1,11 @@
 package jshop.integration.domain.cart;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -131,16 +135,93 @@ public class CartControllerIntegrationTest {
 
         User owner = userRepository.getReferenceById(userId);
         Product product = Product
-            .builder().name("product").owner(owner).build();
+            .builder().name("product").description("상세 정보").manufacturer("제조사").owner(owner).build();
         productRepository.save(product);
         productId = product.getId();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             CreateProductDetailRequest createProductDetailRequest = CreateProductDetailRequest
-                .builder().price(1000L).build();
+                .builder().price(1000L + i).build();
 
             Long productDetailId = productService.createProductDetail(createProductDetailRequest, productId);
             productDetailIds.add(productDetailId);
+        }
+    }
+
+    @Nested
+    @DisplayName("장바구니 정보 가져오기 검증")
+    class GetCartList {
+
+        String addCartRequest = """
+            { "productDetailId" : %d, "quantity" : 1}
+            """;
+
+        Long cartProductDetailId;
+
+        @BeforeEach
+        public void init() throws Exception {
+            for (Long productDetailId : productDetailIds) {
+                mockMvc.perform(post("/api/cart")
+                    .header("Authorization", userToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(String.format(addCartRequest, productDetailId)));
+            }
+
+            em.flush();
+            em.clear();
+
+            User user = userRepository.findById(userId).get();
+
+            List<CartProductDetail> products = user.getCart().getCartProductDetails();
+            assertThat(products.size()).isEqualTo(50);
+
+            cartProductDetailId = products.get(0).getId();
+        }
+
+        @Test
+        @DisplayName("인증된 유저는 자신의 장바구니 정보를 가져올 수 있다")
+        public void getCart_success() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/cart?page=1&size=5").header("Authorization", userToken));
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.products[0].productName").value("product"))
+                .andExpect(jsonPath("$.data.products[0].manufacturer").value("제조사"))
+                .andExpect(jsonPath("$.data.products[0].price").value(1044))
+                .andExpect(jsonPath("$.data.products[0].quantity").value(1))
+                .andExpect(jsonPath("$.data.page").value(1))
+                .andExpect(jsonPath("$.data.totalPage").value(10))
+                .andExpect(jsonPath("$.data.totalCount").value(50));
+        }
+
+        @Test
+        @DisplayName("페이지 정보를 주지 않는다면 기본 값이 사용된다.")
+        public void getCart_default() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/cart").header("Authorization", userToken));
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.products[0].productName").value("product"))
+                .andExpect(jsonPath("$.data.products[0].manufacturer").value("제조사"))
+                .andExpect(jsonPath("$.data.products[0].price").value(1049))
+                .andExpect(jsonPath("$.data.products[0].quantity").value(1))
+                .andExpect(jsonPath("$.data.page").value(0))
+                .andExpect(jsonPath("$.data.totalPage").value(2))
+                .andExpect(jsonPath("$.data.totalCount").value(50));
+        }
+
+        @Test
+        @DisplayName("인증이 안된 요청이 오면 Forbidden 을 내린다")
+        public void getCart_noAuth() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/cart"));
+
+            // then
+            perform.andExpect(status().isForbidden());
         }
     }
 
@@ -330,6 +411,81 @@ public class CartControllerIntegrationTest {
             perform
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.CART_PRODUCTDETAIL_ID_NOT_FOUND.getCode()));
+        }
+    }
+
+    @Nested
+    @DisplayName("장바구니 수량 변경")
+    class UpdateCart {
+
+        String addCartRequest = """
+            { "productDetailId" : %d, "quantity" : 1}
+            """;
+
+        String updateCartRequest = """
+            { "productDetailId" : %d, "quantity" : %d}
+            """;
+
+        Long cartProductDetailId;
+
+        @BeforeEach
+        public void init() throws Exception {
+            mockMvc.perform(post("/api/cart")
+                .header("Authorization", userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(addCartRequest, productDetailIds.get(0))));
+            em.flush();
+            em.clear();
+
+            User user = userRepository.findById(userId).get();
+
+            List<CartProductDetail> products = user.getCart().getCartProductDetails();
+            assertThat(products.size()).isEqualTo(1);
+
+            cartProductDetailId = products.get(0).getId();
+        }
+
+        @Test
+        @DisplayName("로그인한 사용자는 변경 이후 수량이 1 이상이라면 자신의 장바구니의 수량을 변경할 수 있다.")
+        public void updateCart_success() throws Exception {
+            // when
+            mockMvc.perform(put("/api/cart/{id}", cartProductDetailId)
+                .header("Authorization", userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(updateCartRequest, productDetailIds.get(0), 3)));
+
+            // then
+            User user = userRepository.findById(userId).get();
+
+            List<CartProductDetail> products = user.getCart().getCartProductDetails();
+            assertThat(products.get(0).getQuantity()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("로그인하지 않은 요청에는 forbidden 예외를 던진다.")
+        public void updateCart_noAuth() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(put("/api/cart/{id}", cartProductDetailId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(updateCartRequest, productDetailIds.get(0), 3)));
+
+            // then
+            perform.andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("변경 이후 수량이 1보다 작다면 ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION 예외를 던진다.")
+        public void updateCart_lessthen1() throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(put("/api/cart/{id}", cartProductDetailId)
+                .header("Authorization", userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(updateCartRequest, productDetailIds.get(0), -2)));
+
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getCode()));
         }
     }
 }
