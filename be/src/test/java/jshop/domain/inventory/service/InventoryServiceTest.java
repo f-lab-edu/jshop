@@ -116,7 +116,8 @@ class InventoryServiceTest {
             int changeQuantity = 5;
 
             // when
-            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
+            when(productDetailRepository.findInventoryByProductDetailId(productDetailId)).thenReturn(
+                Optional.of(inventory));
             inventoryService.changeStock(productDetailId, changeQuantity);
 
             // then
@@ -137,7 +138,8 @@ class InventoryServiceTest {
             int changeQuantity = -1;
 
             // when
-            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
+            when(productDetailRepository.findInventoryByProductDetailId(productDetailId)).thenReturn(
+                Optional.of(inventory));
             inventoryService.changeStock(productDetailId, changeQuantity);
 
             // then
@@ -157,7 +159,8 @@ class InventoryServiceTest {
             // given
             int changeQuantity = -11;
             // when
-            when(productDetailRepository.findById(productDetailId)).thenReturn(Optional.of(productDetail));
+            when(productDetailRepository.findInventoryByProductDetailId(productDetailId)).thenReturn(
+                Optional.of(inventory));
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
@@ -175,7 +178,7 @@ class InventoryServiceTest {
             int changeQuantity = 1;
 
             // when
-            when(productDetailRepository.findById(2L)).thenReturn(Optional.of(noInventoryProductDetail));
+            when(productDetailRepository.findInventoryByProductDetailId(2L)).thenReturn(Optional.empty());
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,

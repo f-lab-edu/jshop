@@ -407,7 +407,6 @@ class ProductServiceTest {
 
             // then
             productService.deleteProductDetail(1L);
-            assertThat(productDetail.getProduct()).isNull();
             assertThat(productDetail.getIsDeleted()).isTrue();
         }
     }

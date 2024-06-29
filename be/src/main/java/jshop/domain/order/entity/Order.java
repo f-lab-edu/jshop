@@ -57,6 +57,9 @@ public class Order extends BaseEntity {
     @Builder.Default
     private final List<OrderProductDetail> productDetails = new ArrayList<>();
 
-    private Long price;
-    private Integer quantity;
+    @Column(name = "total_price")
+    private Long totalPrice;
+
+    @Column(name = "total_quantity")
+    private Integer totalQuantity;
 }

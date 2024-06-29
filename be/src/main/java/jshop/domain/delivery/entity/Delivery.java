@@ -30,14 +30,7 @@ public class Delivery extends BaseEntity {
     @GeneratedValue
     @Column(name = "delivery_id")
     private Long id;
-
-    /**
-     * 배달 주소를 fk로 보관.
-     * 특별한거 없음.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
-    private Address address;
+    
 
     /**
      * 주문을 fk로 보관.
@@ -49,4 +42,22 @@ public class Delivery extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     private DeliveryState deliveryState;
+
+    @Column(name = "receiver_name")
+    private String receiverName;
+    @Column(name = "receiver_number")
+    private String receiverNumber;
+    private String province;
+    private String city;
+    private String district;
+    private String street;
+
+    @Column(name = "detail_address1", nullable = true)
+    private String detailAddress1;
+
+    @Column(name = "detail_address2", nullable = true)
+    private String detailAddress2;
+
+    @Column(nullable = true)
+    private String message;
 }
