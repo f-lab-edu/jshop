@@ -13,14 +13,13 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Slf4j
 @RequiredArgsConstructor
-@Component
+//@Component
 public class MvcLoggingAop {
 
     private String id;
@@ -69,7 +68,6 @@ public class MvcLoggingAop {
 
         optionalAttrivutes.ifPresent((attributes) -> {
             responseLog.put("status", attributes.getResponse().getStatus());
-            responseLog.put("status", attributes.getResponse().getStatus());
             Map<String, Object> headers = new HashMap<>();
 
             for (String header : attributes.getResponse().getHeaderNames().stream().toList()) {
@@ -77,9 +75,10 @@ public class MvcLoggingAop {
                 headers.putIfAbsent(header, attributes.getResponse().getHeader(header));
             }
             responseLog.put("headers", headers);
-            if (response != null) {
-                responseLog.put("data", response);
-            }
+
+            Optional.ofNullable(response).ifPresent(r -> {
+                responseLog.put("data", r);
+            });
         });
 
         try {

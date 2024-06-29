@@ -1,6 +1,6 @@
 package jshop.domain.user.dto;
 
 public enum UserType {
-    USER,
-    SELLER
+    USER,   // 일반 유저
+    SELLER  // 판매 유저
 }
