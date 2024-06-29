@@ -32,12 +32,9 @@ public class CartController {
     }
 
     @DeleteMapping("/{cart_product_detail_id}")
-    @PreAuthorize("isAuthenticated() && @cartService.checkCartProductOwnership(#productId, authentication.principal)")
-    public void deleteCart(@PathVariable("cart_product_detail_id") @P("productId") Optional<Long> optionalId,
-        @CurrentUserId Long userId) {
+    @PreAuthorize("@cartService.checkCartProductOwnership(#productId, authentication.principal)")
+    public void deleteCart(@PathVariable("cart_product_detail_id") @P("productId") Long cartProductDetailId) {
 
-        Long cartProductDetailId = optionalId.orElseThrow(JshopException::new);
-
-        cartService.deleteCart(cartProductDetailId, userId);
+        cartService.deleteCart(cartProductDetailId);
     }
 }
