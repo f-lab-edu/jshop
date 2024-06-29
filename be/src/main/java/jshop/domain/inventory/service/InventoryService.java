@@ -50,6 +50,7 @@ public class InventoryService {
     public void changeStock(Long productDetailId, int quantity) {
         Inventory inventory = getInventory(productDetailId);
         int oldQuantity = inventory.getQuantity();
+
         inventory.changeStock(quantity);
         int newQuantity = inventory.getQuantity();
 

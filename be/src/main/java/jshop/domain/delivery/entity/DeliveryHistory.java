@@ -1,4 +1,4 @@
-package jshop.domain.wallet.entity;
+package jshop.domain.delivery.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,42 +15,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Table(name = "wallet_history")
-public class WalletHistory extends BaseEntity {
+@Table(name = "delivery_history")
+public class DeliveryHistory extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "wallet_history_id")
+    @Column(name = "delivery_history_id")
     private Long id;
 
-    /**
-     * 하나의 지갑은 여러개의 히스토리를 가질 수 있다.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id")
-    private Wallet wallet;
+    @JoinColumn(name = "delivery_id")
+    private Delivery delivery;
 
-    /**
-     * 구매, 판매, 입금, 출금의 타입을 갖는다.
-     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "wallet_change_type")
-    private WalletChangeType changeType;
-
-    @Column(name = "change_balance")
-    private Long changeBalance;
-
-    @Column(name = "old_balance")
-    private Long oldBalance;
-
-    @Column(name = "new_balance")
-    private Long newBalance;
+    private DeliveryState deliveryState;
 }

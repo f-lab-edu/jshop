@@ -49,6 +49,7 @@ public enum ErrorCode {
         HttpStatus.BAD_REQUEST),
     ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION(70_001, "장바구니 수량이 잘못되었습니다.", "장바구니 수량은 1 이상이여야 합니다. [{}]",
         HttpStatus.BAD_REQUEST),
+    WALLET_BALANCE_EXCEPTION(80_001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
@@ -56,8 +57,11 @@ public enum ErrorCode {
     INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Inventory가 잘못되었습니다. [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PRODUCTDETAIL_PRODUCT(100_200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
-        HttpStatus.INTERNAL_SERVER_ERROR);
+        HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 서버 문제
+    USER_WALLET_NOT_FOUND(200_100, "사용자의 지갑을 찾을 수 없습니다. 관리자에게 문의하세요", "사용자의 지갑을 찾을 수 없습니다. user : [{}]",
+        HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

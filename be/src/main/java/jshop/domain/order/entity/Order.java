@@ -45,7 +45,8 @@ public class Order extends BaseEntity {
      * 주문 하나당 하나의 배송을 갖는다.
      * fk는 배송측에서 보관한다.
      */
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
     /**
