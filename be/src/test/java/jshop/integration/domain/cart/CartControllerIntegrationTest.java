@@ -15,6 +15,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import jshop.JshopApplication;
 import jshop.domain.cart.entity.CartProductDetail;
 import jshop.domain.cart.repository.CartProductDetailRepository;
 import jshop.domain.cart.repository.CartRepository;
@@ -55,12 +56,6 @@ public class CartControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ProductDetailRepository productDetailRepository;
-
-    @Autowired
-    private CartProductDetailRepository cartProductDetailRepository;
 
     @Autowired
     private ProductRepository productRepository;

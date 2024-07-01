@@ -37,9 +37,6 @@ class CategoryControllerTest {
     @MockBean
     private CategoryService categoryService;
 
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
     @Autowired
     private MockMvc mockMvc;
 

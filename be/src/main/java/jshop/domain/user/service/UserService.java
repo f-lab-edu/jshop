@@ -11,7 +11,6 @@ import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
-import jshop.domain.wallet.service.WalletService;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.global.utils.UserUtils;
@@ -30,9 +29,8 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final WalletService walletService;
 
-    public UserInfoResponse getUser(Long userId) {
+    public UserInfoResponse getUserInfo(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
@@ -54,9 +52,8 @@ public class UserService {
             throw JshopException.of(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
-        Wallet wallet = walletService.createWallet();
-        Cart cart = Cart
-            .builder().build();
+        Wallet wallet = Wallet.create();
+        Cart cart = Cart.create();
 
         User user = User
             .builder()
@@ -80,5 +77,10 @@ public class UserService {
         User user = UserUtils.getUserOrThrow(optionalUser, userId);
 
         user.updateUserInfo(updateUserRequest);
+    }
+
+    public User getUser(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return UserUtils.getUserOrThrow(optionalUser, userId);
     }
 }

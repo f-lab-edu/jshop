@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import jakarta.persistence.EntityManagerFactory;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
@@ -19,16 +20,20 @@ import jshop.utils.config.TestSecurityConfig;
 import jshop.utils.config.TestSecurityConfigWithoutMethodSecurity;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -41,10 +46,7 @@ public class AddressControllerTest {
 
     @MockBean
     private AddressService addressService;
-
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
+    
     @Autowired
     private MockMvc mockMvc;
 
@@ -64,10 +66,10 @@ public class AddressControllerTest {
     @DisplayName("주소 생성 리퀘스트 바디 검증")
     class CreateAddress {
 
-        private static final JSONObject createAddressRequestJson = new JSONObject();
+        private final JSONObject createAddressRequestJson = new JSONObject();
 
-        @BeforeAll
-        public static void init() throws Exception {
+        @BeforeEach
+        public void init() throws Exception {
             createAddressRequestJson.put("receiverName", "김재현");
             createAddressRequestJson.put("receiverNumber", "010-1234-1234");
             createAddressRequestJson.put("province", "경기도");
@@ -186,10 +188,10 @@ public class AddressControllerTest {
     @DisplayName("주소 갱신 리퀘스트 바디 검증")
     class UpdateAddress {
 
-        private static final JSONObject updateAddressRequestJson = new JSONObject();
+        private final JSONObject updateAddressRequestJson = new JSONObject();
 
-        @BeforeAll
-        public static void init() throws Exception {
+        @BeforeEach
+        public void init() throws Exception {
             updateAddressRequestJson.put("receiverName", "김재현");
             updateAddressRequestJson.put("receiverNumber", "010-1234-1234");
             updateAddressRequestJson.put("province", "경기도");

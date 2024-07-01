@@ -164,7 +164,7 @@ public class AddressControllerIntegrationTest {
             Optional<Address> softDeletedAddress = addressRepository.findById(addressId);
             assertThat(deletedAddresses.size()).isEqualTo(0);
 
-            UserInfoResponse userInfoResponseResponse = userService.getUser(user1Id);
+            UserInfoResponse userInfoResponseResponse = userService.getUserInfo(user1Id);
             assertThat(userInfoResponseResponse.getAddresses().size()).isEqualTo(0);
 
             softDeletedAddress.ifPresentOrElse((address) -> {

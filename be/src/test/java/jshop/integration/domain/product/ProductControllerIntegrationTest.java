@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import jshop.domain.category.dto.CreateCategoryRequest;
 import jshop.domain.category.service.CategoryService;
-import jshop.domain.inventory.service.InventoryService;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductDetailResponse;
 import jshop.domain.product.dto.CreateProductRequest;

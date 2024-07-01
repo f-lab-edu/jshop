@@ -1,4 +1,4 @@
-package jshop.domain.inventory.entity;
+package jshop.global.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -7,5 +7,5 @@ import org.hibernate.envers.RevisionEntity;
 
 @Entity
 @RevisionEntity
-@Table(name = "inventory_history_timestamp")
-public class InventoryHistory extends DefaultRevisionEntity {}
+@Table(name = "history_timestamp")
+public class HistoryTimestamp extends DefaultRevisionEntity {}

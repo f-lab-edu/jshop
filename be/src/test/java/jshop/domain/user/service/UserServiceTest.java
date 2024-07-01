@@ -145,7 +145,7 @@ class UserServiceTest {
             // when
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
             when(addressRepository.findByUser(user)).thenReturn(List.of(address));
-            UserInfoResponse userInfoResponse = userService.getUser(1L);
+            UserInfoResponse userInfoResponse = userService.getUserInfo(1L);
 
             // then
             assertThat(userInfoResponse).isNotNull();
@@ -155,7 +155,7 @@ class UserServiceTest {
         @Test
         @DisplayName("현재 세션에서 인증된 회원 정보가 없다면 회원 정보를 가져올 수 없다")
         public void getUser_noSuchUser() {
-            JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUser(1L));
+            JshopException jshopException = assertThrows(JshopException.class, () -> userService.getUserInfo(1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
         }
     }

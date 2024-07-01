@@ -32,9 +32,6 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -50,7 +47,7 @@ class UserControllerTest {
                 MockMvcRequestBuilders.get("/api/users").with(mockUserSecurityContext()));
 
             // then
-            verify(userService, times(1)).getUser(getSecurityContextMockUserId());
+            verify(userService, times(1)).getUserInfo(getSecurityContextMockUserId());
             perform.andExpect(status().isOk());
         }
 

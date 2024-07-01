@@ -11,11 +11,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.Optional;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,13 +69,18 @@ public class User extends BaseEntity {
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
+    public Wallet getWallet() {
+        return Optional.ofNullable(wallet).orElseThrow(() -> {
+            log.error(ErrorCode.USER_WALLET_NOT_FOUND.getLogMessage(), id);
+            throw JshopException.of(ErrorCode.USER_WALLET_NOT_FOUND);
+        });
+    }
+
     public void updateUserInfo(UpdateUserRequest updateUserRequest) {
         if (updateUserRequest.getUsername() != null) {
             this.username = updateUserRequest.getUsername();
         } else {
             log.warn("Username은 null 이 될 수 없습니다.");
         }
-
     }
-
 }
