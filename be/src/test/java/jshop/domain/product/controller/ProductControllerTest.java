@@ -46,9 +46,6 @@ class ProductControllerTest {
     @MockBean
     private ProductService productService;
 
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
     @Autowired
     private MockMvc mockMvc;
 

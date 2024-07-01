@@ -172,7 +172,7 @@ public class AddressControllerIntegrationTest {
             /**
              * 유저 정보 조회시 주소가 나타나지 않음
              */
-            UserInfoResponse userInfoResponseResponse = userService.getUser(user1Id);
+            UserInfoResponse userInfoResponseResponse = userService.getUserInfo(user1Id);
             assertThat(userInfoResponseResponse.getAddresses().size()).isEqualTo(0);
 
             /**
@@ -220,7 +220,7 @@ public class AddressControllerIntegrationTest {
             /**
              * 유저 2로 유저 1이 생성한 주소 삭제
              */
-            UserInfoResponse userInfoResponseResponse = userService.getUser(user1Id);
+            UserInfoResponse userInfoResponseResponse = userService.getUserInfo(user1Id);
             assertThat(userInfoResponseResponse.getAddresses().size()).isEqualTo(1);
 
             ResultActions deleteResult = mockMvc.perform(

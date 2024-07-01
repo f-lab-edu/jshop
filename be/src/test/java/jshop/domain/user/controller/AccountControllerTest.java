@@ -39,9 +39,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 class AccountControllerTest {
 
     @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
-    @MockBean
     private UserService userService;
 
     @Captor

@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping
     public Response<UserInfoResponse> getUserInfo(@CurrentUserId Long userId) {
-        UserInfoResponse userInfoResponse = userService.getUser(userId);
+        UserInfoResponse userInfoResponse = userService.getUserInfo(userId);
 
         return Response
             .<UserInfoResponse>builder().data(userInfoResponse).build();

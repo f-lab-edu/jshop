@@ -35,9 +35,6 @@ public class SearchControllerTest {
     @MockBean
     private SearchService searchService;
 
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
     @Autowired
     private MockMvc mockMvc;
 

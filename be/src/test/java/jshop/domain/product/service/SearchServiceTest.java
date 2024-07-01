@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
-import jshop.domain.category.repository.CategoryRepository;
-import jshop.domain.inventory.service.InventoryService;
 import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.dto.SearchProductDetailsResponse;

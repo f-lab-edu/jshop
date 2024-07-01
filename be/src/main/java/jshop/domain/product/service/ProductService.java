@@ -4,7 +4,6 @@ import java.util.Optional;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.inventory.entity.Inventory;
-import jshop.domain.inventory.service.InventoryService;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
@@ -41,7 +40,6 @@ public class ProductService {
     private final ProductDetailRepository productDetailRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final InventoryService inventoryService;
 
     @Transactional
     public Long createProduct(CreateProductRequest createProductRequest, Long userId) {
@@ -99,7 +97,7 @@ public class ProductService {
             throw JshopException.of(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
         }
 
-        Inventory inventory = inventoryService.createInventory();
+        Inventory inventory = Inventory.create();
 
         ProductDetail newProductDetail = ProductDetail.of(createProductDetailRequest, product, inventory);
         productDetailRepository.save(newProductDetail);
@@ -115,11 +113,22 @@ public class ProductService {
 
     @Transactional
     public void updateProductDetailStock(Long detailId, int quantity) {
-        if (quantity == 0) {
+        ProductDetail productDetail = getProductDetail(detailId);
+
+        /**
+         * 증가 요청은 양수로, 감소 요청은 음수로 들어오지만, 실제 변화는 addStock, removeStock 으로만 이루어지고,
+         * 두 메서드다 파라미터는 양수로만 받음.
+         * 코드 가독성을 위해 이런방식으로 동작
+         * 때문에 removeStock 일때는 음수로 들어온 요청을 -1 곱해줘 반영
+         */
+
+        if (quantity > 0) {
+            productDetail.getInventory().addStock(quantity);
+        } else if (quantity < 0) {
+            productDetail.getInventory().removeStock(-quantity);
+        } else {
             log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
             throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
-        } else {
-            inventoryService.changeStock(detailId, quantity);
         }
     }
 
@@ -135,10 +144,9 @@ public class ProductService {
         return product;
     }
 
-    private ProductDetail getProductDetail(Long detailId) {
+    public ProductDetail getProductDetail(Long detailId) {
         Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(detailId);
-        ProductDetail productDetail = ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
-        return productDetail;
+        return ProductUtils.getProductDetailOrThrow(optionalProductDetail, detailId);
     }
 
     public boolean checkProductOwnership(UserDetails userDetails, Long productId) {

@@ -34,4 +34,9 @@ public class Cart extends BaseEntity {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)
     @Builder.Default
     private final List<CartProductDetail> cartProductDetails = new ArrayList<>();
+
+    public static Cart create() {
+        return Cart
+            .builder().build();
+    }
 }

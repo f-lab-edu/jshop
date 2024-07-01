@@ -40,9 +40,6 @@ class CartControllerTest {
     @MockBean
     private CartService cartService;
 
-    @MockBean
-    private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
     @Autowired
     private MockMvc mockMvc;
 
