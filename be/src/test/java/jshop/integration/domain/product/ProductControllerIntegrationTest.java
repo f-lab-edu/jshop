@@ -62,13 +62,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Transactional
 public class ProductControllerIntegrationTest {
 
-    private static Long normalUserId;
-    private static String normalUserToken;
-    private static Long sellerUserId;
-    private static String sellerUserToken;
-    private static Long anotherSellerUserId;
-    private static String anotherSellerUserToken;
-    private static Long categoryId;
+    private Long normalUserId;
+    private String normalUserToken;
+    private Long sellerUserId;
+    private String sellerUserToken;
+    private Long anotherSellerUserId;
+    private String anotherSellerUserToken;
+    private Long categoryId;
 
 
     @Autowired
@@ -89,8 +89,8 @@ public class ProductControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeAll
-    public static void init(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper,
+    @BeforeEach
+    public void init(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper,
         @Autowired CategoryService categoryService, @Autowired UserRepository userRepository) throws Exception {
 
         System.out.println("all user : " + userRepository.findAll());

@@ -8,12 +8,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +29,7 @@ import jshop.domain.product.service.ProductService;
 import jshop.domain.user.dto.JoinUserResponse;
 import jshop.global.dto.Response;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,7 +39,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
@@ -46,11 +51,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Transactional
 public class ProductStockSyncTest {
 
-    private static Long sellerUserId;
-    private static String sellerUserToken;
-    private static Long categoryId;
-    private static Long productId;
-    private static Long productDetailId;
+    private Long sellerUserId;
+    private String sellerUserToken;
+    private Long categoryId;
+    private Long productId;
+    private Long productDetailId;
 
     @Autowired
     private ProductDetailRepository productDetailRepository;
@@ -58,8 +63,8 @@ public class ProductStockSyncTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeAll
-    public static void init(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper,
+    @BeforeEach
+    public void init(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper,
         @Autowired CategoryService categoryService, @Autowired ProductService productService) throws Exception {
 
         /**
@@ -86,7 +91,6 @@ public class ProductStockSyncTest {
         /**
          * 기초 카테고리 생성
          */
-
         CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
             .builder().name("전자제품2").build();
 
@@ -111,32 +115,22 @@ public class ProductStockSyncTest {
     @DisplayName("동시에 여러번의 재고 변화 요청이 있더라도, 모두 반영되어야 함. (동시성 문제)")
     public void changeStock_sync() throws Exception {
         /**
-         * InventoryRepository#findByIdWithNoLock 을 사용하면 문제가 생김
+         * TODO
+         * 다른 테스트에 영향을 주지 않기 위해 하나의 트랜잭션 내부에서 비동기 요청으로 10개의 요청을 보내는것이 가능한가?
          */
+
+
         // given
-        String updateProductDetailStockRequestSTr = """
+        String updateProductDetailStockRequestStr = """
             { "quantity" : 10 }
             """;
 
-        ExecutorService executors = Executors.newFixedThreadPool(10);
-
-        // when
         for (int i = 0; i < 10; i++) {
-            executors.submit(() -> {
-                try {
-                    mockMvc.perform(
-                        patch("/api/products/{product_id}/details/{detail_id}/stocks", productId, productDetailId)
-                            .header("Authorization", sellerUserToken)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(updateProductDetailStockRequestSTr));
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            });
+            mockMvc.perform(patch("/api/products/{product_id}/details/{detail_id}/stocks", productId, productDetailId)
+                .header("Authorization", sellerUserToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateProductDetailStockRequestStr));
         }
-
-        executors.shutdown();
-        executors.awaitTermination(1L, TimeUnit.MINUTES);
 
         // then
         ProductDetail productDetail = productDetailRepository.findById(productDetailId).get();

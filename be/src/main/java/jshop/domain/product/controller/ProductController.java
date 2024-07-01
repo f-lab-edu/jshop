@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -96,6 +97,8 @@ public class ProductController {
     public void updateProductDetailStock(@PathVariable("product_id") @P("productId") Long productId,
         @PathVariable("detail_id") @P("detailId") Long detailId,
         @RequestBody @Valid UpdateProductDetailStockRequest updateProductDetailStockRequest) {
+        Object transactionId = TransactionSynchronizationManager.getCurrentTransactionName();
+        log.info("ProductStockSyncTest.init transactionId = {}", transactionId);
         productService.updateProductDetailStock(detailId, updateProductDetailStockRequest.getQuantity());
     }
 

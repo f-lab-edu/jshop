@@ -26,8 +26,10 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
     Page<SearchProductDetailQueryResult> searchProductDetailsByQuery(@Param("lastProductId") Long lastProductId,
         @Param("name") String name, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"product"})
+    @EntityGraph(attributePaths = {"inventory", "product"})
     Optional<ProductDetail> findById(Long id);
+
+    boolean existsByIdAndIsDeletedFalse(Long productDetailId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select pd.inventory from ProductDetail pd where pd.id = :detailId")

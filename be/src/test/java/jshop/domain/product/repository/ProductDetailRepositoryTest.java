@@ -10,6 +10,7 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.global.config.P6SpyConfig;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,12 +39,12 @@ class ProductDetailRepositoryTest {
     @DisplayName("검색어로 상품정보 찾기 무한스크롤 JPQL 테스트")
     class SearchProductDetailsByQuery {
 
-        private static Map<String, List<String>> attributes;
-        private static Map<String, String> attribute1;
-        private static Map<String, String> attribute2;
+        private Map<String, List<String>> attributes;
+        private Map<String, String> attribute1;
+        private Map<String, String> attribute2;
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             attributes = new HashMap<>();
             attributes.put("storage", List.of("128GB", "256GB"));
             attributes.put("color", List.of("white", "yellow"));
@@ -115,5 +116,24 @@ class ProductDetailRepositoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("상세 상품 존재 여부 확인")
+    class ExistsProductDetails {
+
+        @Test
+        @DisplayName("is_deleted == true 인 상품은 existsByIdAndIsDeletedFalse 의 결과가 false")
+        public void existsByIdAndIsDeletedFalse_success() {
+            // given
+            ProductDetail productDetail = ProductDetail
+                .builder().isDeleted(true).build();
+
+            // when
+            productDetailRepository.save(productDetail);
+
+            // then
+            boolean result = productDetailRepository.existsByIdAndIsDeletedFalse(productDetail.getId());
+            assertThat(result).isFalse();
+        }
+    }
 
 }

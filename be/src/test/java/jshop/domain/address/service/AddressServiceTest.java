@@ -15,7 +15,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,11 +46,11 @@ public class AddressServiceTest {
     @DisplayName("주소 생성 테스트")
     class CreateAddress {
 
-        private static CreateAddressRequest createAddressRequest;
-        private static User user;
+        private CreateAddressRequest createAddressRequest;
+        private User user;
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             createAddressRequest = CreateAddressRequest
                 .builder()
                 .receiverName("김재현")

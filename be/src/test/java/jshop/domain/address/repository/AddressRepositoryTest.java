@@ -9,6 +9,7 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,11 @@ public class AddressRepositoryTest {
     @Nested
     class FindById {
 
-        private static User user;
-        private static Address address1, address2;
+        private User user;
+        private Address address1, address2;
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             user = User
                 .builder().username("kim").role("ROLE_USER").build();
 

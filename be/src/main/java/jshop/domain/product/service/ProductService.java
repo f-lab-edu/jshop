@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -158,6 +159,8 @@ public class ProductService {
 
 
     public boolean checkProductDetailOwnership(UserDetails userDetails, Long detailId, Long productId) {
+        Object transactionId = TransactionSynchronizationManager.getCurrentTransactionName();
+        log.info("ProductStockSyncTest.init transactionId = {}", transactionId);
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         Long userId = customUserDetails.getId();
 
