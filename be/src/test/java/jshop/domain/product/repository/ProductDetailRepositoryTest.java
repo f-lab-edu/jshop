@@ -10,6 +10,7 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.global.config.P6SpyConfig;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] ProductDetailRepository")
+@Transactional
 class ProductDetailRepositoryTest {
 
     @Autowired
@@ -36,12 +39,12 @@ class ProductDetailRepositoryTest {
     @DisplayName("검색어로 상품정보 찾기 무한스크롤 JPQL 테스트")
     class SearchProductDetailsByQuery {
 
-        private static Map<String, List<String>> attributes;
-        private static Map<String, String> attribute1;
-        private static Map<String, String> attribute2;
+        private Map<String, List<String>> attributes;
+        private Map<String, String> attribute1;
+        private Map<String, String> attribute2;
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             attributes = new HashMap<>();
             attributes.put("storage", List.of("128GB", "256GB"));
             attributes.put("color", List.of("white", "yellow"));

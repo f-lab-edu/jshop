@@ -30,6 +30,8 @@ public class InventoryService {
         Inventory inventory = Inventory
             .builder().quantity(0).minQuantity(0).build();
 
+        inventoryRepository.save(inventory);
+
         InventoryHistory inventoryHistory = InventoryHistory
             .builder()
             .inventory(inventory)
@@ -41,7 +43,7 @@ public class InventoryService {
 
         inventoryHistoryRepository.save(inventoryHistory);
 
-        return inventoryRepository.save(inventory);
+        return inventory;
     }
 
     @Transactional
@@ -64,17 +66,12 @@ public class InventoryService {
     }
 
     public Inventory getInventory(Long productDetailId) {
-        Optional<ProductDetail> optionalProductDetail = productDetailRepository.findById(productDetailId);
-        ProductDetail productDetail = optionalProductDetail.orElseThrow(() -> {
-            log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), productDetailId);
-            throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
-        });
-
-        Inventory inventory = productDetail.getInventory();
-        if (inventory == null) {
-            log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), productDetailId);
-            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
-        }
+        Inventory inventory = productDetailRepository
+            .findInventoryByProductDetailId(productDetailId)
+            .orElseThrow(() -> {
+                log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), productDetailId);
+                throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
+            });
 
         return inventory;
     }

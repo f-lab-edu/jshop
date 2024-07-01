@@ -260,7 +260,7 @@ class ProductControllerTest {
 
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-                .patch("/api/products/1/details/1")
+                .patch("/api/products/1/details/1/stocks")
                 .with(mockUserSecurityContext())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateProductDetailStockRequestStr));
@@ -276,7 +276,7 @@ class ProductControllerTest {
 
             // when
             ResultActions perform = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/api/products/1/details/1").with(mockUserSecurityContext()));
+                MockMvcRequestBuilders.patch("/api/products/1/details/1/stocks").with(mockUserSecurityContext()));
 
             // then
             perform

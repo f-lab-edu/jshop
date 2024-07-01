@@ -38,7 +38,7 @@ public enum ErrorCode {
         HttpStatus.BAD_REQUEST),
 
     // 잘못된 요청
-    INVALID_REQUEST_BODY(10001, "요청이 잘못되었습니다.", "Request Body가 비었습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_REQUEST_BODY(10001, "요청이 잘못되었습니다.", "Request Body가 잘못되었습니다 (공백, 잘못된 포맷).", HttpStatus.BAD_REQUEST),
     BAD_REQUEST(10010, "요청이 잘못되었습니다.", "", HttpStatus.BAD_REQUEST),
     NO_SEARCH_QUERY(10050, "검색어가 없습니다.", "상품 검색 쿼리는 null일 수 없습니다.", HttpStatus.BAD_REQUEST),
 

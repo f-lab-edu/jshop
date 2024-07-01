@@ -48,7 +48,7 @@ public class AddressController {
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated() && @addressService.checkAddressOwnership(authentication.principal, #addressId)")
     public void updateAddress(@RequestBody @Valid UpdateAddressRequest updateAddressRequest,
-        @PathVariable("id") Long addressId) {
+        @PathVariable("id") @P("addressId") Long addressId) {
         addressService.updateAddress(updateAddressRequest, addressId);
     }
 }

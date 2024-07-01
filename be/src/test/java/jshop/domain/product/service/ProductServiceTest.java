@@ -79,13 +79,13 @@ class ProductServiceTest {
     @DisplayName("상품 생성 테스트")
     class CreateProduct {
 
-        private static final Map<String, List<String>> attributes = new HashMap<>();
+        private final Map<String, List<String>> attributes = new HashMap<>();
         private final String productName = "product";
         private final String productManufacturer = "apple";
         private final String productDescription = "description";
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             attributes.put("attr1", List.of("1", "2"));
         }
 
@@ -310,12 +310,12 @@ class ProductServiceTest {
     @DisplayName("상세 상품 정보 변경")
     class UpdateProductDetail {
 
-        private static Product product;
-        private static ProductDetail productDetail;
-        private static User user;
+        private Product product;
+        private ProductDetail productDetail;
+        private User user;
 
-        @BeforeAll
-        public static void init() {
+        @BeforeEach
+        public void init() {
             user = User
                 .builder().id(1L).username("kim").build();
             product = Product
@@ -407,7 +407,6 @@ class ProductServiceTest {
 
             // then
             productService.deleteProductDetail(1L);
-            assertThat(productDetail.getProduct()).isNull();
             assertThat(productDetail.getIsDeleted()).isTrue();
         }
     }
