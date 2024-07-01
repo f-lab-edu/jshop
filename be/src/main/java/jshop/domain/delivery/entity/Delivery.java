@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Getter
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "delivery")
+@Audited
 public class Delivery extends BaseEntity {
 
     @Id
@@ -52,6 +54,10 @@ public class Delivery extends BaseEntity {
 
     @Column(nullable = true)
     private String message;
+
+    public void cancel() {
+        deliveryState = DeliveryState.CANCLED;
+    }
 
     public static Delivery of(Address address) {
         return Delivery
