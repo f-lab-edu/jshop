@@ -60,7 +60,7 @@ public class AddressService {
 
         Address address = getAddress(addressId);
 
-        if (address.getUser().getId() == userId) {
+        if (address.getUser().getId().equals(userId)) {
             return true;
         }
 

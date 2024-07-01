@@ -80,7 +80,6 @@ public class ProductDetail extends BaseEntity {
     }
 
     public void delete() {
-        product = null;
         isDeleted = true;
     }
 }

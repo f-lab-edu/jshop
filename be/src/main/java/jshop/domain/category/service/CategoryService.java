@@ -25,15 +25,15 @@ public class CategoryService {
     }
 
     @Transactional
-    public void createCategory(CreateCategoryRequest createCategoryRequest) {
-        
+    public Long createCategory(CreateCategoryRequest createCategoryRequest) {
+
         if (categoryRepository.existsByName(createCategoryRequest.getName())) {
             log.error(ErrorCode.ALREADY_EXISTS_CATEGORY.getLogMessage(), createCategoryRequest.getName());
             throw JshopException.of(ErrorCode.ALREADY_EXISTS_CATEGORY);
         }
 
         Category category = Category.of(createCategoryRequest);
-
         categoryRepository.save(category);
+        return category.getId();
     }
 }
