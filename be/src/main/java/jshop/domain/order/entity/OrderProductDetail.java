@@ -44,4 +44,17 @@ public class OrderProductDetail extends BaseEntity {
 
     private Integer orderQuantity;
     private Long orderPrice;
+
+    public static OrderProductDetail createOrderProductDetail(Order order, int quantity, long price,
+        ProductDetail productDetail) {
+        productDetail.getInventory().purchase(quantity);
+
+        return OrderProductDetail
+            .builder().order(order).orderQuantity(quantity).orderPrice(price).productDetail(productDetail).build();
+    }
+
+
+    public void cancel() {
+        productDetail.getInventory().refund(orderQuantity);
+    }
 }

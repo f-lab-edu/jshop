@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Getter
@@ -24,21 +25,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "delivery")
+@Audited
 public class Delivery extends BaseEntity {
 
     @Id
     @GeneratedValue
     @Column(name = "delivery_id")
     private Long id;
-    
 
-    /**
-     * 주문을 fk로 보관.
-     * 특별한거 없음.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
 
     @Enumerated(value = EnumType.STRING)
     private DeliveryState deliveryState;
@@ -60,4 +54,24 @@ public class Delivery extends BaseEntity {
 
     @Column(nullable = true)
     private String message;
+
+    public void cancel() {
+        deliveryState = DeliveryState.CANCLED;
+    }
+
+    public static Delivery of(Address address) {
+        return Delivery
+            .builder()
+            .deliveryState(DeliveryState.PREPARING)
+            .receiverName(address.getReceiverName())
+            .receiverNumber(address.getReceiverNumber())
+            .province(address.getProvince())
+            .city(address.getCity())
+            .district(address.getDistrict())
+            .street(address.getStreet())
+            .detailAddress1(address.getDetailAddress1())
+            .detailAddress2(address.getDetailAddress2())
+            .message(address.getMessage())
+            .build();
+    }
 }

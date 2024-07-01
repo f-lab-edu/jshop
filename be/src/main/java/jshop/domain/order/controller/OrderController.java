@@ -7,6 +7,9 @@ import jshop.global.annotation.CurrentUserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,4 +28,12 @@ public class OrderController {
     public void createOrder(@RequestBody @Valid CreateOrderRequest createOrderRequest, @CurrentUserId Long userId) {
         orderService.createOrder(createOrderRequest, userId);
     }
+
+    @DeleteMapping("/{order_id}")
+    @PreAuthorize("@orderService.checkOrderOwnership(authentication.principal, #orderId)")
+    public void deleteOrder(@PathVariable("order_id") @P("orderId") Long orderId) {
+        orderService.deleteOrder(orderId);
+
+    }
+
 }

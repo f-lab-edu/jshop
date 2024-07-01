@@ -32,6 +32,7 @@ public enum ErrorCode {
     CART_NOT_FOUND(3060, "장바구니 정보를 찾을 수 없습니다", "유저 ID[{}] 로 장바구니 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CART_PRODUCTDETAIL_ID_NOT_FOUND(3065, "장바구니에 추가된 상품을 찾을 수 없습니다.", "장바구니에 추가된 상품 [{}] 를 찾을 수 없습니다.",
         HttpStatus.BAD_REQUEST),
+    ORDER_ID_NOT_FOUND(3070, "주문 정보를 찾을 수 없습니다.", "주문 ID[{}] 로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 유저 관련 오류
     USER_NOT_SELLER(4001, "판매 유저가 아니라면 상품을 등록할 수 없습니다.", "판매 유저가 아니라면 상품을 등록할 수 없습니다. 현재 유저 : [{}]",
@@ -49,6 +50,8 @@ public enum ErrorCode {
         HttpStatus.BAD_REQUEST),
     ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION(70_001, "장바구니 수량이 잘못되었습니다.", "장바구니 수량은 1 이상이여야 합니다. [{}]",
         HttpStatus.BAD_REQUEST),
+    WALLET_BALANCE_EXCEPTION(80_001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
+    ALREADY_SHIPPING_ORDER(90_001, "이미 배송이 시작된 주문입니다.", "이미 배송이 시작된 주문입니다. [{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
@@ -56,8 +59,11 @@ public enum ErrorCode {
     INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Inventory가 잘못되었습니다. [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PRODUCTDETAIL_PRODUCT(100_200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
-        HttpStatus.INTERNAL_SERVER_ERROR);
+        HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 서버 문제
+    USER_WALLET_NOT_FOUND(200_100, "사용자의 지갑을 찾을 수 없습니다. 관리자에게 문의하세요", "사용자의 지갑을 찾을 수 없습니다. user : [{}]",
+        HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;
