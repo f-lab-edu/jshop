@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,7 +24,6 @@ import jshop.domain.user.service.UserService;
 import jshop.global.dto.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @AutoConfigureMockMvc
 @Transactional
 @DisplayName("[통합 테스트] AddressController")
-@Disabled
 public class AddressControllerIntegrationTest {
 
     @Autowired
@@ -112,7 +111,7 @@ public class AddressControllerIntegrationTest {
     }
 
     @Nested
-    @DisplayName("주소 생성")
+    @DisplayName("주소 생성 API 검증, 생성된 주소가 DB에 잘 생성 되었는지 까지 검증")
     class CreateAddress {
 
         @Test
@@ -125,14 +124,20 @@ public class AddressControllerIntegrationTest {
                 .content(createAddressRequestStr));
 
             // then
-            perform.andExpect(status().isCreated());
+            perform.andExpect(status().isOk());
+
             List<Address> addresses = addressRepository.findByUser(userRepository.getReferenceById(user1Id));
             assertThat(addresses.size()).isEqualTo(1);
+            assertThat(addresses.get(0).getCity()).isEqualTo("city");
+            assertThat(addresses.get(0).getProvince()).isEqualTo("province");
+            perform.andExpect(jsonPath("$.data.id").value(addresses.get(0).getId()));
         }
 
         @Test
         @DisplayName("인증이 안된 사용자는 주소를 생성할 수 없다 (토큰 없는 요청)")
         public void createAddress_noAuth() throws Exception {
+
+            // when
             ResultActions perform = mockMvc.perform(
                 post("/api/addresses").contentType(MediaType.APPLICATION_JSON).content(createAddressRequestStr));
 
@@ -142,31 +147,38 @@ public class AddressControllerIntegrationTest {
     }
 
     @Nested
-    @DisplayName("주소 삭제")
+    @DisplayName("주소 삭제 API 검증, 삭제된 주소가 DB에 반영되나까지 검증")
     class DeleteAddress {
 
-        @Test
-        @DisplayName("인증이 된 사용자는 자신의 주소를 삭제할 수 있다. (소프트 삭제)")
-        public void deleteAddress_success() throws Exception {
-            // given
+        private Long addressId;
+
+        @BeforeEach
+        public void init() throws Exception {
             ResultActions perform = mockMvc.perform(post("/api/addresses")
                 .header("Authorization", user1Token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestStr));
 
-            Long addressId = getAddressIdFromResultActions(perform);
+            addressId = getAddressIdFromResultActions(perform);
+        }
 
+        @Test
+        @DisplayName("인증이 된 사용자는 자신의 주소를 삭제할 수 있다. 삭제된 주소는 DB에 남아있으면서 회원 정보 조회시 나타나지 않음")
+        public void deleteAddress_success() throws Exception {
             // when
             mockMvc.perform(delete("/api/addresses/{address_id}", addressId).header("Authorization", user1Token));
 
             // then
-            List<Address> deletedAddresses = addressRepository.findByUser(userRepository.getReferenceById(user1Id));
-            Optional<Address> softDeletedAddress = addressRepository.findById(addressId);
-            assertThat(deletedAddresses.size()).isEqualTo(0);
-
+            /**
+             * 유저 정보 조회시 주소가 나타나지 않음
+             */
             UserInfoResponse userInfoResponseResponse = userService.getUser(user1Id);
             assertThat(userInfoResponseResponse.getAddresses().size()).isEqualTo(0);
 
+            /**
+             * 주소 조회시 주소는 남아있음
+             */
+            Optional<Address> softDeletedAddress = addressRepository.findById(addressId);
             softDeletedAddress.ifPresentOrElse((address) -> {
                 assertThat(address).isNotNull();
             }, () -> {
@@ -187,16 +199,11 @@ public class AddressControllerIntegrationTest {
 
         @Test
         @DisplayName("자신의 주소가 아닌 주소를 삭제하면 UNAUTHORIZED")
-        public void deleteAddress_noAuth() throws Exception {
+        public void deleteAddress_noOwnership() throws Exception {
             // given
             /**
-             * 유저 1로 주소를 생성하고 유저 2로 로그인
+             * 유저 2로 로그인
              */
-            mockMvc.perform(post("/api/addresses")
-                .header("Authorization", user1Token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createAddressRequestStr));
-
             String joinUser2 = """
                 { "username" : "username2", "email" : "email2@email.com", "password" : "password", "userType" : "USER"}""";
 
@@ -213,35 +220,47 @@ public class AddressControllerIntegrationTest {
             /**
              * 유저 2로 유저 1이 생성한 주소 삭제
              */
-            List<Address> addresses = addressRepository.findByUser(userRepository.getReferenceById(user1Id));
-            assertThat(addresses.size()).isEqualTo(1);
-
-            Long user1AddressId = addresses.get(0).getId();
+            UserInfoResponse userInfoResponseResponse = userService.getUser(user1Id);
+            assertThat(userInfoResponseResponse.getAddresses().size()).isEqualTo(1);
 
             ResultActions deleteResult = mockMvc.perform(
-                delete("/api/addresses/{address_id}", user1AddressId).header("Authorization", user2Token));
+                delete("/api/addresses/{address_id}", addressId).header("Authorization", user2Token));
 
             // then
             deleteResult.andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @DisplayName("인증이 안된 사용자가 변경하려 하면 Forbidden")
+        public void deleteAddress_noAuth() throws Exception {
+            // when
+            ResultActions updateResult = mockMvc.perform(delete("/api/addresses/{address_id}", addressId));
+
+            // then
+            updateResult.andExpect(status().isForbidden());
         }
     }
 
 
     @Nested
-    @DisplayName("주소 변경")
+    @DisplayName("주소 변경, 변경된 주소가 DB에 반영되나 까지 검증")
     class UpdateAddress {
 
-        @Test
-        @DisplayName("인증된 사용자는 자신이 소유한 주소 정보를 변경할 수 있다")
-        public void updateAddress_success() throws Exception {
-            // given
+        private Long addressId;
+
+        @BeforeEach
+        public void init() throws Exception {
             ResultActions perform = mockMvc.perform(post("/api/addresses")
                 .header("Authorization", user1Token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestStr));
 
-            Long addressId = getAddressIdFromResultActions(perform);
+            addressId = getAddressIdFromResultActions(perform);
+        }
 
+        @Test
+        @DisplayName("인증된 사용자는 자신이 소유한 주소 정보를 변경할 수 있다")
+        public void updateAddress_success() throws Exception {
             // when
             ResultActions updateResult = mockMvc.perform(put("/api/addresses/{address_id}", addressId)
                 .header("Authorization", user1Token)
@@ -253,6 +272,7 @@ public class AddressControllerIntegrationTest {
             // then
             updateResult.andExpect(status().isOk());
             assertThat(address.getCity()).isEqualTo("city2");
+            assertThat(address.getProvince()).isEqualTo("province2");
         }
 
         @Test
@@ -269,19 +289,23 @@ public class AddressControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("자신의 주소가 아닌 주소를 수정하면 UNAUTHORIZED")
+        @DisplayName("인증이 안된 사용자가 변경하려 하면 Forbidden")
         public void updateAddress_noAuth() throws Exception {
+            ResultActions updateResult = mockMvc.perform(put("/api/addresses/{address_id}", addressId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateAddressRequestStr));
+
+            // then
+            updateResult.andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("자신의 주소가 아닌 주소를 수정하면 UNAUTHORIZED")
+        public void updateAddress_noOwnership() throws Exception {
             // given
             /**
-             * 유저 1로 주소를 생성하고 유저 2로 로그인
+             * 유저 2로 로그인
              */
-            ResultActions perform = mockMvc.perform(post("/api/addresses")
-                .header("Authorization", user1Token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createAddressRequestStr));
-
-            Long user1AddressId = getAddressIdFromResultActions(perform);
-
             String joinUser2 = """
                 { "username" : "username2", "email" : "email2@email.com", "password" : "password", "userType" : "USER"}""";
 
@@ -298,7 +322,7 @@ public class AddressControllerIntegrationTest {
             /**
              * 유저 2 토큰으로 유저 1이 생성한 주소 변경
              */
-            ResultActions updateResult = mockMvc.perform(put("/api/addresses/{address_id}", user1AddressId)
+            ResultActions updateResult = mockMvc.perform(put("/api/addresses/{address_id}", addressId)
                 .header("Authorization", user2Token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateAddressRequestStr));

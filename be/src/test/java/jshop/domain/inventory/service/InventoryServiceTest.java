@@ -76,7 +76,6 @@ class InventoryServiceTest {
                 () -> assertThat(savedInventoryHistory.getOldQuantity()).isEqualTo(0),
                 () -> assertThat(savedInventoryHistory.getNewQuantity()).isEqualTo(0),
                 () -> assertThat(savedInventoryHistory.getChangeType()).isEqualTo(InventoryChangeType.CREATE));
-
         }
     }
 
