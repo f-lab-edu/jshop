@@ -33,7 +33,5 @@ public class OrderController {
     @PreAuthorize("@orderService.checkOrderOwnership(authentication.principal, #orderId)")
     public void deleteOrder(@PathVariable("order_id") @P("orderId") Long orderId) {
         orderService.deleteOrder(orderId);
-
     }
-
 }
