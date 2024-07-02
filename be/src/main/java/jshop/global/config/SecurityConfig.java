@@ -42,7 +42,8 @@ public class SecurityConfig {
             auth -> auth.requestMatchers("/api/login", "/api/join", "/api/search/**").permitAll());
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers("/admin").hasRole("ADMIN"));
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll());
+        http.authorizeHttpRequests(
+            auth -> auth.requestMatchers("/swagger-ui/**", "/api-docs/**", "/actuator/prometheus").permitAll());
 
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
 

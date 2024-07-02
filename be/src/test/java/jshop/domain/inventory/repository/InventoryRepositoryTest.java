@@ -93,7 +93,7 @@ class InventoryRepositoryTest {
                 try {
                     transaction.begin();
                     Inventory foundInventory = em.find(Inventory.class, inventory.getId());
-                    foundInventory.changeStock(1);
+                    foundInventory.addStock(1);
                     em.persist(foundInventory);
                     transaction.commit();
                 } catch (Exception e) {

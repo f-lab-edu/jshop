@@ -24,7 +24,7 @@ class InventoryTest {
                 .builder().quantity(0).minQuantity(0).build();
 
             // when
-            inventory.changeStock(5);
+            inventory.addStock(5);
             // then
             assertThat(inventory.getQuantity()).isEqualTo(5);
         }
@@ -37,7 +37,7 @@ class InventoryTest {
                 .builder().quantity(10).minQuantity(0).build();
 
             // when
-            inventory.changeStock(-5);
+            inventory.removeStock(5);
             // then
             assertThat(inventory.getQuantity()).isEqualTo(5);
         }
@@ -50,7 +50,7 @@ class InventoryTest {
                 .builder().quantity(0).minQuantity(0).build();
 
             // then
-            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.changeStock(-1));
+            JshopException jshopException = assertThrows(JshopException.class, () -> inventory.removeStock(1));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION);
         }
 
@@ -62,7 +62,7 @@ class InventoryTest {
                 .builder().quantity(10).minQuantity(8).build();
 
             // when
-            inventory.changeStock(-5);
+            inventory.removeStock(5);
 
             // then
             assertThat(inventory.getQuantity()).isEqualTo(5);

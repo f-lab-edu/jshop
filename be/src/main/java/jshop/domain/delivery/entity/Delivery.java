@@ -33,7 +33,6 @@ public class Delivery extends BaseEntity {
     @Column(name = "delivery_id")
     private Long id;
 
-
     @Enumerated(value = EnumType.STRING)
     private DeliveryState deliveryState;
 
