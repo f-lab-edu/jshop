@@ -12,13 +12,17 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jshop.domain.address.entity.Address;
 import jshop.domain.order.entity.Order;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.envers.Audited;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -53,6 +57,22 @@ public class Delivery extends BaseEntity {
 
     @Column(nullable = true)
     private String message;
+
+    public void nextState() {
+        if (deliveryState.equals(DeliveryState.CANCLED)) {
+            log.error(ErrorCode.ALREADY_CANCLED_DELIVERY.getLogMessage(), id);
+            throw JshopException.of(ErrorCode.ALREADY_CANCLED_DELIVERY);
+        }
+
+        switch (deliveryState) {
+            case PREPARING:
+                deliveryState = DeliveryState.IN_TRANSIT;
+                break;
+            case IN_TRANSIT:
+                deliveryState = DeliveryState.DELIVERED;
+                break;
+        }
+    }
 
     public void cancel() {
         deliveryState = DeliveryState.CANCLED;

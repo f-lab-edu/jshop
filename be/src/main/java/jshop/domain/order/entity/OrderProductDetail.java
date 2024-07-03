@@ -8,13 +8,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jshop.domain.order.dto.OrderItemRequest;
 import jshop.domain.product.entity.ProductDetail;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -45,8 +50,14 @@ public class OrderProductDetail extends BaseEntity {
     private Integer orderQuantity;
     private Long orderPrice;
 
-    public static OrderProductDetail createOrderProductDetail(Order order, int quantity, long price,
-        ProductDetail productDetail) {
+    public static OrderProductDetail of(Order order, OrderItemRequest orderItem, ProductDetail productDetail) {
+        if (orderItem.getQuantity() == null || orderItem.getPrice() == null) {
+            log.error(ErrorCode.INVALID_ORDER_ITEM.getLogMessage(), orderItem.getQuantity(), orderItem.getPrice());
+            throw JshopException.of(ErrorCode.INVALID_ORDER_ITEM);
+        }
+        int quantity = orderItem.getQuantity();
+        long price = orderItem.getPrice();
+
         productDetail.getInventory().purchase(quantity);
 
         return OrderProductDetail

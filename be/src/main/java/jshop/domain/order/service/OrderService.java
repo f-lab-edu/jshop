@@ -11,10 +11,8 @@ import jshop.domain.order.entity.OrderProductDetail;
 import jshop.domain.order.repository.OrderProductDetailRepository;
 import jshop.domain.order.repository.OrderRepository;
 import jshop.domain.product.entity.ProductDetail;
-import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
@@ -25,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -41,21 +40,33 @@ public class OrderService {
     @Transactional
     public Long createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         User user = userService.getUser(userId);
-        user.getWallet().purchase(createOrderRequest.getTotalPrice());
+        Long totalPrice = createOrderRequest.getTotalPrice();
 
         Address deliveryAddress = addressService.getAddress(createOrderRequest.getAddressId());
         Delivery delivery = Delivery.of(deliveryAddress);
 
         Order order = Order.createOrder(user, delivery, createOrderRequest);
 
-        orderRepository.save(order);
-
+        long totalProductPrice = 0L;
         for (OrderItemRequest orderItem : createOrderRequest.getOrderItems()) {
             ProductDetail productDetail = productService.getProductDetail(orderItem.getProductDetailId());
-            OrderProductDetail orderProductDetail = OrderProductDetail.createOrderProductDetail(order,
-                orderItem.getQuantity(), orderItem.getPrice(), productDetail);
-            orderProductDetailRepository.save(orderProductDetail);
+            order.addProduct(orderItem, productDetail);
+            totalProductPrice += orderItem.getPrice() * orderItem.getQuantity();
         }
+
+        if (totalProductPrice != totalPrice) {
+            log.error(ErrorCode.ORDER_PRICE_MISMATCH.getLogMessage(), totalPrice, totalProductPrice);
+            throw JshopException.of(ErrorCode.ORDER_PRICE_MISMATCH);
+        }
+
+        user.getWallet().purchase(totalPrice);
+
+        /**
+         * TODO
+         * 쿠폰 가격 할인 적용
+         */
+
+        orderRepository.save(order);
 
         return order.getId();
     }

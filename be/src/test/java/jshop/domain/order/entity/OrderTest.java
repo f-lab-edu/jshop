@@ -21,6 +21,8 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,6 +83,42 @@ class OrderTest {
             assertThat(user.getWallet().getBalance()).isEqualTo(13000L);
             assertThat(delivery.getDeliveryState()).isEqualTo(DeliveryState.CANCLED);
             assertThat(productDetail.getInventory().getQuantity()).isEqualTo(13);
+        }
+
+        @Test
+        @DisplayName("배송중이라면 주문을 취소할 수 없다.")
+        public void createOrder_shipping() {
+            // given
+            Inventory inventory = Inventory.create();
+            inventory.addStock(10);
+
+            ProductDetail productDetail = ProductDetail
+                .builder().id(1L).price(1000L).inventory(inventory).build();
+            Wallet wallet = Wallet.create();
+            wallet.deposit(10000L);
+            User user = User
+                .builder().wallet(wallet).build();
+
+            Delivery delivery = Delivery
+                .builder().deliveryState(DeliveryState.PREPARING).build();
+
+            CreateOrderRequest createOrderRequest = CreateOrderRequest
+                .builder()
+                .addressId(1L)
+                .totalPrice(3000L)
+                .totalQuantity(3)
+                .orderItems(List.of(OrderItemRequest
+                    .builder().quantity(3).price(1000L).productDetailId(1L).build()))
+                .build();
+
+            Order order = Order.createOrder(user, delivery, createOrderRequest);
+
+            // when
+            delivery.nextState();
+            JshopException jshopException = assertThrows(JshopException.class, () -> order.cancel());
+
+            // then
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_SHIPPING_ORDER);
         }
     }
 }
