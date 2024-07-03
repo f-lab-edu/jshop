@@ -73,7 +73,6 @@ public class Order extends BaseEntity {
     private Integer totalQuantity;
 
     public static Order createOrder(User user, Delivery delivery, CreateOrderRequest createOrderRequest) {
-        user.getWallet().purchase(createOrderRequest.getTotalPrice());
 
         return Order
             .builder()

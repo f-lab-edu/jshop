@@ -41,6 +41,7 @@ public class OrderService {
     @Transactional
     public Long createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         User user = userService.getUser(userId);
+        user.getWallet().purchase(createOrderRequest.getTotalPrice());
 
         Address deliveryAddress = addressService.getAddress(createOrderRequest.getAddressId());
         Delivery delivery = Delivery.of(deliveryAddress);
