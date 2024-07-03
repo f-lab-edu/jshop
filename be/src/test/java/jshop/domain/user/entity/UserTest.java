@@ -2,6 +2,7 @@ package jshop.domain.user.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 class UserTest {
 
     @Nested
+    @DisplayName("유저 이름 변경")
     class UpdateUserName {
 
         @Test
@@ -45,5 +47,26 @@ class UserTest {
         }
     }
 
+    @Nested
+    @DisplayName("유저 생성 검증")
+    class CreateUser {
 
+        @Test
+        @DisplayName("유저 생성 함수를 사용하면, 지갑과 장바구니가 생성된다.")
+        public void createUser() {
+            // given
+            JoinUserRequest joinUserRequest = JoinUserRequest
+                .builder().username("kim").email("email@email.com").build();
+
+            // when
+            User user = User.of(joinUserRequest, "password");
+
+            // then
+            assertThat(user.getWallet().getBalance()).isEqualTo(0);
+            assertThat(user.getCart().getCartProductDetails().size()).isEqualTo(0);
+            assertThat(user.getUsername()).isEqualTo("kim");
+            assertThat(user.getPassword()).isEqualTo("password");
+            assertThat(user.getEmail()).isEqualTo("email@email.com");
+        }
+    }
 }

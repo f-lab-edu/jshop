@@ -36,9 +36,6 @@ public class AddressService {
 
     @Transactional
     public void deleteAddress(Long addressId) {
-        /**
-         * 주소가 삭제되더라도, 주문이나 배송에서는 주소를 조회할 수 있어야 하기 때문에 소프트 삭제
-         */
         Address address = getAddress(addressId);
         address.delete();
     }

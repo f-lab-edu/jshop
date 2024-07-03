@@ -14,14 +14,18 @@ import java.util.Map;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -66,6 +70,11 @@ public class ProductDetail extends BaseEntity {
 
     public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest, Product product,
         Inventory inventory) {
+        if (!product.verifyChildAttribute(createProductDetailRequest.getAttribute())) {
+            log.error(ErrorCode.INVALID_PRODUCT_ATTRIBUTE.getLogMessage(), product.getAttributes(),
+                createProductDetailRequest.getAttribute());
+            throw JshopException.of(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
+        }
         return ProductDetail
             .builder()
             .product(product)
@@ -76,6 +85,10 @@ public class ProductDetail extends BaseEntity {
     }
 
     public void update(UpdateProductDetailRequest updateProductDetailRequest) {
+        if (updateProductDetailRequest.getPrice() <= 0) {
+            log.error(ErrorCode.ILLEGAL_PRICE_EXCEPTION.getLogMessage(), updateProductDetailRequest.getPrice());
+            throw JshopException.of(ErrorCode.ILLEGAL_PRICE_EXCEPTION);
+        }
         price = updateProductDetailRequest.getPrice();
     }
 
