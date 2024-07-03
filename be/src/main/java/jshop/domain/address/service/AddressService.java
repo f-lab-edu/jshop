@@ -49,7 +49,7 @@ public class AddressService {
         address.update(updateAddressRequest);
     }
 
-    private Address getAddress(Long addressId) {
+    public Address getAddress(Long addressId) {
         Optional<Address> optionalAddress = addressRepository.findById(addressId);
         return AddressUtils.getAddressOrThrow(optionalAddress, addressId);
     }

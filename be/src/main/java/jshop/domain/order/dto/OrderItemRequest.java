@@ -1,6 +1,5 @@
 package jshop.domain.order.dto;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -14,10 +13,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class CreateOrderRequest {
+public class OrderItemRequest {
 
-    private Long addressId;
-    private List<OrderItemRequest> orderItems;
-    private Integer totalQuantity;
-    private Long totalPrice;
+    private Long productDetailId;
+    private Integer quantity;
+    private Long price;
 }
