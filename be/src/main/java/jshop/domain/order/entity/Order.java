@@ -79,8 +79,15 @@ public class Order extends BaseEntity {
             log.error(ErrorCode.INVALID_ORDER_ITEM.getLogMessage(), orderItem.getQuantity(), orderItem.getPrice());
             throw JshopException.of(ErrorCode.INVALID_ORDER_ITEM);
         }
+
         int quantity = orderItem.getQuantity();
         long price = orderItem.getPrice();
+
+        if (price != productDetail.getPrice()) {
+            log.error(ErrorCode.PRODUCT_PRICE_MISMATCH.getLogMessage(), productDetail.getId(), price,
+                productDetail.getPrice());
+            throw JshopException.of(ErrorCode.PRODUCT_PRICE_MISMATCH);
+        }
 
         productDetail.getInventory().purchase(quantity);
 

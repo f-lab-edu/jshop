@@ -50,20 +50,6 @@ public class OrderProductDetail extends BaseEntity {
     private Integer orderQuantity;
     private Long orderPrice;
 
-    public static OrderProductDetail of(Order order, OrderItemRequest orderItem, ProductDetail productDetail) {
-        if (orderItem.getQuantity() == null || orderItem.getPrice() == null) {
-            log.error(ErrorCode.INVALID_ORDER_ITEM.getLogMessage(), orderItem.getQuantity(), orderItem.getPrice());
-            throw JshopException.of(ErrorCode.INVALID_ORDER_ITEM);
-        }
-        int quantity = orderItem.getQuantity();
-        long price = orderItem.getPrice();
-
-        productDetail.getInventory().purchase(quantity);
-
-        return OrderProductDetail
-            .builder().order(order).orderQuantity(quantity).orderPrice(price).productDetail(productDetail).build();
-    }
-
 
     public void cancel() {
         productDetail.getInventory().refund(orderQuantity);
