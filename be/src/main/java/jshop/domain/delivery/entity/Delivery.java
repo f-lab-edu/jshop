@@ -58,20 +58,20 @@ public class Delivery extends BaseEntity {
     @Column(nullable = true)
     private String message;
 
-    public void nextState() {
-        if (deliveryState.equals(DeliveryState.CANCLED)) {
-            log.error(ErrorCode.ALREADY_CANCLED_DELIVERY.getLogMessage(), id);
-            throw JshopException.of(ErrorCode.ALREADY_CANCLED_DELIVERY);
+    public void startTransit() {
+        if (!deliveryState.equals(DeliveryState.PREPARING)) {
+            log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.PREPARING, deliveryState);
+            throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
         }
+        deliveryState = DeliveryState.IN_TRANSIT;
+    }
 
-        switch (deliveryState) {
-            case PREPARING:
-                deliveryState = DeliveryState.IN_TRANSIT;
-                break;
-            case IN_TRANSIT:
-                deliveryState = DeliveryState.DELIVERED;
-                break;
+    public void endDelivered() {
+        if (!deliveryState.equals(DeliveryState.IN_TRANSIT)) {
+            log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.IN_TRANSIT, deliveryState);
+            throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
         }
+        deliveryState = DeliveryState.DELIVERED;
     }
 
     public void cancel() {

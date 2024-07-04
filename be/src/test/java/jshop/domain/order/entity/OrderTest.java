@@ -114,7 +114,7 @@ class OrderTest {
             Order order = Order.createOrder(user, delivery, createOrderRequest);
 
             // when
-            delivery.nextState();
+            delivery.startTransit();
             JshopException jshopException = assertThrows(JshopException.class, () -> order.cancel());
 
             // then

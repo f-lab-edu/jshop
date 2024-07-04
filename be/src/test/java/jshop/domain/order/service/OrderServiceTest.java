@@ -298,7 +298,7 @@ class OrderServiceTest {
         @DisplayName("주문 취소시 배송이 진행중이라면 주문을 취소할 수 없다.")
         public void cancelOrder_shipping() {
             // given
-            order.getDelivery().nextState();
+            order.getDelivery().startTransit();
             // when
             when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 

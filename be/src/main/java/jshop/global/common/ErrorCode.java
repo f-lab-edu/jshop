@@ -55,6 +55,8 @@ public enum ErrorCode {
     WALLET_BALANCE_EXCEPTION(80_001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
     ALREADY_SHIPPING_ORDER(90_001, "이미 배송이 시작된 주문입니다.", "이미 배송이 시작된 주문입니다. [{}]", HttpStatus.BAD_REQUEST),
     ALREADY_CANCLED_DELIVERY(90_100, "이미 취소된 배송입니다.", "이미 취소된 배송입니다. DELIVERY_ID : [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_DELIVERY_STATE(90_200, "배송 상태가 잘못되었습니다.", "배송 상태가 잘못되었습니다. 현재 상태 : [{}], 원하는 상태 : [{}]",
+        HttpStatus.BAD_REQUEST),
     ORDER_PRICE_MISMATCH(90_500, "주문 가격과 상품 가격이 맞지 않습니다.", "주문 가격과 상품 가격이 맞지 않습니다. 주문가격 : [{}] , 상품 가격 총합 : [{}]",
         HttpStatus.BAD_REQUEST),
 
