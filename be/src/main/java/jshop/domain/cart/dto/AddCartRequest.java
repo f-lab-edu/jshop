@@ -1,5 +1,6 @@
 package jshop.domain.cart.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,5 +22,6 @@ public class AddCartRequest {
     private Long productDetailId;
 
     @NotNull(message = "수량은 공백일 수 없습니다.")
+    @Min(value = 1, message = "수량은 1 이상이여야 합니다.")
     private Integer quantity;
 }

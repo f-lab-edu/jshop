@@ -3,6 +3,7 @@ package jshop.domain.product.service;
 import java.util.Optional;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
+import jshop.domain.category.service.CategoryService;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
@@ -40,6 +41,7 @@ public class ProductService {
     private final ProductDetailRepository productDetailRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     @Transactional
     public Long createProduct(CreateProductRequest createProductRequest, Long userId) {
@@ -51,14 +53,7 @@ public class ProductService {
             throw JshopException.of(ErrorCode.USER_NOT_SELLER);
         }
 
-        Long categoryId = createProductRequest.getCategoryId();
-
-        if (!categoryRepository.existsById(categoryId)) {
-            log.error(ErrorCode.CATEGORYID_NOT_FOUND.getLogMessage(), categoryId);
-            throw JshopException.of(ErrorCode.CATEGORYID_NOT_FOUND);
-        }
-
-        Category category = categoryRepository.getReferenceById(categoryId);
+        Category category = categoryService.getCategory(createProductRequest.getCategoryId());
         Product newProduct = Product.of(createProductRequest, category, user);
 
         productRepository.save(newProduct);
@@ -72,13 +67,7 @@ public class ProductService {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         Page<Product> page = productRepository.findByOwner(user, pageRequest);
 
-        return OwnProductsResponse
-            .builder()
-            .page(page.getNumber())
-            .totalPage(page.getTotalPages())
-            .products(page.map(ProductResponse::of).toList())
-            .totalCount(page.getTotalElements())
-            .build();
+        return OwnProductsResponse.create(page);
     }
 
     @Transactional
@@ -89,12 +78,6 @@ public class ProductService {
             log.error(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL.getLogMessage(), productId,
                 createProductDetailRequest.getAttribute());
             throw JshopException.of(ErrorCode.ALREADY_EXISTS_PRODUCT_DETAIL);
-        }
-
-        if (!product.verifyChildAttribute(createProductDetailRequest.getAttribute())) {
-            log.error(ErrorCode.INVALID_PRODUCT_ATTRIBUTE.getLogMessage(), product.getAttributes(),
-                createProductDetailRequest.getAttribute());
-            throw JshopException.of(ErrorCode.INVALID_PRODUCT_ATTRIBUTE);
         }
 
         Inventory inventory = Inventory.create();

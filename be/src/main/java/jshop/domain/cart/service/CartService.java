@@ -43,13 +43,7 @@ public class CartService {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Direction.DESC, "createdAt"));
         Page<CartProductQueryResult> page = cartProductDetailRepository.findCartProductInfoByQuery(cart, pageRequest);
 
-        return OwnCartInfoResponse
-            .builder()
-            .page(page.getNumber())
-            .totalPage(page.getTotalPages())
-            .totalCount(page.getTotalElements())
-            .products(page.getContent().stream().map(CartProductResponse::of).toList())
-            .build();
+        return OwnCartInfoResponse.create(page);
     }
 
     @Transactional
@@ -63,23 +57,9 @@ public class CartService {
             throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
         }
 
-        if (addCartRequest.getQuantity() <= 0) {
-            log.error(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), addCartRequest.getQuantity());
-            throw JshopException.of(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION);
-        }
-
         ProductDetail productDetail = productDetailRepository.getReferenceById(detailId);
 
-        cartProductDetailRepository
-            .findByCartAndProductDetail(cart, productDetail)
-            .ifPresentOrElse(cartProductDetail -> {
-                cartProductDetail.changeQuantity(addCartRequest.getQuantity());
-            }, () -> {
-                CartProductDetail cartProductDetail = CartProductDetail
-                    .builder().cart(cart).productDetail(productDetail).quantity(addCartRequest.getQuantity()).build();
-
-                cartProductDetailRepository.save(cartProductDetail);
-            });
+        cart.addCart(productDetail, addCartRequest.getQuantity());
     }
 
     @Transactional

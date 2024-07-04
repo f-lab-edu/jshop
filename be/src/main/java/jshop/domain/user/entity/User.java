@@ -13,6 +13,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Optional;
 import jshop.domain.cart.entity.Cart;
+import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.wallet.entity.Wallet;
@@ -68,6 +69,22 @@ public class User extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
+
+    public static User of(JoinUserRequest joinUserRequest, String encryptedPassword) {
+        Wallet wallet = Wallet.create();
+        Cart cart = Cart.create();
+
+        return User
+            .builder()
+            .username(joinUserRequest.getUsername())
+            .password(encryptedPassword)
+            .email(joinUserRequest.getEmail())
+            .userType(joinUserRequest.getUserType())
+            .role("ROLE_USER")
+            .wallet(wallet)
+            .cart(cart)
+            .build();
+    }
 
     public Wallet getWallet() {
         return Optional.ofNullable(wallet).orElseThrow(() -> {

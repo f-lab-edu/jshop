@@ -36,4 +36,12 @@ public class CategoryService {
         categoryRepository.save(category);
         return category.getId();
     }
+
+    public Category getCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> {
+            log.error(ErrorCode.CATEGORYID_NOT_FOUND.getLogMessage(), categoryId);
+            throw JshopException.of(ErrorCode.CATEGORYID_NOT_FOUND);
+        });
+
+    }
 }

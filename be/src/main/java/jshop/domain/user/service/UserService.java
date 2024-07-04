@@ -2,15 +2,13 @@ package jshop.domain.user.service;
 
 import java.util.List;
 import java.util.Optional;
-import jshop.domain.address.dto.AddressInfoResponse;
+import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
-import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
-import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.global.utils.UserUtils;
@@ -31,14 +29,8 @@ public class UserService {
     private final AddressRepository addressRepository;
 
     public UserInfoResponse getUserInfo(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = UserUtils.getUserOrThrow(optionalUser, userId);
-
-        List<AddressInfoResponse> addresses = addressRepository
-            .findByUser(user)
-            .stream()
-            .map(AddressInfoResponse::of)
-            .toList();
+        User user = getUser(userId);
+        List<Address> addresses = addressRepository.findByUser(user);
 
         return UserInfoResponse.of(user, addresses);
     }
@@ -52,30 +44,14 @@ public class UserService {
             throw JshopException.of(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
-        Wallet wallet = Wallet.create();
-        Cart cart = Cart.create();
-
-        User user = User
-            .builder()
-            .username(joinUserRequest.getUsername())
-            .password(bCryptPasswordEncoder.encode(joinUserRequest.getPassword()))
-            .email(email)
-            .userType(joinUserRequest.getUserType())
-            .role("ROLE_USER")
-            .wallet(wallet)
-            .cart(cart)
-            .build();
-
+        User user = User.of(joinUserRequest, bCryptPasswordEncoder.encode(joinUserRequest.getPassword()));
         userRepository.save(user);
-
         return user.getId();
     }
 
     @Transactional
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = UserUtils.getUserOrThrow(optionalUser, userId);
-
+        User user = getUser(userId);
         user.updateUserInfo(updateUserRequest);
     }
 
