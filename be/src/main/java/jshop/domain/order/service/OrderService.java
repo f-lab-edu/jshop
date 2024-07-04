@@ -48,15 +48,23 @@ public class OrderService {
         Order order = Order.createOrder(user, delivery, createOrderRequest);
 
         long totalProductPrice = 0L;
+        int totalProductQuantity = 0;
         for (OrderItemRequest orderItem : createOrderRequest.getOrderItems()) {
             ProductDetail productDetail = productService.getProductDetail(orderItem.getProductDetailId());
             order.addProduct(orderItem, productDetail);
             totalProductPrice += orderItem.getPrice() * orderItem.getQuantity();
+            totalProductQuantity += orderItem.getQuantity();
         }
 
         if (totalProductPrice != totalPrice) {
             log.error(ErrorCode.ORDER_PRICE_MISMATCH.getLogMessage(), totalPrice, totalProductPrice);
             throw JshopException.of(ErrorCode.ORDER_PRICE_MISMATCH);
+        }
+
+        if (totalProductQuantity != totalProductQuantity) {
+            log.error(ErrorCode.ORDER_QUANTITY_MISMATCH.getLogMessage(), createOrderRequest.getTotalQuantity(),
+                totalProductQuantity);
+            throw JshopException.of(ErrorCode.ORDER_QUANTITY_MISMATCH);
         }
 
         user.getWallet().purchase(totalPrice);

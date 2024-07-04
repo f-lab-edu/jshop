@@ -61,6 +61,8 @@ public enum ErrorCode {
         HttpStatus.BAD_REQUEST),
     PRODUCT_PRICE_MISMATCH(90_501, "상품 가격이 변경되었습니다.",
         "주문요청 상품 가격과 실제 상품 가격이 맞지 않습니다. 상품 상세 ID : [{}] 주문 상품 가격 : " + "[{}], 실제 상품 가격 : [{}]", HttpStatus.BAD_REQUEST),
+    ORDER_QUANTITY_MISMATCH(90_550, "주문 수량과 상품 수량의 합이 맞지 않습니다.",
+        "주문 수량과 상품 수량의 합이 맞지 않습니다. 주문수량 : [{}] , 상품 수량 총합 : " + "[{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
