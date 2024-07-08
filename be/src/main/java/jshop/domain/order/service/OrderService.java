@@ -61,7 +61,7 @@ public class OrderService {
             throw JshopException.of(ErrorCode.ORDER_PRICE_MISMATCH);
         }
 
-        if (totalProductQuantity != totalProductQuantity) {
+        if (createOrderRequest.getTotalQuantity() != totalProductQuantity) {
             log.error(ErrorCode.ORDER_QUANTITY_MISMATCH.getLogMessage(), createOrderRequest.getTotalQuantity(),
                 totalProductQuantity);
             throw JshopException.of(ErrorCode.ORDER_QUANTITY_MISMATCH);
