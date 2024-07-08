@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
+import jshop.domain.category.service.CategoryService;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
@@ -41,6 +42,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -59,12 +61,14 @@ class ProductServiceTest {
     @Mock
     private ProductDetailRepository productDetailRepository;
 
-
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private CategoryService categoryService;
 
     @Captor
     private ArgumentCaptor<Product> productCaptor;
@@ -108,8 +112,7 @@ class ProductServiceTest {
 
             // when
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-            when(categoryRepository.existsById(1L)).thenReturn(true);
-            when(categoryRepository.getReferenceById(1L)).thenReturn(category);
+            when(categoryService.getCategory(1L)).thenReturn(category);
 
             productService.createProduct(createProductRequest, 1L);
 
@@ -169,7 +172,7 @@ class ProductServiceTest {
 
             // when
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-            when(categoryRepository.existsById(1L)).thenReturn(false);
+            when(categoryService.getCategory(1L)).thenThrow(JshopException.of(ErrorCode.CATEGORYID_NOT_FOUND));
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,
@@ -335,45 +338,6 @@ class ProductServiceTest {
             assertThat(productDetail.getPrice()).isEqualTo(1000L);
         }
     }
-
-    @Nested
-    @DisplayName("상세 상품 재고 변경")
-    class UpdateProductDetailQuantity {
-
-        private Inventory inventory;
-        private ProductDetail productDetail;
-
-        private Long inventoryId = 1L;
-        private Long productDetailId = 1L;
-
-        @BeforeEach
-        public void init() {
-            inventory = Inventory
-                .builder().id(inventoryId).quantity(0).minQuantity(0).build();
-
-            productDetail = ProductDetail
-                .builder().inventory(inventory).id(productDetailId).build();
-        }
-
-        @Test
-        @DisplayName("변경 수량이 0이 아니면 재고 변경을 할 수 있음")
-        @Disabled
-        public void changeStock() {
-
-        }
-
-        @Test
-        @DisplayName("변경 수량이 0 이면 ILLEGAL_QUANTITY_REQUEST_EXCEPTION 예외")
-        @Disabled
-        public void invalid_update_stock() {
-            // then
-            JshopException jshopException = assertThrows(JshopException.class,
-                () -> productService.updateProductDetailStock(1L, 0));
-
-            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
-        }
-    }
-
 
     @Nested
     @DisplayName("상세 상품 삭제")

@@ -36,7 +36,7 @@ public class Cart extends BaseEntity {
     /**
      * 카트물품들은 카트가 삭제되면 같이 삭제
      */
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private final List<CartProductDetail> cartProductDetails = new ArrayList<>();
 
@@ -61,5 +61,9 @@ public class Cart extends BaseEntity {
         CartProductDetail cartProductDetail = CartProductDetail
             .builder().cart(this).productDetail(productDetail).quantity(quantity).build();
         cartProductDetails.add(cartProductDetail);
+    }
+
+    public void deleteCart(Long cartProductDetailId) {
+        cartProductDetails.removeIf((cartProductDetail) -> cartProductDetail.getId().equals(cartProductDetailId));
     }
 }

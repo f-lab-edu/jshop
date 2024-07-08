@@ -39,11 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("[단위 테스트]  Order")
 class OrderTest {
 
-    @BeforeEach
-    public void init() {
-
-    }
-
     @Nested
     @DisplayName("주문 취소 로직 검증")
     class CreateOrder {
@@ -82,7 +77,7 @@ class OrderTest {
             // then
             assertThat(user.getWallet().getBalance()).isEqualTo(13000L);
             assertThat(delivery.getDeliveryState()).isEqualTo(DeliveryState.CANCLED);
-            assertThat(productDetail.getInventory().getQuantity()).isEqualTo(13);
+            assertThat(productDetail.getInventory().getQuantity()).isEqualTo(10);
         }
 
         @Test

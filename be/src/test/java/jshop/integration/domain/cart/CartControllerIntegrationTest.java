@@ -52,6 +52,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class CartControllerIntegrationTest {
 
     @Autowired
+    private CartProductDetailRepository cartProductDetailRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -354,10 +357,8 @@ public class CartControllerIntegrationTest {
         @DisplayName("로그인한 유저는 자신의 장바구니에서 장바구니_상품_ID로 삭제할 수 있다.")
         public void deleteCart_success() throws Exception {
             // when
-            mockMvc.perform(delete("/api/cart/{cartProductDetailId}", cartProductDetailId)
-                .header("Authorization", userToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(String.format(addCartRequest, productDetailIds.get(0))));
+            mockMvc.perform(
+                delete("/api/cart/{cartProductDetailId}", cartProductDetailId).header("Authorization", userToken));
             em.flush();
             em.clear();
 

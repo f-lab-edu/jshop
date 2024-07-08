@@ -29,6 +29,7 @@ public enum ErrorCode {
     CATEGORY_NAME_NOT_FOUND(3030, "카테고리 정보를 찾을 수 없습니다.", "카테고리 이름[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     ADDRESSID_NOT_FOUND(3040, "주소 정보를 찾을 수 없습니다.", "주소 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     PRODUCTDETAIL_ID_NOT_FOUND(3050, "상세 상품 정보를 찾을 수 없습니다.", "상세 상품 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVENTORY_ID_NOT_FOUND(3055, "재고 정보를 찾을 수 없습니다.", "재고 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CART_NOT_FOUND(3060, "장바구니 정보를 찾을 수 없습니다", "유저 ID[{}] 로 장바구니 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CART_PRODUCTDETAIL_ID_NOT_FOUND(3065, "장바구니에 추가된 상품을 찾을 수 없습니다.", "장바구니에 추가된 상품 [{}] 를 찾을 수 없습니다.",
         HttpStatus.BAD_REQUEST),

@@ -148,6 +148,9 @@ class OrderServiceTest {
 
             // when
             when(userService.getUser(1L)).thenReturn(user);
+            when(addressService.getAddress(1L)).thenReturn(address);
+            when(productService.getProductDetail(1L)).thenReturn(productDetail1);
+            when(productService.getProductDetail(2L)).thenReturn(productDetail2);
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,

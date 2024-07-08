@@ -63,8 +63,9 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteCart(Long cartProductDetailId) {
-        cartProductDetailRepository.deleteById(cartProductDetailId);
+    public void deleteCart(Long userId, Long cartProductDetailId) {
+        Cart cart = getCart(userId);
+        cart.deleteCart(cartProductDetailId);
     }
 
     @Transactional
