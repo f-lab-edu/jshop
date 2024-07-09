@@ -3,6 +3,7 @@ package jshop.domain.inventory.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,11 @@ import org.hibernate.envers.Audited;
 @Table(name = "inventory")
 @Audited
 public class Inventory extends BaseEntity {
+
+    @Override
+    public String toString() {
+        return "Inventory{" + "quantity=" + quantity + '}';
+    }
 
     @Id
     @GeneratedValue

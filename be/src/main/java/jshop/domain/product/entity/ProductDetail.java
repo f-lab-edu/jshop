@@ -59,7 +59,7 @@ public class ProductDetail extends BaseEntity {
     /**
      * 인벤토리와 일대일 관계에 있다.
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
