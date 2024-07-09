@@ -17,6 +17,8 @@ import java.util.Optional;
 import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.order.dto.CreateOrderRequest;
+import jshop.domain.order.dto.OrderItemRequest;
+import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.user.entity.User;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
@@ -72,8 +74,29 @@ public class Order extends BaseEntity {
     @Column(name = "total_quantity")
     private Integer totalQuantity;
 
+    public void addProduct(OrderItemRequest orderItem, ProductDetail productDetail) {
+        if (orderItem.getQuantity() == null || orderItem.getPrice() == null) {
+            log.error(ErrorCode.INVALID_ORDER_ITEM.getLogMessage(), orderItem.getQuantity(), orderItem.getPrice());
+            throw JshopException.of(ErrorCode.INVALID_ORDER_ITEM);
+        }
+
+        int quantity = orderItem.getQuantity();
+        long price = orderItem.getPrice();
+
+        if (price != productDetail.getPrice()) {
+            log.error(ErrorCode.PRODUCT_PRICE_MISMATCH.getLogMessage(), productDetail.getId(), price,
+                productDetail.getPrice());
+            throw JshopException.of(ErrorCode.PRODUCT_PRICE_MISMATCH);
+        }
+
+        productDetail.getInventory().purchase(quantity);
+
+        OrderProductDetail orderProductDetail = OrderProductDetail
+            .builder().order(this).orderQuantity(quantity).orderPrice(price).productDetail(productDetail).build();
+        productDetails.add(orderProductDetail);
+    }
+
     public static Order createOrder(User user, Delivery delivery, CreateOrderRequest createOrderRequest) {
-        user.getWallet().purchase(createOrderRequest.getTotalPrice());
 
         return Order
             .builder()
