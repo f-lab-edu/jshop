@@ -6,9 +6,11 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
+import jshop.domain.user.dto.UpdateWalletBalanceRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.global.utils.UserUtils;
@@ -53,6 +55,21 @@ public class UserService {
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         User user = getUser(userId);
         user.updateUserInfo(updateUserRequest);
+    }
+
+    @Transactional
+    public void updateWalletBalance(Long userId, UpdateWalletBalanceRequest updateWalletBalanceRequest) {
+        User user = getUser(userId);
+        Wallet wallet = user.getWallet();
+        switch (updateWalletBalanceRequest.getType()) {
+            case DEPOSIT:
+                wallet.deposit(updateWalletBalanceRequest.getAmount());
+                break;
+
+            case WITHDRAW:
+                wallet.withdraw(updateWalletBalanceRequest.getAmount());
+                break;
+        }
     }
 
     public User getUser(Long userId) {

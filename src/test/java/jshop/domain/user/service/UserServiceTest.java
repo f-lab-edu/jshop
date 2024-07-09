@@ -8,16 +8,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import jshop.domain.address.dto.AddressInfoResponse;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UpdateUserRequest;
+import jshop.domain.user.dto.UpdateWalletBalanceRequest;
 import jshop.domain.user.dto.UserInfoResponse;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
+import jshop.domain.wallet.entity.WalletChangeType;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.utils.EntityBuilder;
@@ -27,6 +30,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -206,6 +212,96 @@ class UserServiceTest {
                     .builder().build()));
 
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.USERID_NOT_FOUND);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 잔고 변경 검증")
+    class UpdateWallet {
+
+        private static Stream<Arguments> provideValidArgs() {
+            UpdateWalletBalanceRequest deposit = UpdateWalletBalanceRequest
+                .builder().amount(100L).type(WalletChangeType.DEPOSIT).build();
+
+            UpdateWalletBalanceRequest withdraw = UpdateWalletBalanceRequest
+                .builder().amount(100L).type(WalletChangeType.WITHDRAW).build();
+
+            return Stream.of(Arguments.of(deposit, 400L), Arguments.of(withdraw, 200L));
+        }
+
+        private static Stream<Arguments> provideInValidBalance() {
+            UpdateWalletBalanceRequest deposit = UpdateWalletBalanceRequest
+                .builder().amount(-100L).type(WalletChangeType.DEPOSIT).build();
+
+            UpdateWalletBalanceRequest withdraw = UpdateWalletBalanceRequest
+                .builder().amount(0L).type(WalletChangeType.WITHDRAW).build();
+
+            return Stream.of(Arguments.of(deposit, 300L), Arguments.of(withdraw, 300L));
+        }
+
+        private static Stream<Arguments> provideInValidType() {
+            UpdateWalletBalanceRequest deposit = UpdateWalletBalanceRequest
+                .builder().amount(100L).type(WalletChangeType.PURCHASE).build();
+
+            UpdateWalletBalanceRequest withdraw = UpdateWalletBalanceRequest
+                .builder().amount(100L).type(WalletChangeType.REFUND).build();
+
+            return Stream.of(Arguments.of(deposit, 300L), Arguments.of(withdraw, 300L));
+        }
+
+
+        @ParameterizedTest
+        @DisplayName("잔고 변경 금액이 0보다 크고, 타입이 DEPOSIT, WITHDRAW 중 하나라면 잔고 변경 가능")
+        @MethodSource("provideValidArgs")
+        public void updateWalletBalance_success(UpdateWalletBalanceRequest request, Long result) {
+            // given
+            Wallet wallet = Wallet.create(300L);
+            User user = User
+                .builder().wallet(wallet).build();
+
+            // when
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            userService.updateWalletBalance(1L, request);
+
+            // then
+            assertThat(wallet.getBalance()).isEqualTo(result);
+        }
+
+        @ParameterizedTest
+        @DisplayName("잔고 변경 금액이 0 이하라면 ILLEGAL_BALANCE_REQUEST 발생")
+        @MethodSource("provideInValidBalance")
+        public void updateWalletBalance_illegal_balance(UpdateWalletBalanceRequest request, Long result) {
+            // given
+            Wallet wallet = Wallet.create(300L);
+            User user = User
+                .builder().wallet(wallet).build();
+
+            // when
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+            // then
+
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> userService.updateWalletBalance(1L, request));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ILLEGAL_BALANCE_REQUEST);
+            assertThat(wallet.getBalance()).isEqualTo(result);
+        }
+
+        @ParameterizedTest
+        @DisplayName("잔고 변경 타입이 DEPOSIT, WITHDRAW가 아니라면 아무런 작업도 이루어지지 않음.")
+        @MethodSource("provideInValidType")
+        public void updateWalletBalance_illegal_type(UpdateWalletBalanceRequest request, Long result) {
+            // given
+            Wallet wallet = Wallet.create(300L);
+            User user = User
+                .builder().wallet(wallet).build();
+
+            // when
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            userService.updateWalletBalance(1L, request);
+            // then
+            
+            assertThat(wallet.getBalance()).isEqualTo(result);
         }
     }
 }

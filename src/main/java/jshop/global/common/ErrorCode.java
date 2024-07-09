@@ -46,35 +46,36 @@ public enum ErrorCode {
     INVALID_ORDER_ITEM(10060, "주문 정보가 잘못되었습니다", "주문 수량이나 가격이 잘못되었습니다. 수량 : [{}], 가격 : [{}]", HttpStatus.BAD_REQUEST),
 
     // 비즈니스 로직 오류
-    ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50_001, "재고 변화량이 잘못되었습니다.", "재고 변화량이 잘못되었습니다. [{}]", HttpStatus.BAD_REQUEST),
-    NEGATIVE_QUANTITY_EXCEPTION(50_002, "재고는 음수일 수 없습니다.", "재고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
-    ILLEGAL_PRICE_EXCEPTION(50_101, "가격이 잘못되었습니다.", "가격은 0보다 커야합니다. [{}].", HttpStatus.BAD_REQUEST),
-    ILLEGAL_PAGE_REQUEST(60_001, "요청할 수 없는 페이지 입니다.", "요청할 수 없는 페이지 입니다. pageNumber : [{}], pageSize : [{}]",
+    ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50001, "재고 변화량이 잘못되었습니다.", "재고 변화량이 잘못되었습니다. [{}]", HttpStatus.BAD_REQUEST),
+    NEGATIVE_QUANTITY_EXCEPTION(50002, "재고는 음수일 수 없습니다.", "재고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_PRICE_EXCEPTION(50101, "가격이 잘못되었습니다.", "가격은 0보다 커야합니다. [{}].", HttpStatus.BAD_REQUEST),
+    ILLEGAL_PAGE_REQUEST(60001, "요청할 수 없는 페이지 입니다.", "요청할 수 없는 페이지 입니다. pageNumber : [{}], pageSize : [{}]",
         HttpStatus.BAD_REQUEST),
-    ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION(70_001, "장바구니 수량이 잘못되었습니다.", "장바구니 수량은 1 이상이여야 합니다. [{}]",
+    ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION(70001, "장바구니 수량이 잘못되었습니다.", "장바구니 수량은 1 이상이여야 합니다. [{}]",
         HttpStatus.BAD_REQUEST),
-    WALLET_BALANCE_EXCEPTION(80_001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
-    ALREADY_SHIPPING_ORDER(90_001, "이미 배송이 시작된 주문입니다.", "이미 배송이 시작된 주문입니다. [{}]", HttpStatus.BAD_REQUEST),
-    ALREADY_CANCLED_DELIVERY(90_100, "이미 취소된 배송입니다.", "이미 취소된 배송입니다. DELIVERY_ID : [{}]", HttpStatus.BAD_REQUEST),
-    ILLEGAL_DELIVERY_STATE(90_200, "배송 상태가 잘못되었습니다.", "배송 상태가 잘못되었습니다. 현재 상태 : [{}], 원하는 상태 : [{}]",
+    ILLEGAL_BALANCE_REQUEST(70101, "잔고 변화는 0보다 커야합니다.", "잔고 변화는 0보다 커야합니다. 요청 값 : [{}]", HttpStatus.BAD_REQUEST),
+    WALLET_BALANCE_EXCEPTION(80001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
+    ALREADY_SHIPPING_ORDER(90001, "이미 배송이 시작된 주문입니다.", "이미 배송이 시작된 주문입니다. [{}]", HttpStatus.BAD_REQUEST),
+    ALREADY_CANCLED_DELIVERY(90100, "이미 취소된 배송입니다.", "이미 취소된 배송입니다. DELIVERY_ID : [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_DELIVERY_STATE(90200, "배송 상태가 잘못되었습니다.", "배송 상태가 잘못되었습니다. 현재 상태 : [{}], 원하는 상태 : [{}]",
         HttpStatus.BAD_REQUEST),
-    ORDER_PRICE_MISMATCH(90_500, "주문 가격과 상품 가격이 맞지 않습니다.", "주문 가격과 상품 가격이 맞지 않습니다. 주문가격 : [{}] , 상품 가격 총합 : [{}]",
+    ORDER_PRICE_MISMATCH(90500, "주문 가격과 상품 가격이 맞지 않습니다.", "주문 가격과 상품 가격이 맞지 않습니다. 주문가격 : [{}] , 상품 가격 총합 : [{}]",
         HttpStatus.BAD_REQUEST),
-    PRODUCT_PRICE_MISMATCH(90_501, "상품 가격이 변경되었습니다.",
+    PRODUCT_PRICE_MISMATCH(90501, "상품 가격이 변경되었습니다.",
         "주문요청 상품 가격과 실제 상품 가격이 맞지 않습니다. 상품 상세 ID : [{}] 주문 상품 가격 : " + "[{}], 실제 상품 가격 : [{}]", HttpStatus.BAD_REQUEST),
-    ORDER_QUANTITY_MISMATCH(90_550, "주문 수량과 상품 수량의 합이 맞지 않습니다.",
+    ORDER_QUANTITY_MISMATCH(90550, "주문 수량과 상품 수량의 합이 맞지 않습니다.",
         "주문 수량과 상품 수량의 합이 맞지 않습니다. 주문수량 : [{}] , 상품 수량 총합 : " + "[{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
-    INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
+    INVALID_PRODUCT_ATTRIBUTE(100001, "상세 상품 속성이 잘못되었습니다.",
         "상세상품 속성이 상품 속성에 없습니다. [attributes : {}]   [attribute : {}]", HttpStatus.BAD_REQUEST),
-    INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요",
+    INVALID_PRODUCTDETAIL_INVENTORY(100100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요",
         "상세 상품의 Inventory가 잘못되었습니다. product " + "detail : [{}]", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_PRODUCTDETAIL_PRODUCT(100_200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
+    INVALID_PRODUCTDETAIL_PRODUCT(100200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 서버 문제
-    USER_WALLET_NOT_FOUND(200_100, "사용자의 지갑을 찾을 수 없습니다. 관리자에게 문의하세요", "사용자의 지갑을 찾을 수 없습니다. user : [{}]",
+    USER_WALLET_NOT_FOUND(200100, "사용자의 지갑을 찾을 수 없습니다. 관리자에게 문의하세요", "사용자의 지갑을 찾을 수 없습니다. user : [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
