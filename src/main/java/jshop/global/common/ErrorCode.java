@@ -76,7 +76,8 @@ public enum ErrorCode {
 
     // 서버 문제
     USER_WALLET_NOT_FOUND(200100, "사용자의 지갑을 찾을 수 없습니다. 관리자에게 문의하세요", "사용자의 지갑을 찾을 수 없습니다. user : [{}]",
-        HttpStatus.INTERNAL_SERVER_ERROR);
+        HttpStatus.INTERNAL_SERVER_ERROR),
+    INTERNAL_SERVER_ERROR(300100, "서버 문제가 발생했습니다. 잠시후 재시도 해주세요.", "", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

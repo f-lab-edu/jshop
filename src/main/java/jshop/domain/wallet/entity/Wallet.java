@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
 import jshop.global.exception.JshopException;
@@ -36,6 +37,9 @@ public class Wallet extends BaseEntity {
     private Long id;
 
     private Long balance;
+
+    @Version
+    private Integer version;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "wallet_change_type")
