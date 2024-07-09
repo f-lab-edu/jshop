@@ -10,7 +10,7 @@ import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.dto.UserType;
 import jshop.domain.user.service.UserService;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.DtoBuilder;
+import jshop.utils.dto.UserDtoUtils;
 import jshop.utils.config.TestSecurityConfig;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
@@ -69,7 +68,7 @@ class AccountControllerTest {
         @DisplayName("회원가입 요청으로 유저이름, 이메일, 비밀번호, 유저타입이 들어오면 회원가입")
         public void join_success() throws Exception {
             // given
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
 
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
@@ -99,7 +98,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")
@@ -129,7 +128,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")
@@ -159,7 +158,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")
@@ -218,7 +217,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")
@@ -248,7 +247,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")
@@ -278,7 +277,7 @@ class AccountControllerTest {
             requestBody.put("password", password);
             requestBody.put("userType", "USER");
 
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/join")

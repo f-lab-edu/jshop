@@ -86,7 +86,8 @@ class CartServiceTest {
 
             cartService.addCart(addCartRequest, userId);
             // then
-            verify(cartProductDetailRepository, times(1)).save(cartProductDetailArgumentCaptor.capture());
+
+            assertThat(cart.getCartProductDetails().size()).isEqualTo(1);
         }
 
         @Test
@@ -104,8 +105,7 @@ class CartServiceTest {
             AddCartRequest addCartRequest = AddCartRequest
                 .builder().productDetailId(detailId).quantity(1).build();
 
-            CartProductDetail cartProductDetail = CartProductDetail
-                .builder().cart(cart).productDetail(productDetail).quantity(10).build();
+            cart.addCart(productDetail, 10);
 
             // when
             when(cartRepository.findCartByUserId(userId)).thenReturn(Optional.of(cart));
@@ -113,12 +113,8 @@ class CartServiceTest {
             when(productDetailRepository.getReferenceById(detailId)).thenReturn(productDetail);
 
             cartService.addCart(addCartRequest, userId);
-
-            when(cartProductDetailRepository.findByCartAndProductDetail(cart, productDetail)).thenReturn(
-                Optional.of(cartProductDetail));
-            cartService.addCart(addCartRequest, userId);
             // then
-            assertThat(cartProductDetail.getQuantity()).isEqualTo(11);
+            assertThat(cart.getCartProductDetails().get(0).getQuantity()).isEqualTo(11);
         }
 
         @Test
@@ -190,22 +186,6 @@ class CartServiceTest {
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.CART_NOT_FOUND);
         }
 
-    }
-
-    @Nested
-    @DisplayName("장바구니 삭제 검증")
-    class DeleteCart {
-
-        @Test
-        @DisplayName("삭제하려는 상품에 문제가 없다면 장바구니에서 삭제할 수 있다.")
-        public void addCart_success() {
-            // given
-            Long deleteCartProductId = 1L;
-            // when
-            cartService.deleteCart(deleteCartProductId);
-            // then
-            verify(cartProductDetailRepository, times(1)).deleteById(deleteCartProductId);
-        }
     }
 
     @Nested

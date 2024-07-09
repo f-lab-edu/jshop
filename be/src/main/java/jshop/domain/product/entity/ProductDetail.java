@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Map;
+import java.util.Optional;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
@@ -58,7 +59,7 @@ public class ProductDetail extends BaseEntity {
     /**
      * 인벤토리와 일대일 관계에 있다.
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
@@ -67,6 +68,13 @@ public class ProductDetail extends BaseEntity {
     @Column(name = "is_deleted")
     @Builder.Default
     private Boolean isDeleted = false;
+
+    public Inventory getInventory() {
+        return Optional.ofNullable(inventory).orElseThrow(() -> {
+            log.error(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY.getLogMessage(), id);
+            throw JshopException.of(ErrorCode.INVALID_PRODUCTDETAIL_INVENTORY);
+        });
+    }
 
     public static ProductDetail of(CreateProductDetailRequest createProductDetailRequest, Product product,
         Inventory inventory) {

@@ -29,6 +29,7 @@ public enum ErrorCode {
     CATEGORY_NAME_NOT_FOUND(3030, "카테고리 정보를 찾을 수 없습니다.", "카테고리 이름[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     ADDRESSID_NOT_FOUND(3040, "주소 정보를 찾을 수 없습니다.", "주소 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     PRODUCTDETAIL_ID_NOT_FOUND(3050, "상세 상품 정보를 찾을 수 없습니다.", "상세 상품 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVENTORY_ID_NOT_FOUND(3055, "재고 정보를 찾을 수 없습니다.", "재고 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CART_NOT_FOUND(3060, "장바구니 정보를 찾을 수 없습니다", "유저 ID[{}] 로 장바구니 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CART_PRODUCTDETAIL_ID_NOT_FOUND(3065, "장바구니에 추가된 상품을 찾을 수 없습니다.", "장바구니에 추가된 상품 [{}] 를 찾을 수 없습니다.",
         HttpStatus.BAD_REQUEST),
@@ -42,6 +43,7 @@ public enum ErrorCode {
     INVALID_REQUEST_BODY(10001, "요청이 잘못되었습니다.", "Request Body가 잘못되었습니다 (공백, 잘못된 포맷).", HttpStatus.BAD_REQUEST),
     BAD_REQUEST(10010, "요청이 잘못되었습니다.", "", HttpStatus.BAD_REQUEST),
     NO_SEARCH_QUERY(10050, "검색어가 없습니다.", "상품 검색 쿼리는 null일 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_ITEM(10060, "주문 정보가 잘못되었습니다", "주문 수량이나 가격이 잘못되었습니다. 수량 : [{}], 가격 : [{}]", HttpStatus.BAD_REQUEST),
 
     // 비즈니스 로직 오류
     ILLEGAL_QUANTITY_REQUEST_EXCEPTION(50_001, "재고 변화량이 잘못되었습니다.", "재고 변화량이 잘못되었습니다. [{}]", HttpStatus.BAD_REQUEST),
@@ -53,12 +55,21 @@ public enum ErrorCode {
         HttpStatus.BAD_REQUEST),
     WALLET_BALANCE_EXCEPTION(80_001, "잔고는 음수일 수 없습니다.", "잔고는 음수일 수 없습니다. [{}]", HttpStatus.BAD_REQUEST),
     ALREADY_SHIPPING_ORDER(90_001, "이미 배송이 시작된 주문입니다.", "이미 배송이 시작된 주문입니다. [{}]", HttpStatus.BAD_REQUEST),
+    ALREADY_CANCLED_DELIVERY(90_100, "이미 취소된 배송입니다.", "이미 취소된 배송입니다. DELIVERY_ID : [{}]", HttpStatus.BAD_REQUEST),
+    ILLEGAL_DELIVERY_STATE(90_200, "배송 상태가 잘못되었습니다.", "배송 상태가 잘못되었습니다. 현재 상태 : [{}], 원하는 상태 : [{}]",
+        HttpStatus.BAD_REQUEST),
+    ORDER_PRICE_MISMATCH(90_500, "주문 가격과 상품 가격이 맞지 않습니다.", "주문 가격과 상품 가격이 맞지 않습니다. 주문가격 : [{}] , 상품 가격 총합 : [{}]",
+        HttpStatus.BAD_REQUEST),
+    PRODUCT_PRICE_MISMATCH(90_501, "상품 가격이 변경되었습니다.",
+        "주문요청 상품 가격과 실제 상품 가격이 맞지 않습니다. 상품 상세 ID : [{}] 주문 상품 가격 : " + "[{}], 실제 상품 가격 : [{}]", HttpStatus.BAD_REQUEST),
+    ORDER_QUANTITY_MISMATCH(90_550, "주문 수량과 상품 수량의 합이 맞지 않습니다.",
+        "주문 수량과 상품 수량의 합이 맞지 않습니다. 주문수량 : [{}] , 상품 수량 총합 : " + "[{}]", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100_001, "상세 상품 속성이 잘못되었습니다.",
         "상세상품 속성이 상품 속성에 없습니다. [attributes : {}]   [attribute : {}]", HttpStatus.BAD_REQUEST),
-    INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Inventory가 잘못되었습니다. [{}]",
-        HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_PRODUCTDETAIL_INVENTORY(100_100, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요",
+        "상세 상품의 Inventory가 잘못되었습니다. product " + "detail : [{}]", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PRODUCTDETAIL_PRODUCT(100_200, "상세 상품이 잘못되었습니다. 관리자에게 문의하세요", "상세 상품의 Product가 잘못되었습니다. [{}]",
         HttpStatus.INTERNAL_SERVER_ERROR),
 

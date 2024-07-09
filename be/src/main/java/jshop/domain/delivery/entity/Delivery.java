@@ -10,15 +10,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import jshop.domain.address.entity.Address;
 import jshop.domain.order.entity.Order;
+import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
+import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.envers.Audited;
 
+@Slf4j
 @Entity
 @Getter
 @Builder
@@ -53,6 +58,25 @@ public class Delivery extends BaseEntity {
 
     @Column(nullable = true)
     private String message;
+
+    private LocalDateTime deliveredDate;
+
+    public void startTransit() {
+        if (!deliveryState.equals(DeliveryState.PREPARING)) {
+            log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.PREPARING, deliveryState);
+            throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
+        }
+        deliveryState = DeliveryState.IN_TRANSIT;
+    }
+
+    public void endDelivered() {
+        if (!deliveryState.equals(DeliveryState.IN_TRANSIT)) {
+            log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.IN_TRANSIT, deliveryState);
+            throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
+        }
+        deliveryState = DeliveryState.DELIVERED;
+        deliveredDate = LocalDateTime.now();
+    }
 
     public void cancel() {
         deliveryState = DeliveryState.CANCLED;
