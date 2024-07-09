@@ -32,6 +32,9 @@ class ProductDetailRepositoryTest {
     private ProductDetailRepository productDetailRepository;
 
     @Autowired
+    private SearchRepository searchRepository;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Nested
@@ -59,7 +62,7 @@ class ProductDetailRepositoryTest {
 
 
         @Test
-        @DisplayName("검색어와 상품ID 로 페이징쿼리 요청")
+        @DisplayName("검색어로 페이징쿼리 요청")
         public void searchProduct() throws Exception {
             // given
             Product iphone = Product
@@ -76,8 +79,8 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
-                Long.MAX_VALUE, "아이폰", PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = searchRepository.searchProductDetailsByQuery("아이폰",
+                PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(2);
@@ -107,8 +110,8 @@ class ProductDetailRepositoryTest {
             productDetailRepository.save(iphone_white_128);
 
             // when
-            Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(
-                Long.MAX_VALUE, null, PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
+            Page<SearchProductDetailQueryResult> page = searchRepository.searchProductDetailsByQuery(null,
+                PageRequest.of(0, 3, Sort.by(Direction.DESC, "id")));
 
             // then
             assertThat(page.getTotalElements()).isEqualTo(0);

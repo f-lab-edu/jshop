@@ -47,21 +47,21 @@ public class SearchControllerTest {
     class SearchProductDetail {
 
         @Test
-        @DisplayName("상품 검색시 cursor, size, query 정보가 필요하다")
+        @DisplayName("상품 검색시 pageNumber, pageSize, query 정보가 필요하다")
         public void searchProduct_success() throws Exception {
             // given
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/search?cursor=123&size=20&query=아이폰")
+                .get("/api/search?page=123&size=20&query=아이폰")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(createAddressRequestJson.toString()));
             // when
 
-            verify(searchService, times(1)).searchProductDetail(123L, "아이폰", 20);
+            verify(searchService, times(1)).searchProductDetail(123, 20, "아이폰");
             // then
         }
 
         @Test
-        @DisplayName("상품 검색시 cursor, size 정보가 없다면 기본 값이 사용된다")
+        @DisplayName("상품 검색시 pageNumber, pageSize 정보가 없다면 기본 값이 사용된다")
         public void searchProduct_defaultValue() throws Exception {
             // when
             ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
@@ -71,7 +71,7 @@ public class SearchControllerTest {
                 .content(createAddressRequestJson.toString()));
 
             // then
-            verify(searchService, times(1)).searchProductDetail(Long.MAX_VALUE, "아이폰", 30);
+            verify(searchService, times(1)).searchProductDetail(0, 30, "아이폰");
         }
 
         @Test

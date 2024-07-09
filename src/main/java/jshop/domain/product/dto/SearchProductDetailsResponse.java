@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchProductDetailsResponse {
 
-    private Long nextCursor;
     private List<ProductDetailResponse> products;
 }

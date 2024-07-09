@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@DisplayName("[통합 테스트] OrderService")
 class OrderServiceIntegrationTest {
 
     @Autowired
