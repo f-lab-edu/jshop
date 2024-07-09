@@ -1,10 +1,12 @@
 package jshop.domain.product.service;
 
+import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.category.service.CategoryService;
 import jshop.domain.inventory.entity.Inventory;
+import jshop.domain.inventory.repository.InventoryRepository;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
@@ -28,13 +30,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -42,6 +46,8 @@ public class ProductService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
+    private final EntityManager em;
+    private final InventoryRepository inventoryRepository;
 
     @Transactional
     public Long createProduct(CreateProductRequest createProductRequest, Long userId) {
@@ -98,6 +104,7 @@ public class ProductService {
     public void updateProductDetailStock(Long detailId, int quantity) {
         ProductDetail productDetail = getProductDetail(detailId);
 
+        Inventory inventory = getInventory(productDetail.getInventory().getId());
         /**
          * 증가 요청은 양수로, 감소 요청은 음수로 들어오지만, 실제 변화는 addStock, removeStock 으로만 이루어지고,
          * 두 메서드다 파라미터는 양수로만 받음.
@@ -106,9 +113,9 @@ public class ProductService {
          */
 
         if (quantity > 0) {
-            productDetail.getInventory().addStock(quantity);
+            inventory.addStock(quantity);
         } else if (quantity < 0) {
-            productDetail.getInventory().removeStock(-quantity);
+            inventory.removeStock(-quantity);
         } else {
             log.error(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
             throw JshopException.of(ErrorCode.ILLEGAL_QUANTITY_REQUEST_EXCEPTION);
@@ -119,6 +126,11 @@ public class ProductService {
     public void deleteProductDetail(Long detailId) {
         ProductDetail productDetail = getProductDetail(detailId);
         productDetail.delete();
+    }
+
+    public Inventory getInventory(Long inventoryId) {
+        Optional<Inventory> optionalInventory = inventoryRepository.findById(inventoryId);
+        return ProductUtils.getInventoryOrThrow(optionalInventory, inventoryId);
     }
 
     private Product getProduct(Long productId) {

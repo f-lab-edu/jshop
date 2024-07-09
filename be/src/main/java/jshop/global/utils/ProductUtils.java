@@ -1,6 +1,7 @@
 package jshop.global.utils;
 
 import java.util.Optional;
+import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.global.common.ErrorCode;
@@ -22,6 +23,13 @@ public class ProductUtils {
         return optionalProductDetail.orElseThrow(() -> {
             log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), productDetailId);
             throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
+        });
+    }
+
+    public static Inventory getInventoryOrThrow(Optional<Inventory> optionalInventory, Long inventoryId) {
+        return optionalInventory.orElseThrow(() -> {
+            log.error(ErrorCode.INVENTORY_ID_NOT_FOUND.getLogMessage(), inventoryId);
+            throw JshopException.of(ErrorCode.INVENTORY_ID_NOT_FOUND);
         });
     }
 }

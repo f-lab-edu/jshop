@@ -3,26 +3,34 @@ package jshop.domain.order.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.service.AddressService;
+import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.order.dto.CreateOrderRequest;
 import jshop.domain.order.dto.OrderItemRequest;
+import jshop.domain.order.dto.OrderListResponse;
 import jshop.domain.order.entity.Order;
+import jshop.domain.order.entity.OrderProductDetail;
 import jshop.domain.order.repository.OrderProductDetailRepository;
 import jshop.domain.order.repository.OrderRepository;
+import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.entity.User;
+import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
@@ -37,6 +45,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[단위 테스트] OrderService")
@@ -50,6 +61,9 @@ class OrderServiceTest {
 
     @Mock
     OrderRepository orderRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @Mock
     OrderProductDetailRepository orderProductDetailRepository;
@@ -134,6 +148,9 @@ class OrderServiceTest {
 
             // when
             when(userService.getUser(1L)).thenReturn(user);
+            when(addressService.getAddress(1L)).thenReturn(address);
+            when(productService.getProductDetail(1L)).thenReturn(productDetail1);
+            when(productService.getProductDetail(2L)).thenReturn(productDetail2);
 
             // then
             JshopException jshopException = assertThrows(JshopException.class,

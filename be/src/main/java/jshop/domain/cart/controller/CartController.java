@@ -60,8 +60,9 @@ public class CartController {
 
     @DeleteMapping("/{cart_product_detail_id}")
     @PreAuthorize("@cartService.checkCartProductOwnership(#productId, authentication.principal)")
-    public void deleteCart(@PathVariable("cart_product_detail_id") @P("productId") Long cartProductDetailId) {
-        cartService.deleteCart(cartProductDetailId);
+    public void deleteCart(@PathVariable("cart_product_detail_id") @P("productId") Long cartProductDetailId,
+        @CurrentUserId Long userId) {
+        cartService.deleteCart(userId, cartProductDetailId);
     }
 
     @PutMapping("/{cart_product_detail_id}")

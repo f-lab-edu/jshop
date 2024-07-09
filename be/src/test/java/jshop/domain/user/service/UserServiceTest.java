@@ -20,7 +20,7 @@ import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
-import jshop.utils.DtoBuilder;
+import jshop.utils.dto.UserDtoUtils;
 import jshop.utils.EntityBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +68,7 @@ class UserServiceTest {
         @DisplayName("중복된 이메일이 없다면 회원가입이 가능")
         public void joinUser_success() {
             // given
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
             User user = EntityBuilder.getJoinUser(username, email, password, userType, role);
 
             // when
@@ -91,7 +91,7 @@ class UserServiceTest {
         @DisplayName("중복된 이메일이 있다면 회원 가입이 불가능")
         public void joinUser_dupEmail() {
             // given
-            JoinUserRequest joinUserRequest = DtoBuilder.getJoinDto(username, email, password, userType);
+            JoinUserRequest joinUserRequest = UserDtoUtils.getJoinUserRequestDto(username, email, password, userType);
 
             // when
             userService.joinUser(joinUserRequest);

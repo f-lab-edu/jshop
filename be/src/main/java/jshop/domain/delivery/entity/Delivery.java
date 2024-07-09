@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import jshop.domain.address.entity.Address;
 import jshop.domain.order.entity.Order;
 import jshop.global.common.ErrorCode;
@@ -58,6 +59,8 @@ public class Delivery extends BaseEntity {
     @Column(nullable = true)
     private String message;
 
+    private LocalDateTime deliveredDate;
+
     public void startTransit() {
         if (!deliveryState.equals(DeliveryState.PREPARING)) {
             log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.PREPARING, deliveryState);
@@ -72,6 +75,7 @@ public class Delivery extends BaseEntity {
             throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
         }
         deliveryState = DeliveryState.DELIVERED;
+        deliveredDate = LocalDateTime.now();
     }
 
     public void cancel() {
