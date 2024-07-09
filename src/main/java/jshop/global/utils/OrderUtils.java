@@ -1,7 +1,6 @@
 package jshop.global.utils;
 
 import java.util.Optional;
-import jshop.domain.cart.entity.Cart;
 import jshop.domain.order.entity.Order;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;

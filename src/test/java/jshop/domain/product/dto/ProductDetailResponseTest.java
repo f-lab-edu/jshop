@@ -1,15 +1,12 @@
 package jshop.domain.product.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import jshop.domain.product.entity.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.annotation.MergedAnnotations.Search;
 
 @DisplayName("[단위 테스트] ProductDetailResponse")
 class ProductDetailResponseTest {

@@ -27,7 +27,7 @@ public class UserInfoResponse {
 
     public static UserInfoResponse of(User user, List<Address> addresses) {
         List<AddressInfoResponse> addressInfoResponses = addresses.stream().map(AddressInfoResponse::of).toList();
-        
+
         return UserInfoResponse
             .builder()
             .username(user.getUsername())

@@ -1,10 +1,8 @@
 package jshop.domain.cart.service;
 
-import java.util.List;
 import java.util.Optional;
 import jshop.domain.cart.dto.AddCartRequest;
 import jshop.domain.cart.dto.CartProductQueryResult;
-import jshop.domain.cart.dto.CartProductResponse;
 import jshop.domain.cart.dto.OwnCartInfoResponse;
 import jshop.domain.cart.dto.UpdateCartRequest;
 import jshop.domain.cart.entity.Cart;

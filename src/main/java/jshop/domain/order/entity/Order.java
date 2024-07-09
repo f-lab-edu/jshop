@@ -13,14 +13,12 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.order.dto.CreateOrderRequest;
 import jshop.domain.order.dto.OrderItemRequest;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.user.entity.User;
-import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
 import jshop.global.exception.JshopException;
@@ -28,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -10,7 +10,6 @@ import jshop.domain.inventory.repository.InventoryRepository;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
 import jshop.domain.product.dto.OwnProductsResponse;
-import jshop.domain.product.dto.ProductResponse;
 import jshop.domain.product.dto.UpdateProductDetailRequest;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
@@ -30,8 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 

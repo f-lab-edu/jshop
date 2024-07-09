@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import jshop.domain.order.entity.Order;
 import jshop.domain.user.entity.User;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

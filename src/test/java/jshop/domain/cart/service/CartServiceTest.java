@@ -1,11 +1,7 @@
 package jshop.domain.cart.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -13,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import jshop.domain.cart.dto.AddCartRequest;
 import jshop.domain.cart.dto.CartProductQueryResult;
-import jshop.domain.cart.dto.CartProductResponse;
 import jshop.domain.cart.dto.OwnCartInfoResponse;
 import jshop.domain.cart.dto.UpdateCartRequest;
 import jshop.domain.cart.entity.Cart;
@@ -22,7 +17,6 @@ import jshop.domain.cart.repository.CartProductDetailRepository;
 import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
-import jshop.domain.user.entity.User;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 

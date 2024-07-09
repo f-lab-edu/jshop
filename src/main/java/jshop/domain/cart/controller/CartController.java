@@ -1,10 +1,8 @@
 package jshop.domain.cart.controller;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import jshop.domain.cart.dto.AddCartRequest;
-import jshop.domain.cart.dto.CartProductResponse;
 import jshop.domain.cart.dto.OwnCartInfoResponse;
 import jshop.domain.cart.dto.UpdateCartRequest;
 import jshop.domain.cart.service.CartService;

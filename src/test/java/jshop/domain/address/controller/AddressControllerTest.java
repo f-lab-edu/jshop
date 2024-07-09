@@ -10,16 +10,13 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import jakarta.persistence.EntityManagerFactory;
 import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.dto.UpdateAddressRequest;
 import jshop.domain.address.service.AddressService;
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
-import jshop.utils.config.TestSecurityConfig;
 import jshop.utils.config.TestSecurityConfigWithoutMethodSecurity;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,13 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -46,7 +39,7 @@ public class AddressControllerTest {
 
     @MockBean
     private AddressService addressService;
-    
+
     @Autowired
     private MockMvc mockMvc;
 

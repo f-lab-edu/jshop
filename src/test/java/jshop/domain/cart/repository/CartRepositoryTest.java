@@ -1,8 +1,6 @@
 package jshop.domain.cart.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.entity.User;

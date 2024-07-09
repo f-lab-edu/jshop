@@ -2,7 +2,6 @@ package jshop.domain.product.controller;
 
 import java.util.Optional;
 import jshop.domain.product.dto.SearchProductDetailsResponse;
-import jshop.domain.product.service.ProductService;
 import jshop.domain.product.service.SearchService;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;

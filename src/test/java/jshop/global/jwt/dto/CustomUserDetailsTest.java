@@ -3,7 +3,6 @@ package jshop.global.jwt.dto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import jshop.domain.user.entity.User;
-import jshop.global.jwt.dto.CustomUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

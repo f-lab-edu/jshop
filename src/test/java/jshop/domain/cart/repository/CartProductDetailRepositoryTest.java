@@ -1,8 +1,6 @@
 package jshop.domain.cart.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -11,8 +9,6 @@ import java.util.List;
 import jshop.domain.cart.dto.CartProductQueryResult;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.cart.entity.CartProductDetail;
-import jshop.domain.inventory.entity.Inventory;
-import jshop.domain.product.dto.ProductDetailResponse;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;

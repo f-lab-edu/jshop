@@ -1,22 +1,18 @@
 package jshop.domain.cart.controller;
 
 import static jshop.utils.MockSecurityContextUtil.getSecurityContextMockUserId;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import jshop.domain.address.controller.AddressController;
 import jshop.domain.cart.dto.AddCartRequest;
 import jshop.domain.cart.service.CartService;
 import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.config.TestSecurityConfigWithoutMethodSecurity;
-import net.bytebuddy.asm.Advice.Argument;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;

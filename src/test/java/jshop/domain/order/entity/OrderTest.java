@@ -1,39 +1,23 @@
 package jshop.domain.order.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import jshop.domain.address.entity.Address;
 import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.order.dto.CreateOrderRequest;
 import jshop.domain.order.dto.OrderItemRequest;
-import jshop.domain.order.repository.OrderRepository;
-import jshop.domain.product.dto.CreateProductDetailRequest;
-import jshop.domain.product.dto.CreateProductRequest;
-import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
-import jshop.domain.product.repository.ProductDetailRepository;
-import jshop.domain.product.service.ProductService;
-import jshop.domain.user.dto.JoinUserRequest;
 import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
-import jshop.domain.user.service.UserService;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @DisplayName("[단위 테스트]  Order")
