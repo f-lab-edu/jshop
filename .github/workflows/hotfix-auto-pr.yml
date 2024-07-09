@@ -1,0 +1,34 @@
+name: Create Pull Request on Push to hotfix branches
+
+on:
+  push:
+    branches:
+      - "hotfix/*" 
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up jq
+        run: sudo apt-get install jq
+
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_TOKEN }}
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          TARGET_BRANCH="master"
+          PR_TITLE="${BRANCH_NAME}"
+          PR_BODY=$(cat <<EOF
+          # 변경사항      
+                    
+          EOF)
+          
+          curl -s -X POST https://api.github.com/repos/${{ github.repository }}/pulls \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -d "$(jq -n --arg title "$PR_TITLE" --arg body "$PR_BODY" --arg head "$BRANCH_NAME" --arg base "$TARGET_BRANCH" \
+              '{title: $title, body: $body, head: $head, base: $base}')"
