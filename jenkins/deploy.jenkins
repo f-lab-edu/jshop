@@ -4,17 +4,15 @@ pipeline {
     environment {        
         NCLOUD_ACCESS_KEY_ID = credentials('NCLOUD_ACCESS_KEY_ID')
         NCLOUD_SECRET_KEY = credentials('NCLOUD_SECRET_KEY')
-        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.2'
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.3'
     }
 
     stages {
         stage('Test') {
             steps {
                 script {
-                    dir('be') {                
-                       echo 'Test'
-                        sh './gradlew clean test'
-                    }
+                    echo 'Test'
+                    sh './gradlew clean test'
                 }
             }
         }
@@ -22,10 +20,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    dir('be') {
-                        echo 'build'
-                        sh "docker build -t ${IMAGE} ."
-                    }                    
+                    echo 'build'
+                    sh "docker build -t ${IMAGE} ."
                 }
             }
         }
