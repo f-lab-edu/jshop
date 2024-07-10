@@ -12,5 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchProductDetailsResponse {
 
+    private Long totalCount;
+    private Integer currentPage;
+    private Integer totalPages;
     private List<ProductDetailResponse> products;
 }
