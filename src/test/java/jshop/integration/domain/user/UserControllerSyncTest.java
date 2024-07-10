@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -119,16 +122,20 @@ public class UserControllerSyncTest {
         public void updateBalance_many_retry() throws Exception {
             ExecutorService executors = Executors.newFixedThreadPool(10);
 
+            List<ResultActions> performs = new ArrayList<>();
+
             for (int i = 0; i < 10; i++) {
                 executors.submit(() -> {
                     String request = """
                         { "amount" : 100, "type" : "DEPOSIT"}
                         """;
                     try {
-                        mockMvc.perform(patch("/api/users/balance")
+                        ResultActions perform = mockMvc.perform(patch("/api/users/balance")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(request)
                             .header("Authorization", userToken));
+
+                        performs.add(perform);
                     } catch (Exception e) {
 
                     }
@@ -141,6 +148,14 @@ public class UserControllerSyncTest {
             User user = userService.getUser(userId);
             Wallet wallet = user.getWallet();
             assertThat(wallet.getBalance()).isNotEqualTo(2000L);
+
+            for (ResultActions perform : performs) {
+                if (perform.andReturn().getResponse().getStatus() != HttpStatus.OK.value()) {
+                    perform
+                        .andExpect(status().isInternalServerError())
+                        .andExpect(jsonPath("$.errorCode").value(ErrorCode.INTERNAL_SERVER_ERROR.getCode()));
+                }
+            }
         }
     }
 }
