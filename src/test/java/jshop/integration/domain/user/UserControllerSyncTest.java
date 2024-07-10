@@ -23,6 +23,7 @@ import jshop.domain.wallet.entity.Wallet;
 import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.common.ErrorCode;
 import jshop.utils.dto.UserDtoUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -74,6 +75,11 @@ public class UserControllerSyncTest {
         ResultActions login = mockMvc.perform(
             post("/api/login").contentType(MediaType.APPLICATION_JSON).content(UserDtoUtils.getLoginJsonStr()));
         userToken = login.andReturn().getResponse().getHeader("Authorization");
+    }
+
+    @AfterEach
+    public void destroy() {
+        userRepository.deleteAll();
     }
 
     @Nested

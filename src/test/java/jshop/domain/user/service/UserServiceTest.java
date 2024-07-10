@@ -21,6 +21,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.domain.wallet.entity.WalletChangeType;
+import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import jshop.utils.EntityBuilder;
@@ -56,6 +57,9 @@ class UserServiceTest {
 
     @Mock
     private AddressRepository addressRepository;
+
+    @Mock
+    private WalletRepository walletRepository;
 
     @Captor
     private ArgumentCaptor<User> userCaptor;
@@ -256,11 +260,9 @@ class UserServiceTest {
         public void updateWalletBalance_success(UpdateWalletBalanceRequest request, Long result) {
             // given
             Wallet wallet = Wallet.create(300L);
-            User user = User
-                .builder().wallet(wallet).build();
 
             // when
-            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(walletRepository.findWalletByUserId(1L)).thenReturn(Optional.of(wallet));
             userService.updateWalletBalance(1L, request);
 
             // then
@@ -273,11 +275,9 @@ class UserServiceTest {
         public void updateWalletBalance_illegal_balance(UpdateWalletBalanceRequest request, Long result) {
             // given
             Wallet wallet = Wallet.create(300L);
-            User user = User
-                .builder().wallet(wallet).build();
 
             // when
-            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(walletRepository.findWalletByUserId(1L)).thenReturn(Optional.of(wallet));
 
             // then
 
@@ -293,14 +293,12 @@ class UserServiceTest {
         public void updateWalletBalance_illegal_type(UpdateWalletBalanceRequest request, Long result) {
             // given
             Wallet wallet = Wallet.create(300L);
-            User user = User
-                .builder().wallet(wallet).build();
 
             // when
-            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(walletRepository.findWalletByUserId(1L)).thenReturn(Optional.of(wallet));
             userService.updateWalletBalance(1L, request);
             // then
-            
+
             assertThat(wallet.getBalance()).isEqualTo(result);
         }
     }
