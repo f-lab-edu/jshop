@@ -5,19 +5,15 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    dir('be') {                
-                       echo 'Test'
-                        sh './gradlew clean test'
-                    }
+                   echo 'Test'
+                    sh './gradlew clean test'
                 }
             }
         }
     }
     post {
         always {
-            dir('be') {                
-                junit 'build/test-results/test/*.xml'
-            }
+            junit 'build/test-results/test/*.xml'
         }
     }
 }
