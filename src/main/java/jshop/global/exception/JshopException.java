@@ -18,9 +18,14 @@ public class JshopException extends RuntimeException {
         super(message);
     }
 
+    public JshopException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public static JshopException of(ErrorCode errorCode) {
         return JshopException
             .builder().errorCode(errorCode).build();
     }
+
 
 }

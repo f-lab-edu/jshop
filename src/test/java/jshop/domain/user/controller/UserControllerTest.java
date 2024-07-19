@@ -4,16 +4,26 @@ import static jshop.utils.MockSecurityContextUtil.getSecurityContextMockUserId;
 import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.stream.Stream;
 import jshop.domain.user.dto.UpdateUserRequest;
+import jshop.domain.user.dto.UpdateWalletBalanceRequest;
 import jshop.domain.user.service.UserService;
+import jshop.domain.wallet.entity.WalletChangeType;
+import jshop.global.common.ErrorCode;
 import jshop.global.controller.GlobalExceptionHandler;
 import jshop.utils.config.TestSecurityConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +32,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @WebMvcTest(UserController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
@@ -105,6 +118,77 @@ class UserControllerTest {
 
             // then
             perform.andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Nested
+    @DisplayName("현재 유저의 잔고 변경 검증")
+    class UpdateWallet {
+
+        @Captor
+        ArgumentCaptor<Long> userIdCaptor;
+
+        @Captor
+        ArgumentCaptor<UpdateWalletBalanceRequest> updateWalletBalanceRequestArgumentCaptor;
+
+        private static Stream<Arguments> provideValidArgs() {
+            String depositRequestStr = """
+                { "amount" : 100, "type" : "DEPOSIT"}
+                """;
+
+            String withdrawRequestStr = """
+                { "amount" : 100, "type" : "WITHDRAW"}
+                """;
+            return Stream.of(Arguments.of(depositRequestStr, WalletChangeType.DEPOSIT),
+                Arguments.of(withdrawRequestStr, WalletChangeType.WITHDRAW));
+        }
+
+        private static Stream<Arguments> provideInValidArgs() {
+            String depositRequestStr = """
+                { "amount" : -100, "type" : "DEPOSIT"}
+                """;
+
+            String withdrawRequestStr = """
+                { "amount" : 0, "type" : "WITHDRAW"}
+                """;
+            return Stream.of(Arguments.of(depositRequestStr, WalletChangeType.DEPOSIT),
+                Arguments.of(withdrawRequestStr, WalletChangeType.WITHDRAW));
+        }
+
+        @ParameterizedTest
+        @DisplayName("잔고 변화량이 0 이상이고, 변경 타입이 DEPOSIT, WITHDRAW라면 잔고를 갱신할 수 있다.")
+        @MethodSource("provideValidArgs")
+        public void updateWalletBalance_success(String request, WalletChangeType type) throws Exception {
+            // when
+            mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/users/balance")
+                .with(mockUserSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request));
+
+            // then
+            verify(userService, times(1)).updateWalletBalance(userIdCaptor.capture(),
+                updateWalletBalanceRequestArgumentCaptor.capture());
+
+            assertThat(updateWalletBalanceRequestArgumentCaptor.getValue().getAmount()).isEqualTo(100);
+            assertThat(updateWalletBalanceRequestArgumentCaptor.getValue().getType()).isEqualTo(type);
+        }
+
+        @ParameterizedTest
+        @DisplayName("잔고 변화량이 0 이하면 BAD_REQUEST 발생")
+        @MethodSource("provideInValidArgs")
+        public void updateWalletBalance_illegal_amount(String request, WalletChangeType type) throws Exception {
+            // when
+            ResultActions perform = mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/users/balance")
+                .with(mockUserSecurityContext())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request));
+
+            // then
+            perform
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.BAD_REQUEST.getCode()));
         }
     }
 }
