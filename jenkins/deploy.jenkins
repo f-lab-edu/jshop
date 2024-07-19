@@ -4,7 +4,7 @@ pipeline {
     environment {        
         NCLOUD_ACCESS_KEY_ID = credentials('NCLOUD_ACCESS_KEY_ID')
         NCLOUD_SECRET_KEY = credentials('NCLOUD_SECRET_KEY')
-        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.3'
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.4'
     }
 
     stages {
