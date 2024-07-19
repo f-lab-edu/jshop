@@ -22,5 +22,9 @@ public class UserDtoUtils {
             .build();
     }
 
-
+    public static String getLoginJsonStr() {
+        return """
+            { "email" : "email@email.com", "password" : "password"}
+            """;
+    }
 }

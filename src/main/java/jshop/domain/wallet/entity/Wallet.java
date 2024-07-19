@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
 import jshop.global.exception.JshopException;
@@ -37,27 +38,37 @@ public class Wallet extends BaseEntity {
 
     private Long balance;
 
+    @Version
+    private Integer version;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "wallet_change_type")
     private WalletChangeType walletChangeType;
 
     public static Wallet create() {
+        return create(0L);
+    }
+
+    public static Wallet create(Long balance) {
         return Wallet
-            .builder().balance(0L).walletChangeType(WalletChangeType.CREATE).build();
+            .builder().balance(balance).walletChangeType(WalletChangeType.CREATE).build();
     }
 
 
     public Long deposit(Long amount) {
+        checkAmount(amount);
         walletChangeType = WalletChangeType.DEPOSIT;
         return balance += amount;
     }
 
     public Long refund(Long amount) {
+        checkAmount(amount);
         walletChangeType = WalletChangeType.REFUND;
         return balance += amount;
     }
 
     public Long purchase(Long amount) {
+        checkAmount(amount);
         if (balance - amount < 0) {
             log.error(ErrorCode.WALLET_BALANCE_EXCEPTION.getLogMessage(), balance - amount);
             throw JshopException.of(ErrorCode.WALLET_BALANCE_EXCEPTION);
@@ -68,6 +79,7 @@ public class Wallet extends BaseEntity {
     }
 
     public Long withdraw(Long amount) {
+        checkAmount(amount);
         if (balance - amount < 0) {
             log.error(ErrorCode.WALLET_BALANCE_EXCEPTION.getLogMessage(), balance - amount);
             throw JshopException.of(ErrorCode.WALLET_BALANCE_EXCEPTION);
@@ -75,5 +87,13 @@ public class Wallet extends BaseEntity {
 
         walletChangeType = WalletChangeType.WITHDRAW;
         return balance -= amount;
+    }
+
+    private boolean checkAmount(Long amount) {
+        if (amount <= 0) {
+            log.error(ErrorCode.ILLEGAL_BALANCE_REQUEST.getLogMessage(), amount);
+            throw JshopException.of(ErrorCode.ILLEGAL_BALANCE_REQUEST);
+        }
+        return true;
     }
 }
