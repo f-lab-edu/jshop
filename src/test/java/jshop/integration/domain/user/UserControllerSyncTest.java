@@ -130,7 +130,7 @@ public class UserControllerSyncTest {
 
             List<ResultActions> performs = new ArrayList<>();
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 100; i++) {
                 executors.submit(() -> {
                     String request = """
                         { "amount" : 100, "type" : "DEPOSIT"}
@@ -153,7 +153,7 @@ public class UserControllerSyncTest {
 
             User user = userService.getUser(userId);
             Wallet wallet = user.getWallet();
-            assertThat(wallet.getBalance()).isNotEqualTo(2000L);
+            assertThat(wallet.getBalance()).isNotEqualTo(10100L);
 
             for (ResultActions perform : performs) {
                 if (perform.andReturn().getResponse().getStatus() != HttpStatus.OK.value()) {
