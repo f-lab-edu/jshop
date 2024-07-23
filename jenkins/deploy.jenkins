@@ -4,7 +4,18 @@ pipeline {
     environment {        
         NCLOUD_ACCESS_KEY_ID = credentials('NCLOUD_ACCESS_KEY_ID')
         NCLOUD_SECRET_KEY = credentials('NCLOUD_SECRET_KEY')
-        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.4'
+
+        MYSQL_HOST = credentials('MYSQL_HOST')
+        MYSQL_PORT = credentials('MYSQL_PORT')
+        MYSQL_PASSWORD = credentials('MYSQL_PASSWORD')
+        MYSQL_USERNAME = credentials('MYSQL_HOST')
+
+        JWT_SECRET_KEY = credentials('JWT_SECRET_KEY')
+        REDIS_HOST = credentials('REDIS_HOST')
+        REDIS_PORT = credentials('REDIS_PORT')
+        REDIS_PASSWORD = credentials('REDIS_PASSWORD')
+
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.5-beta'
     }
 
     stages {
@@ -12,7 +23,7 @@ pipeline {
             steps {
                 script {
                     echo 'Test'
-                    sh './gradlew clean test --debug'
+                    sh './gradlew clean test'
                 }
             }
         }
@@ -21,7 +32,7 @@ pipeline {
             steps {
                 script {
                     echo 'build'
-                    sh "docker build -t ${IMAGE} ."
+                    sh "docker build -x test -t ${IMAGE} --build-arg MYSQL_HOST={MYSQL_HOST} --build-arg MYSQL_PORT=${MYSQL_PORT} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg REDIS_HOST=${REDIS_HOST} --build-arg REDIS_PORT=${REDIS_PORT} --build-arg REDIS_PASSWORD=${REDIS_PASSWORD} ."
                 }
             }
         }
