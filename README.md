@@ -27,9 +27,15 @@
 
 ## 아키텍쳐
 
+![architecture](/images/architecture.png)
+
 ### ERD
 
-### 아키텍쳐
+![erd](/images/erd.png)
+
+### 모니터링
+
+![monitoring](/images/monitoring.png)
 
 ## 해결한 문제
 
