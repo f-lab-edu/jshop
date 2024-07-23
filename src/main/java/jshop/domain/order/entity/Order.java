@@ -13,6 +13,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import jshop.domain.coupon.entity.Coupon;
+import jshop.domain.coupon.entity.UserCoupon;
 import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.order.dto.CreateOrderRequest;
@@ -57,6 +59,11 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_coupon_id")
+    private UserCoupon userCoupon;
+
     /**
      * 주문 하나당 여러개의 아이템을 가지고 있다.
      * 주문이 삭제되면 이 아이템 리스트도 삭제된다.
@@ -69,8 +76,18 @@ public class Order extends BaseEntity {
     @Column(name = "total_price")
     private Long totalPrice;
 
+    @Column(name = "payment_price")
+    private Long paymentPrice;
+
     @Column(name = "total_quantity")
     private Integer totalQuantity;
+
+    public void applyCoupon(UserCoupon userCoupon) {
+        this.userCoupon = userCoupon;
+        Coupon coupon = userCoupon.getCoupon();
+        paymentPrice = coupon.discount(totalPrice);
+        userCoupon.use();
+    }
 
     public void addProduct(OrderItemRequest orderItem, ProductDetail productDetail) {
         if (orderItem.getQuantity() == null || orderItem.getPrice() == null) {
@@ -95,12 +112,12 @@ public class Order extends BaseEntity {
     }
 
     public static Order createOrder(User user, Delivery delivery, CreateOrderRequest createOrderRequest) {
-
         return Order
             .builder()
             .user(user)
             .delivery(delivery)
             .totalPrice(createOrderRequest.getTotalPrice())
+            .paymentPrice(createOrderRequest.getTotalPrice())
             .totalQuantity(createOrderRequest.getTotalQuantity())
             .build();
     }
@@ -112,7 +129,8 @@ public class Order extends BaseEntity {
         }
         delivery.cancel();
 
-        user.getWallet().refund(totalPrice);
+        user.getWallet().refund(paymentPrice);
+        userCoupon.cancelUse();
 
         for (OrderProductDetail orderProductDetail : productDetails) {
             orderProductDetail.cancel();
