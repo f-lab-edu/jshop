@@ -48,7 +48,6 @@ out/
 ##### CUSTOM #####
 **/*.idea
 **/*.drawio*
-**/*application.yml
 
 # User-specific stuff
 .idea/**/workspace.xml
