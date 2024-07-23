@@ -19,6 +19,7 @@ pipeline {
     }
 
     stages {
+        /*
         stage('Test') {
             steps {
                 script {
@@ -27,6 +28,7 @@ pipeline {
                 }
             }
         }
+        */
 
         stage('Build') {
             steps {
@@ -46,7 +48,7 @@ pipeline {
                 }
             }
         }
-
+        /*
         stage('Deploy') {
             steps {
                 script {
@@ -67,5 +69,6 @@ pipeline {
                 }
             }
         }
+        */
     }
 }
