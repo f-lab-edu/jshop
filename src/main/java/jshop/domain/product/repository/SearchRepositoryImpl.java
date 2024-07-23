@@ -11,14 +11,12 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.BooleanTemplate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import jshop.domain.category.entity.QCategory;
 import jshop.domain.product.dto.QSearchProductDetailQueryResult;
 import jshop.domain.product.dto.SearchCondition;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
@@ -26,7 +24,6 @@ import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.metamodel.mapping.SqlExpressible;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -62,7 +59,7 @@ public class SearchRepositoryImpl implements SearchRepository {
             .leftJoin(productDetail.product, product)
             .leftJoin(product.category, category)
             .where(
-                queryEq(condition.getQuery()),
+                nameLike(condition.getQuery()),
                 categoryEq(condition.getCategoryId()),
                 manufacturerEq(condition.getManufacturer()),
                 attributeEq(condition.getAttributeFilters()),
@@ -79,7 +76,7 @@ public class SearchRepositoryImpl implements SearchRepository {
             .from(productDetail)
             .leftJoin(productDetail.product, product)
             .where(
-                queryEq(condition.getQuery()),
+                nameLike(condition.getQuery()),
                 categoryEq(condition.getCategoryId()),
                 manufacturerEq(condition.getManufacturer()),
                 attributeEq(condition.getAttributeFilters()),
@@ -138,7 +135,7 @@ public class SearchRepositoryImpl implements SearchRepository {
         return categoryId != null ? product.category.id.eq(categoryId) : null;
     }
 
-    private BooleanExpression queryEq(String query) {
+    private BooleanExpression nameLike(String query) {
         if (query == null) {
             log.error(ErrorCode.NO_SEARCH_QUERY.getLogMessage());
             throw JshopException.of(ErrorCode.NO_SEARCH_QUERY);
