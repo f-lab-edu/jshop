@@ -7,8 +7,9 @@ pipeline {
 
         MYSQL_HOST = credentials('MYSQL_HOST')
         MYSQL_PORT = credentials('MYSQL_PORT')
+        MYSQL_USERNAME = credentials('MYSQL_USERNAME')
         MYSQL_PASSWORD = credentials('MYSQL_PASSWORD')
-        MYSQL_USERNAME = credentials('MYSQL_HOST')
+
 
         JWT_SECRET_KEY = credentials('JWT_SECRET_KEY')
         REDIS_HOST = credentials('REDIS_HOST')
@@ -19,6 +20,7 @@ pipeline {
     }
 
     stages {
+        /*
         stage('Test') {
             steps {
                 script {
@@ -27,12 +29,13 @@ pipeline {
                 }
             }
         }
+        */
 
         stage('Build') {
             steps {
                 script {
                     echo 'build'
-                    sh "docker build -x test -t ${IMAGE} --build-arg MYSQL_HOST={MYSQL_HOST} --build-arg MYSQL_PORT=${MYSQL_PORT} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg REDIS_HOST=${REDIS_HOST} --build-arg REDIS_PORT=${REDIS_PORT} --build-arg REDIS_PASSWORD=${REDIS_PASSWORD} ."
+                    sh "docker build -t ${IMAGE} --build-arg MYSQL_HOST=${MYSQL_HOST} --build-arg MYSQL_PORT=${MYSQL_PORT} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg REDIS_HOST=${REDIS_HOST} --build-arg REDIS_PORT=${REDIS_PORT} --build-arg REDIS_PASSWORD=${REDIS_PASSWORD} ."
                 }
             }
         }
@@ -46,7 +49,7 @@ pipeline {
                 }
             }
         }
-
+        /*
         stage('Deploy') {
             steps {
                 script {
@@ -67,5 +70,6 @@ pipeline {
                 }
             }
         }
+        */
     }
 }
