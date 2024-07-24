@@ -1,9 +1,13 @@
 package jshop.domain.order.entity;
 
+import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -61,7 +65,7 @@ public class Order extends BaseEntity {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_coupon_id")
+    @JoinColumn(name = "user_coupon_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
     private UserCoupon userCoupon;
 
     /**
