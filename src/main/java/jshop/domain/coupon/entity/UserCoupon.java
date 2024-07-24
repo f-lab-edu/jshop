@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jshop.domain.user.entity.User;
+import jshop.global.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_coupon")
-public class UserCoupon {
+public class UserCoupon extends BaseEntity {
 
     @Id
     @GeneratedValue
