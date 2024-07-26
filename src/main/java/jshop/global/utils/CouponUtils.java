@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CouponUtils {
 
-    public static Coupon getCouponOrThrow(Optional<Coupon> optionalCoupon, UUID couponId) {
+    public static Coupon getCouponOrThrow(Optional<Coupon> optionalCoupon, String couponId) {
         return optionalCoupon.orElseThrow(() -> {
             log.error(ErrorCode.COUPON_ID_NOT_FOUND.getLogMessage(), couponId);
             throw JshopException.of(ErrorCode.COUPON_ID_NOT_FOUND);

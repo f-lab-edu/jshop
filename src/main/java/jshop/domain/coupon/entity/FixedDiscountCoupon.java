@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,5 +35,19 @@ public class FixedDiscountCoupon extends Coupon {
         }
 
         return originPrice - discountPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "FixedDiscountCoupon{" +
+            "discountPrice=" + discountPrice +
+            ", minOriginPrice=" + minOriginPrice +
+            ", totalQuantity=" + totalQuantity +
+            ", remainingQuantity=" + remainingQuantity +
+            ", issueStartDate=" + issueStartDate +
+            ", issueEndDate=" + issueEndDate +
+            ", useStartDate=" + useStartDate +
+            ", useEndDate=" + useEndDate +
+            '}';
     }
 }

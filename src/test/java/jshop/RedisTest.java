@@ -32,6 +32,7 @@ public class RedisTest {
                     } catch (Exception e) {
 
                     } finally {
+
                         testLock.unlock();
                         System.out.println(Thread.currentThread() + " release lock");
                     }
