@@ -1,5 +1,6 @@
 package jshop.domain.product.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,14 +11,26 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @Builder
-@AllArgsConstructor
 @ToString
 public class SearchProductDetailQueryResult {
 
     private Long id;
     private String name;
+    private String category;
     private String manufacturer;
     private String description;
     private Long price;
     private Map<String, String> attribute;
+
+    @QueryProjection
+    public SearchProductDetailQueryResult(Long id, String name, String category, String manufacturer,
+        String description, Long price, Map<String, String> attribute) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.manufacturer = manufacturer;
+        this.description = description;
+        this.price = price;
+        this.attribute = attribute;
+    }
 }

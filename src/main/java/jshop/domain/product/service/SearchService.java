@@ -1,18 +1,16 @@
 package jshop.domain.product.service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 import jshop.domain.product.dto.ProductDetailResponse;
+import jshop.domain.product.dto.SearchCondition;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.dto.SearchProductDetailsResponse;
-import jshop.domain.product.repository.ProductDetailRepository;
+import jshop.domain.product.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,24 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class SearchService {
 
-    private final ProductDetailRepository productDetailRepository;
+    private final SearchRepository searchRepository;
 
-    public SearchProductDetailsResponse searchProductDetail(long lastProductId, String query, int size) {
+    public SearchProductDetailsResponse search(SearchCondition condition, Pageable pageable) {
 
-        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Direction.DESC, "id"));
-        Page<SearchProductDetailQueryResult> page = productDetailRepository.searchProductDetailsByQuery(lastProductId,
-            query, pageRequest);
+        Page<SearchProductDetailQueryResult> page = searchRepository.search(condition, pageable);
 
         List<ProductDetailResponse> contents = page.getContent().stream().map(ProductDetailResponse::of).toList();
 
-        Long nextCursor = Optional
-            .ofNullable(page.getContent())
-            .filter(Predicate.not(List::isEmpty))
-            .map(list -> list.get(list.size() - 1))
-            .map(SearchProductDetailQueryResult::getId)
-            .orElse(null);
-
         return SearchProductDetailsResponse
-            .builder().nextCursor(nextCursor).products(contents).build();
+            .builder()
+            .totalCount(page.getTotalElements())
+            .totalPages(page.getTotalPages())
+            .currentPage(pageable.getPageNumber())
+            .products(contents)
+            .build();
     }
 }

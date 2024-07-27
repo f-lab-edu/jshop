@@ -16,6 +16,7 @@ public class ProductDetailResponse {
 
     private Long id;
     private String name;
+    private String category;
     private String manufacturer;
     private String description;
     private Long price;
@@ -25,6 +26,7 @@ public class ProductDetailResponse {
         return ProductDetailResponse
             .builder()
             .id(searchProductDetailQueryResult.getId())
+            .category(searchProductDetailQueryResult.getCategory())
             .name(searchProductDetailQueryResult.getName())
             .manufacturer(searchProductDetailQueryResult.getManufacturer())
             .description(searchProductDetailQueryResult.getDescription())

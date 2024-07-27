@@ -51,34 +51,7 @@ class InventoryRepositoryTest {
             transaction.rollback();
         }
     }
-
-    @Test
-    @DisplayName("Inventory 재고 변경 동기화 테스트 (비관적 락)")
-    @Disabled
-    public void changeStock_pessimistic() throws Exception {
-        // given
-//        ExecutorService executor = Executors.newFixedThreadPool(5);
-//        for (int i = 0; i < 5; i++) {
-//            try {
-//
-//                Inventory foundInventory = em.find(Inventory.class, inventory.getId(),
-//                    LockModeType.PESSIMISTIC_WRITE);
-//                foundInventory.changeStock(1);
-//                em.persist(foundInventory);
-//                transaction.commit();
-//            } catch (Exception e) {
-//                System.err.println(e.getMessage());
-//                transaction.rollback();
-//            }
-//        }
-//
-//        executor.shutdown();
-//        executor.awaitTermination(1L, TimeUnit.MINUTES);
-//
-//        Inventory findInventory = inventoryRepository.findById(inventory.getId()).get();
-//        assertThat(findInventory.getQuantity()).isEqualTo(5);
-    }
-
+    
     @Test
     @DisplayName("Inventory 재고 변경 동기화 테스트 (문제 발생)")
     public void changeStock_nolock() throws Exception {
