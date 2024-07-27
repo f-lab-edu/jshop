@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -17,11 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class PercentageDiscountCoupon extends Coupon {
+public class FixedPriceCoupon extends Coupon {
 
-    @Column(name = "discount_rate")
-    private double discountRate;
-
+    @Column(name = "discount_price")
+    private Long discountPrice;
     @Column(name = "min_origin_price")
     private Long minOriginPrice;
 
@@ -34,6 +32,20 @@ public class PercentageDiscountCoupon extends Coupon {
             JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
         }
 
-        return Math.round(originPrice * (1 - discountRate));
+        return originPrice - discountPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "FixedDiscountCoupon{" +
+            "discountPrice=" + discountPrice +
+            ", minOriginPrice=" + minOriginPrice +
+            ", totalQuantity=" + totalQuantity +
+            ", remainingQuantity=" + remainingQuantity +
+            ", issueStartDate=" + issueStartDate +
+            ", issueEndDate=" + issueEndDate +
+            ", useStartDate=" + useStartDate +
+            ", useEndDate=" + useEndDate +
+            '}';
     }
 }

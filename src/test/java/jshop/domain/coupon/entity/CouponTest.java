@@ -1,12 +1,10 @@
 package jshop.domain.coupon.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jshop.domain.order.entity.Order;
 import jshop.domain.user.entity.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,11 +19,11 @@ class CouponTest {
         Order order = Order
             .builder().totalPrice(10000L).build();
 
-        Coupon coupon = FixedDiscountCoupon
+        Coupon coupon = FixedPriceCoupon
             .builder()
             .minOriginPrice(1000L)
-            .totalQuantity(10)
-            .remainingQuantity(10)
+            .totalQuantity(10L)
+            .remainingQuantity(10L)
             .discountPrice(1000L).build();
 
         User user = User
@@ -47,11 +45,11 @@ class CouponTest {
         Order order = Order
             .builder().totalPrice(10000L).build();
 
-        Coupon coupon = PercentageDiscountCoupon
+        Coupon coupon = FixedRateCoupon
             .builder()
             .minOriginPrice(1000L)
-            .totalQuantity(10)
-            .remainingQuantity(10)
+            .totalQuantity(10L)
+            .remainingQuantity(10L)
             .discountRate(0.1).build();
 
         User user = User

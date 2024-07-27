@@ -43,10 +43,10 @@ public abstract class Coupon {
     private String name;
 
     @Column(name = "total_quantity")
-    protected Integer totalQuantity;
+    protected Long totalQuantity;
 
     @Column(name = "remaining_quantity")
-    protected Integer remainingQuantity;
+    protected Long remainingQuantity;
 
     @Column(name = "created_at")
     @CreatedDate
@@ -55,8 +55,6 @@ public abstract class Coupon {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    abstract public long discount(long originPrice);
 
     @Column(name = "issue_start_date")
     @Default
@@ -73,6 +71,8 @@ public abstract class Coupon {
     @Column(name = "use_end_date")
     @Default
     protected LocalDateTime useEndDate = LocalDateTime.of(9999, 12, 31, 23, 59);
+
+    abstract public long discount(long originPrice);
 
     protected boolean checkCouponUsagePeriod() {
         LocalDateTime now = LocalDateTime.now();

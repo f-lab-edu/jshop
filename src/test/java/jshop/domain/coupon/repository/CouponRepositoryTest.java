@@ -1,12 +1,10 @@
 package jshop.domain.coupon.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jshop.domain.coupon.entity.Coupon;
-import jshop.domain.coupon.entity.FixedDiscountCoupon;
-import jshop.global.utils.CouponUtils;
+import jshop.domain.coupon.entity.FixedPriceCoupon;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ class CouponRepositoryTest {
     @DisplayName("쿠폰 생성 id 검증")
     public void createId() {
         // given
-        Coupon coupon = FixedDiscountCoupon
+        Coupon coupon = FixedPriceCoupon
             .builder().build();
         // when
         couponRepository.save(coupon);
