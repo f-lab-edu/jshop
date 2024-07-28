@@ -174,7 +174,6 @@ public class LoginTest {
 
 
     @Test
-    @Disabled("다른 커밋에서 해결됨.")
     public void 인가받은유저_페이지접속() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
