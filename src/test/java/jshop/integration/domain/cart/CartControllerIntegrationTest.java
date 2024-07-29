@@ -66,8 +66,7 @@ public class CartControllerIntegrationTest {
 
     @PersistenceContext
     private EntityManager em;
-
-
+    
     private Long userId;
     private String userToken;
     private Long anotherUserId;

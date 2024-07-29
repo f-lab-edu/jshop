@@ -40,13 +40,18 @@ public class RedisDistLockAspect {
     public Object lock(ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
 
         RLock lock = redissonClient.getLock(redisLock.value());
+        Throwable throwable = null;
         try {
-            log.info("tx lock : {}", TransactionSynchronizationManager.isActualTransactionActive());
             lock.lock();
             return joinPoint.proceed();
+        } catch (Exception e) {
+            throwable = e;
+            return null;
         } finally {
-            log.info("tx unlock : {}", TransactionSynchronizationManager.isActualTransactionActive());
             lock.unlock();
+            if (throwable != null) {
+                throw throwable;
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -33,6 +34,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "coupon")
 public abstract class Coupon {
 
     @Id
@@ -84,12 +86,18 @@ public abstract class Coupon {
         return true;
     }
 
-    public UserCoupon issueCoupon(User user) {
+    protected boolean checkCouponIssuePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(issueStartDate) || now.isAfter(issueEndDate)) {
             log.error(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION.getLogMessage(), issueStartDate, issueEndDate);
             throw JshopException.of(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION);
         }
+
+        return true;
+    }
+
+    public UserCoupon issueCoupon(User user) {
+        checkCouponIssuePeriod();
 
         if (remainingQuantity <= 0) {
             log.error(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION.getLogMessage(), id, remainingQuantity);

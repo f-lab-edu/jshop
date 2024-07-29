@@ -2,6 +2,9 @@ package jshop.domain.coupon.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import jshop.domain.coupon.dto.CreateCouponRequest;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
 import lombok.AllArgsConstructor;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "fixed_rate_coupon")
 public class FixedRateCoupon extends Coupon {
 
     @Column(name = "discount_rate")
@@ -24,13 +28,35 @@ public class FixedRateCoupon extends Coupon {
     @Column(name = "min_origin_price")
     private Long minOriginPrice;
 
+    public static FixedRateCoupon of(CreateCouponRequest createCouponRequest) {
+        LocalDateTime defaultStartDate = LocalDateTime.now();
+        LocalDateTime defaultEndDate = LocalDateTime.of(9999, 12, 31, 23, 59);
+        return FixedRateCoupon
+            .builder()
+            .id(createCouponRequest.getId())
+            .name(createCouponRequest.getName())
+            .totalQuantity(createCouponRequest.getQuantity())
+            .remainingQuantity(createCouponRequest.getQuantity())
+            .issueStartDate(createCouponRequest.getIssueStartDate() != null ?
+                createCouponRequest.getIssueStartDate() : defaultStartDate)
+            .issueEndDate(createCouponRequest.getIssueEndDate() != null ? createCouponRequest.getIssueEndDate() :
+                defaultEndDate)
+            .useStartDate(createCouponRequest.getUseStartDate() != null ? createCouponRequest.getUseStartDate() :
+                defaultStartDate)
+            .useEndDate(
+                createCouponRequest.getUseEndDate() != null ? createCouponRequest.getUseEndDate() : defaultEndDate)
+            .discountRate(createCouponRequest.getValue1() / 100)
+            .minOriginPrice(createCouponRequest.getValue2())
+            .build();
+    }
+
     @Override
     public long discount(long originPrice) {
         checkCouponUsagePeriod();
 
         if (originPrice < minOriginPrice) {
             log.error(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getLogMessage(), minOriginPrice, originPrice);
-            JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
+            throw JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
         }
 
         return Math.round(originPrice * (1 - discountRate));

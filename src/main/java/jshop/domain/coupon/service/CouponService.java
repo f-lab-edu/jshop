@@ -35,34 +35,10 @@ public class CouponService {
         Coupon coupon = null;
         switch (createCouponRequest.getCoupontType()) {
             case FIXED_PRICE:
-                coupon = FixedPriceCoupon
-                    .builder()
-                    .id(createCouponRequest.getId())
-                    .name(createCouponRequest.getName())
-                    .totalQuantity(createCouponRequest.getAmount())
-                    .remainingQuantity(createCouponRequest.getAmount())
-                    .issueStartDate(createCouponRequest.getIssueStartDate())
-                    .issueEndDate(createCouponRequest.getIssueEndDate())
-                    .useStartDate(createCouponRequest.getUseStartDate())
-                    .useEndDate(createCouponRequest.getUseEndDate())
-                    .discountPrice(createCouponRequest.getValue1())
-                    .minOriginPrice(createCouponRequest.getValue2())
-                    .build();
+                coupon = FixedPriceCoupon.of(createCouponRequest);
                 break;
             case FIXED_RATE:
-                coupon = FixedRateCoupon
-                    .builder()
-                    .id(createCouponRequest.getId())
-                    .name(createCouponRequest.getName())
-                    .totalQuantity(createCouponRequest.getAmount())
-                    .remainingQuantity(createCouponRequest.getAmount())
-                    .issueStartDate(createCouponRequest.getIssueStartDate())
-                    .issueEndDate(createCouponRequest.getIssueEndDate())
-                    .useStartDate(createCouponRequest.getUseStartDate())
-                    .useEndDate(createCouponRequest.getUseEndDate())
-                    .discountRate(createCouponRequest.getValue1() / 100)
-                    .minOriginPrice(createCouponRequest.getValue2())
-                    .build();
+                coupon = FixedRateCoupon.of(createCouponRequest);
                 break;
         }
 
@@ -76,19 +52,11 @@ public class CouponService {
     @Transactional
     @RedisLock("coupon")
     public Long issueCoupon(String couponId, Long userId) {
-        RLock lock = redissonClient.getLock("coupon");
-        try {
-            lock.lock();
-            Coupon coupon = getCoupon(couponId);
-            User user = userRepository.getReferenceById(userId);
-            UserCoupon userCoupon = coupon.issueCoupon(user);
-            userCouponRepository.save(userCoupon);
-            return userCoupon.getId();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
-        }
+        Coupon coupon = getCoupon(couponId);
+        User user = userRepository.getReferenceById(userId);
+        UserCoupon userCoupon = coupon.issueCoupon(user);
+        userCouponRepository.save(userCoupon);
+        return userCoupon.getId();
     }
 
 

@@ -1,4 +1,4 @@
-package jshop.integration.order;
+package jshop.integration.domain.order;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

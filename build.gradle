@@ -37,6 +37,7 @@ dependencies {
 
     // utils
     compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.data:spring-data-envers'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
@@ -58,9 +59,10 @@ dependencies {
 
     // test
     implementation 'org.springframework.security:spring-security-test'
-    annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     // test
 }
 

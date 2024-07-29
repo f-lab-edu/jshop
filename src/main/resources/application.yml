@@ -12,6 +12,7 @@ spring:
         envers:
           audit_table_suffix: _history
 logging:
+  config: classpath:logback-spring-dev.xml
   level:
     sql: error
 
@@ -70,3 +71,6 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+
+logging:
+  config: classpath:logback-spring-prod.xml

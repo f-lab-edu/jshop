@@ -2,39 +2,36 @@ package jshop.domain.coupon.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import jshop.domain.coupon.dto.CreateCouponRequest;
 import jshop.domain.coupon.entity.Coupon;
+import jshop.domain.coupon.entity.CouponType;
 import jshop.domain.coupon.entity.FixedPriceCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
 import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
+import jshop.global.utils.UUIDUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@DisplayName("[단위 테스트] CouponService")
 class CouponServiceTest {
 
-    @Autowired
+    @InjectMocks
     CouponService couponService;
-    @Autowired
+
+    @Mock
     private CouponRepository couponRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @PersistenceContext
-    EntityManager em;
-
-    @Autowired
-    RedissonClient redissonClient;
-
 
     private Coupon coupon;
     private User user;
@@ -52,71 +49,38 @@ class CouponServiceTest {
         user = User
             .builder()
             .build();
-
-        couponRepository.save(coupon);
-        userRepository.save(user);
     }
 
-    @Test
-    public void test() {
-        // when
-        couponService.issueCoupon(coupon.getId(), user.getId());
+    @DisplayName("쿠폰 생성 검증")
+    @Nested
+    public class CreateCoupon {
 
-        // then
-        Coupon foundCoupon = couponService.getCoupon(coupon.getId());
-        System.out.println(foundCoupon);
+        @Captor
+        private ArgumentCaptor<Coupon> couponArgumentCaptor;
 
-    }
+        @Test
+        @DisplayName("쿠폰 생성은 두가지 타입으로 가능하다.")
+        public void createCoupon_success() {
+            // given
+            String uuid = UUIDUtils.generateB64UUID();
+            CreateCouponRequest createCouponRequest = CreateCouponRequest
+                .builder()
+                .id(uuid)
+                .name("test")
+                .quantity(10L)
+                .coupontType(CouponType.FIXED_RATE)
+                .value1(10L)
+                .build();
 
-    @Test
-    public void test2() throws InterruptedException {
-        // given
-        Coupon coupon = FixedPriceCoupon
-            .builder()
-            .name("쿠폰")
-            .discountPrice(100L)
-            .totalQuantity(10L)
-            .remainingQuantity(10L)
-            .build();
+            // when
+            couponService.createCoupon(createCouponRequest);
 
-        User user = User
-            .builder()
-            .build();
-
-        couponRepository.save(coupon);
-        userRepository.save(user);
-
-        AtomicInteger counter = new AtomicInteger(0);
-
-        // when
-        ExecutorService executors = Executors.newFixedThreadPool(10);
-
-        for (int i = 0; i < 100; i++) {
-            executors.submit(() -> {
-                try {
-                    couponService.issueCoupon(coupon.getId(), user.getId());
-                    counter.getAndIncrement();
-                } catch (Exception e) {
-                    System.err.println(e);
-                }
-            });
-//            executors.submit(() -> {
-//                RLock lock = redissonClient.getLock("coupon");
-//                try {
-//                    lock.lock();
-//                    couponService.issueCoupon(coupon.getId(), user.getId());
-//                    counter.getAndIncrement();
-//                } catch (Exception e) {
-//                    System.err.println(e + " " + e.getMessage());
-//                } finally {
-//                    lock.unlock();
-//                }
-//            });
+            // then
+            verify(couponRepository, times(1)).save(couponArgumentCaptor.capture());
+            Coupon savedCoupon = couponArgumentCaptor.getValue();
+            assertThat(savedCoupon.getId()).isEqualTo(uuid);
+            assertThat(savedCoupon.getName()).isEqualTo("test");
+            assertThat(savedCoupon.getRemainingQuantity()).isEqualTo(10L);
         }
-
-        executors.shutdown();
-        executors.awaitTermination(1, TimeUnit.MINUTES);
-
-        assertThat(counter.get()).isEqualTo(10);
     }
 }

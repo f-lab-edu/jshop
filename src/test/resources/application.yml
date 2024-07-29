@@ -33,21 +33,6 @@ spring:
         envers:
           audit_table_suffix: _history
 logging:
+  config: classpath:logback-spring-dev.xml
   level:
     sql: error
-
-springdoc:
-  api-docs:
-    path: /api-docs
-
-management:
-  endpoints:
-    prometheus:
-      enabled: true
-    web:
-      exposure:
-        include: prometheus
-  prometheus:
-    metrics:
-      export:
-        step: 5s
