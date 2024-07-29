@@ -8,12 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import jshop.domain.user.entity.User;
 import jshop.global.common.ErrorCode;
 import jshop.global.entity.BaseEntity;
 import jshop.global.exception.JshopException;
+import jshop.global.utils.UUIDUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -34,17 +36,17 @@ import org.springframework.data.annotation.LastModifiedDate;
 public abstract class Coupon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "coupon_id")
-    private UUID id;
+    @Default
+    private String id = UUIDUtils.generateB64UUID();
 
     private String name;
 
     @Column(name = "total_quantity")
-    private Integer totalQuantity;
+    protected Integer totalQuantity;
 
     @Column(name = "remaining_quantity")
-    private Integer remainingQuantity;
+    protected Integer remainingQuantity;
 
     @Column(name = "created_at")
     @CreatedDate
@@ -71,7 +73,6 @@ public abstract class Coupon {
     @Column(name = "use_end_date")
     @Default
     protected LocalDateTime useEndDate = LocalDateTime.of(9999, 12, 31, 23, 59);
-    ;
 
     protected boolean checkCouponUsagePeriod() {
         LocalDateTime now = LocalDateTime.now();
@@ -88,6 +89,11 @@ public abstract class Coupon {
         if (now.isBefore(issueStartDate) || now.isAfter(issueEndDate)) {
             log.error(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION.getLogMessage(), issueStartDate, issueEndDate);
             throw JshopException.of(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION);
+        }
+
+        if (remainingQuantity <= 0) {
+            log.error(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION.getLogMessage(), id, remainingQuantity);
+            throw JshopException.of(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION);
         }
 
         remainingQuantity--;
