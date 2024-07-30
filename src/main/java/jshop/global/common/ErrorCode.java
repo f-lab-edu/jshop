@@ -34,6 +34,8 @@ public enum ErrorCode {
     CART_PRODUCTDETAIL_ID_NOT_FOUND(3065, "장바구니에 추가된 상품을 찾을 수 없습니다.", "장바구니에 추가된 상품 [{}] 를 찾을 수 없습니다.",
         HttpStatus.BAD_REQUEST),
     ORDER_ID_NOT_FOUND(3070, "주문 정보를 찾을 수 없습니다.", "주문 ID[{}] 로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    COUPON_ID_NOT_FOUND(3080, "쿠폰 정보를 찾을 수 없습니다.", "쿠폰 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    USER_COUPON_ID_NOT_FOUND(3085, "유저-쿠폰 정보를 찾을 수 없습니다.", "유저-쿠폰 ID[{}]로 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 유저 관련 오류
     USER_NOT_SELLER(4001, "판매 유저가 아니라면 상품을 등록할 수 없습니다.", "판매 유저가 아니라면 상품을 등록할 수 없습니다. 현재 유저 : [{}]",
@@ -65,6 +67,10 @@ public enum ErrorCode {
         "주문요청 상품 가격과 실제 상품 가격이 맞지 않습니다. 상품 상세 ID : [{}] 주문 상품 가격 : " + "[{}], 실제 상품 가격 : [{}]", HttpStatus.BAD_REQUEST),
     ORDER_QUANTITY_MISMATCH(90550, "주문 수량과 상품 수량의 합이 맞지 않습니다.",
         "주문 수량과 상품 수량의 합이 맞지 않습니다. 주문수량 : [{}] , 상품 수량 총합 : " + "[{}]", HttpStatus.BAD_REQUEST),
+    COUPON_MIN_PRICE_EXCEPTION(96001, "주문금액이 쿠폰 사용 최소금액보다 작습니다.", "주문금액이 쿠폰 사용 최소금액보다 작습니다. 최소금액 : [{}], 주문금액 : [{}]"
+        , HttpStatus.BAD_REQUEST),
+    COUPON_USAGE_PERIOD_EXCEPTION(96051, "쿠폰 사용기간이 잘못되었습니다.", "쿠폰 사용기간이 잘못되었습니다. {} ~ {}", HttpStatus.BAD_REQUEST),
+    COUPON_ISSUE_PERIOD_EXCEPTION(96052, "쿠폰 발급기간이 잘못되었습니다.", "쿠폰 발급기간이 잘못되었습니다. {} ~ {}", HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100001, "상세 상품 속성이 잘못되었습니다.",

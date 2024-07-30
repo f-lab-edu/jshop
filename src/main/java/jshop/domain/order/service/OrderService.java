@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.service.AddressService;
+import jshop.domain.coupon.entity.UserCoupon;
+import jshop.domain.coupon.repository.CouponRepository;
+import jshop.domain.coupon.service.CouponService;
 import jshop.domain.delivery.entity.Delivery;
 import jshop.domain.order.dto.CreateOrderRequest;
 import jshop.domain.order.dto.OrderItemRequest;
@@ -46,11 +49,12 @@ public class OrderService {
     private final UserService userService;
     private final ProductService productService;
     private final UserRepository userRepository;
+    private final CouponRepository couponRepository;
+    private final CouponService couponService;
 
     public OrderListResponse getOrderList(int pageSize, LocalDateTime lastOrderDate, Long userId) {
         User user = userRepository.getReferenceById(userId);
         PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by(Direction.DESC, "createdAt"));
-//        Page<Order> page = orderRepository.findOrdersByQuery(user, pageRequest, lastOrderDate);
         Page<Order> page = orderRepository.findOrdersByUserAndCreatedAtIsBefore(user, lastOrderDate, pageRequest);
 
         List<Order> orders = page.getContent();
@@ -103,12 +107,12 @@ public class OrderService {
             throw JshopException.of(ErrorCode.ORDER_QUANTITY_MISMATCH);
         }
 
-        user.getWallet().purchase(totalPrice);
+        if (createOrderRequest.getUserCouponId() != null) {
+            UserCoupon userCoupon = couponService.getUserCoupon(createOrderRequest.getUserCouponId());
+            order.applyCoupon(userCoupon);
+        }
 
-        /**
-         * TODO
-         * 쿠폰 가격 할인 적용
-         */
+        user.getWallet().purchase(order.getPaymentPrice());
 
         orderRepository.save(order);
 

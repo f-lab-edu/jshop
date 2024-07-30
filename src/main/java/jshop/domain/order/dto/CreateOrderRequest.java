@@ -3,6 +3,7 @@ package jshop.domain.order.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -29,4 +30,6 @@ public class CreateOrderRequest {
 
     @NotNull(message = "주문 가격은 공백일 수 없습니다.")
     private Long totalPrice;
+
+    private Long userCouponId;
 }
