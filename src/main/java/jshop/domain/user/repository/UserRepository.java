@@ -1,7 +1,9 @@
 package jshop.domain.user.repository;
 
 
+import java.util.List;
 import java.util.Optional;
+import jshop.domain.user.dto.UserType;
 import jshop.domain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @EntityGraph(attributePaths = "wallet")
     Optional<User> findById(Long id);
+
+    List<User> findUsersByUserType(UserType userType);
 }
