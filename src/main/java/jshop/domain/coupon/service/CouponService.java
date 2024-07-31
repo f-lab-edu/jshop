@@ -16,7 +16,6 @@ import jshop.global.exception.JshopException;
 import jshop.global.utils.CouponUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,7 @@ public class CouponService {
                 createCouponRequest.getCoupontType());
             throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
-        
+
         switch (createCouponRequest.getCoupontType()) {
             case FIXED_PRICE:
                 coupon = FixedPriceCoupon.of(createCouponRequest);
@@ -64,7 +63,7 @@ public class CouponService {
     }
 
     @Transactional
-    @RedisLock("coupon")
+    @RedisLock(key = "coupon")
     public Long issueCoupon(String couponId, Long userId) {
         Coupon coupon = getCoupon(couponId);
         User user = userRepository.getReferenceById(userId);

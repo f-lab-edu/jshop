@@ -9,5 +9,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RedisLock {
 
-    String value();
+    String key();
+
+    /**
+     * TimeUnit.SECONDS
+     *
+     * @return
+     */
+    int timeout() default 3;
 }
