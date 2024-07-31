@@ -130,7 +130,7 @@ public class ProductService {
         return ProductUtils.getInventoryOrThrow(optionalInventory, inventoryId);
     }
 
-    private Product getProduct(Long productId) {
+    public Product getProduct(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Product product = ProductUtils.getProductOrThrow(optionalProduct, productId);
         return product;

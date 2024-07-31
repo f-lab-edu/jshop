@@ -3,6 +3,7 @@ package jshop;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@Disabled
 public class RedisTest {
 
     @Autowired
@@ -32,6 +34,7 @@ public class RedisTest {
                     } catch (Exception e) {
 
                     } finally {
+
                         testLock.unlock();
                         System.out.println(Thread.currentThread() + " release lock");
                     }

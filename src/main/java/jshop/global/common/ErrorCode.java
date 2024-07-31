@@ -71,6 +71,8 @@ public enum ErrorCode {
         , HttpStatus.BAD_REQUEST),
     COUPON_USAGE_PERIOD_EXCEPTION(96051, "쿠폰 사용기간이 잘못되었습니다.", "쿠폰 사용기간이 잘못되었습니다. {} ~ {}", HttpStatus.BAD_REQUEST),
     COUPON_ISSUE_PERIOD_EXCEPTION(96052, "쿠폰 발급기간이 잘못되었습니다.", "쿠폰 발급기간이 잘못되었습니다. {} ~ {}", HttpStatus.BAD_REQUEST),
+    COUPON_OUT_OF_STOCK_EXCEPTION(97051, "쿠폰이 모두 발급되었습니다.", "쿠폰이 모두 발급되었습니다. CouponID : [{}], [{}]",
+        HttpStatus.BAD_REQUEST),
 
     // 잘못된 상품
     INVALID_PRODUCT_ATTRIBUTE(100001, "상세 상품 속성이 잘못되었습니다.",
