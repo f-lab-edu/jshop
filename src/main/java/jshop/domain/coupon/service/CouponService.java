@@ -11,6 +11,8 @@ import jshop.domain.coupon.repository.UserCouponRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.annotation.RedisLock;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import jshop.global.utils.CouponUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +42,18 @@ public class CouponService {
             case FIXED_RATE:
                 coupon = FixedRateCoupon.of(createCouponRequest);
                 break;
+            default:
+                log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
+                    createCouponRequest.getCoupontType());
+                throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 
-        if (coupon != null) {
-            couponRepository.save(coupon);
+        if (coupon == null) {
+            log.error(ErrorCode.COUPON_CREATE_EXCEPTION.getLogMessage(), createCouponRequest.getId());
+            throw JshopException.of(ErrorCode.COUPON_CREATE_EXCEPTION);
         }
 
+        couponRepository.save(coupon);
         return coupon.getId();
     }
 
