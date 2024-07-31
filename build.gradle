@@ -51,6 +51,7 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.33.0'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    // db
 
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
@@ -71,6 +72,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.testcontainers:testcontainers:1.20.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.0'
+    testImplementation 'org.testcontainers:mysql:1.20.0'
     // test
 }
 

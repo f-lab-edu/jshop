@@ -3,10 +3,6 @@ spring:
     name: jshop
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/jshop_test?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    username: root
-    password: 1234
     hikari:
       maximum-pool-size: 11
     p6spy:
@@ -24,7 +20,7 @@ spring:
     secret: 61dd10f1-cee2-454b-964f-9bda4cb993d861dd10f1-cee2-454b-964f-9bda4cb993d8
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
