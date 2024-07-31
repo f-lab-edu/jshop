@@ -1,6 +1,9 @@
 spring:
   application:
     name: jshop
+  datasource:
+    hikari:
+      idle-timeout: 250
   jpa:
     hibernate:
       ddl-auto: update
