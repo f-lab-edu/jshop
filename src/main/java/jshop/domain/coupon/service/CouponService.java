@@ -35,6 +35,12 @@ public class CouponService {
     @Transactional
     public String createCoupon(CreateCouponRequest createCouponRequest) {
         Coupon coupon = null;
+        if (createCouponRequest.getCoupontType() == null) {
+            log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
+                createCouponRequest.getCoupontType());
+            throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
+        }
+        
         switch (createCouponRequest.getCoupontType()) {
             case FIXED_PRICE:
                 coupon = FixedPriceCoupon.of(createCouponRequest);

@@ -31,12 +31,7 @@ public class RedisDistLockAspect {
 
     private final RedissonClient redissonClient;
 
-    @Pointcut("@annotation(redisLock) && @annotation(jshop.global.annotation.RedisLock)")
-    public void redisLockMethod(RedisLock redisLock) {
-    }
-
-
-    @Around("redisLockMethod(redisLock)")
+    @Around("@annotation(redisLock)")
     public Object lock(ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
 
         RLock lock = redissonClient.getLock(redisLock.value());
