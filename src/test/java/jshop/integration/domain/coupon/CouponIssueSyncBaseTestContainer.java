@@ -2,8 +2,6 @@ package jshop.integration.domain.coupon;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +12,7 @@ import jshop.domain.coupon.repository.CouponRepository;
 import jshop.domain.coupon.service.CouponService;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class CouponIssueSyncTest {
+@DisplayName("[통합 테스트] CouponController - sync")
+public class CouponIssueSyncBaseTestContainer extends BaseTestContainers {
 
     @Autowired
     CouponService couponService;

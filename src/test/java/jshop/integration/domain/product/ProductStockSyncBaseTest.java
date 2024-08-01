@@ -18,6 +18,7 @@ import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
+import jshop.utils.config.BaseTestContainers;
 import jshop.utils.dto.CategoryDtoUtils;
 import jshop.utils.dto.ProductDtoUtils;
 import jshop.utils.dto.UserDtoUtils;
@@ -27,15 +28,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
-@DisplayName("[통합 테스트] 상품 재고 동기화 테스트")
-public class ProductStockSyncTest {
+@DisplayName("[통합 테스트] ProductController - sync")
+public class ProductStockSyncBaseTest extends BaseTestContainers {
 
     private Long sellerUserId;
     private String sellerUserToken;
