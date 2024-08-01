@@ -34,7 +34,6 @@ import jshop.global.utils.UUIDUtils;
 import jshop.utils.command.DeleteDBUtils;
 import jshop.utils.config.BaseTestContainers;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,10 +43,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -57,8 +57,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
 @DisplayName("[통합 테스트] CouponController")
-@Testcontainers
-public class CouponIntegrationBaseTest extends BaseTestContainers {
+@Transactional
+public class CouponIntegrationTest extends BaseTestContainers {
 
     @Autowired
     private UserCouponRepository userCouponRepository;
@@ -104,6 +104,9 @@ public class CouponIntegrationBaseTest extends BaseTestContainers {
     private ProductService productService;
     @Autowired
     private ProductDetailRepository productDetailRepository;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -113,6 +116,15 @@ public class CouponIntegrationBaseTest extends BaseTestContainers {
 
     @BeforeEach
     public void init() throws Exception {
+        User admin = User
+            .builder()
+            .username("admin")
+            .password(bCryptPasswordEncoder.encode("admin"))
+            .email("admin@admin.com")
+            .role("ROLE_ADMIN")
+            .build();
+
+        userRepository.save(admin);
 
         log.info("url : {}", dataSource.getConnection().getMetaData().getURL());
         /**
@@ -219,60 +231,5 @@ public class CouponIntegrationBaseTest extends BaseTestContainers {
             // then
             perform.andExpect(status().isForbidden());
         }
-    }
-
-    @Nested
-    @DisplayName("쿠폰 발급 검증")
-    class IssueCoupon {
-
-        private String couponId;
-
-        @BeforeEach
-        public void init() throws Exception {
-            String uuid = UUIDUtils.generateB64UUID();
-            CreateCouponRequest createCouponRequest = CreateCouponRequest
-                .builder()
-                .id(uuid)
-                .name("test")
-                .quantity(10L)
-                .coupontType(CouponType.FIXED_RATE)
-                .value1(10L)
-                .build();
-
-            couponId = couponService.createCoupon(createCouponRequest);
-        }
-
-        @Test
-        @DisplayName("쿠폰 발급은 정해진 수량만큼만 가능하다")
-        public void issue_coupon() throws InterruptedException {
-            // given
-            User user = userRepository.getReferenceById(userId);
-            ExecutorService executors = Executors.newFixedThreadPool(100);
-
-            // when
-            for (int i = 0; i < 100; i++) {
-                executors.submit(() -> {
-                    try {
-                        mockMvc.perform(post("/api/coupon/{coupon_id}", couponId)
-                            .header("Authorization", userToken));
-                    } catch (Exception e) {
-                        log.error("err : ", e);
-                    }
-                });
-            }
-
-            executors.shutdown();
-            executors.awaitTermination(1, TimeUnit.MINUTES);
-
-            // then
-            List<UserCoupon> byUser = userCouponRepository.findByUser(user);
-            assertThat(byUser.size()).isEqualTo(10);
-
-        }
-    }
-
-    @AfterEach
-    public void destroy() {
-        deleteDBUtils.destroy();
     }
 }

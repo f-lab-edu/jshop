@@ -19,6 +19,7 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.JoinUserResponse;
 import jshop.domain.user.dto.UserInfoResponse;
+import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.global.dto.Response;
@@ -33,6 +34,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @Transactional
 @DisplayName("[통합 테스트] AddressController")
-public class AddressControllerIntegrationBaseTest extends BaseTestContainers {
+public class AddressControllerIntegrationTest extends BaseTestContainers {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -54,6 +56,9 @@ public class AddressControllerIntegrationBaseTest extends BaseTestContainers {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    
     private Long user1Id;
     private String user1Token;
 
@@ -92,6 +97,15 @@ public class AddressControllerIntegrationBaseTest extends BaseTestContainers {
 
     @BeforeEach
     public void init() throws Exception {
+        User admin = User
+            .builder()
+            .username("admin")
+            .password(bCryptPasswordEncoder.encode("admin"))
+            .email("admin@admin.com")
+            .role("ROLE_ADMIN")
+            .build();
+
+        userRepository.save(admin);
 
         String joinUser1 = """
             { "username" : "username", "email" : "email@email.com", "password" : "password", "userType" : "USER"}""";

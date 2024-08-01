@@ -10,7 +10,7 @@ public enum ErrorCode {
     // @formatter:off
     // 이미 등록된 자료
     ALREADY_REGISTERED_EMAIL(1001, "이미 등록된 이메일입니다.", "{}는 이미 등록된 이메일입니다.", HttpStatus.BAD_REQUEST),
-    ALREADY_EXISTS_PRODUCT_DETAIL(1005, "이미 등록된 상세상품입니다.", "이미 등록된 상품입니다. {}, {}", HttpStatus.BAD_REQUEST), // 상품 ID, 상세 상품 속성
+    ALREADY_EXISTS_PRODUCT_DETAIL(1005, "이미 등록된 상세상품입니다.", "이미 등록된 상세 상품입니다. product id : {}, attribute : {}", HttpStatus.BAD_REQUEST), // 상품 ID, 상세 상품 속성
     ALREADY_EXISTS_CATEGORY(1006, "이미 등록된 카테고리입니다.", "{}는 이미 등록된 카테고리 입니다.", HttpStatus.BAD_REQUEST),
 
     // 인증 오류

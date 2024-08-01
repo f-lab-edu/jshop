@@ -14,11 +14,18 @@ import jshop.domain.address.dto.CreateAddressRequest;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.address.service.AddressService;
 import jshop.domain.category.dto.CreateCategoryRequest;
+import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.category.service.CategoryService;
+import jshop.domain.inventory.entity.Inventory;
+import jshop.domain.inventory.repository.InventoryRepository;
 import jshop.domain.order.dto.CreateOrderRequest;
 import jshop.domain.order.dto.OrderItemRequest;
+import jshop.domain.order.repository.OrderProductDetailRepository;
+import jshop.domain.order.repository.OrderRepository;
 import jshop.domain.product.dto.CreateProductDetailRequest;
 import jshop.domain.product.dto.CreateProductRequest;
+import jshop.domain.product.repository.ProductDetailRepository;
+import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.product.service.ProductService;
 import jshop.domain.user.dto.JoinUserResponse;
 import jshop.domain.user.entity.User;
@@ -27,6 +34,8 @@ import jshop.domain.user.service.UserService;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
 import jshop.utils.config.BaseTestContainers;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,14 +47,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@Slf4j
 @EnableWebMvc
 @SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @DisplayName("[통합 테스트] OrderController")
-@Transactional
 public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
@@ -65,7 +78,7 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
 
     private Long user1Id;
     private String user1Token;
-    private Long categoryId, productId, addressId, productDetail1Id, productDetail2Id;
+    private Long categoryId, product1Id, product2Id, addressId, productDetail1Id, productDetail2Id;
 
     @Autowired
     private UserService userService;
@@ -75,10 +88,22 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
     private ProductService productService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private ProductDetailRepository productDetailRepository;
+    @Autowired
+    private OrderProductDetailRepository orderProductDetailRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    InventoryRepository inventoryRepository;
 
     @BeforeEach
-    @Transactional
-    public void init() throws Exception {
+    public void beforeEach() throws Exception {
 
         String joinUser1 = """
             { "username" : "username", "email" : "email@email.com", "password" : "password", "userType" : "SELLER"}""";
@@ -103,20 +128,36 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
         addressId = addressService.createAddress(CreateAddressRequest
             .builder().build(), user1Id);
 
-        productId = productService.createProduct(CreateProductRequest
+        product1Id = productService.createProduct(CreateProductRequest
+            .builder().categoryId(categoryId).build(), user1Id);
+
+        product2Id = productService.createProduct(CreateProductRequest
             .builder().categoryId(categoryId).build(), user1Id);
 
         productDetail1Id = productService.createProductDetail(CreateProductDetailRequest
-            .builder().price(1000L).build(), productId);
+            .builder().price(1000L).build(), product1Id);
 
         productDetail2Id = productService.createProductDetail(CreateProductDetailRequest
-            .builder().price(2000L).build(), productId);
+            .builder().price(2000L).build(), product2Id);
 
         productService.updateProductDetailStock(productDetail1Id, 10);
         productService.updateProductDetailStock(productDetail2Id, 10);
 
         User user = userService.getUser(user1Id);
         user.getWallet().deposit(10000L);
+
+        userRepository.save(user);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        addressRepository.deleteAll();
+        orderRepository.deleteAll();
+        orderProductDetailRepository.deleteAll();
+        productDetailRepository.deleteAll();
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Nested
@@ -145,9 +186,12 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
 
             // then
             perform.andExpect(status().isOk());
-//            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(1000L);
-//            assertThat(productService.getProductDetail(productDetail1Id).getInventory().getQuantity()).isEqualTo(7);
-//            assertThat(productService.getProductDetail(productDetail2Id).getInventory().getQuantity()).isEqualTo(7);
+            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(1000L);
+            Inventory inventory1 = productService.getProductDetail(productDetail1Id).getInventory();
+            Inventory inventory2 = productService.getProductDetail(productDetail2Id).getInventory();
+            assertThat(inventoryRepository.findById(inventory1.getId()).get().getQuantity()).isEqualTo(7);
+            assertThat(inventoryRepository.findById(inventory2.getId()).get().getQuantity()).isEqualTo(7);
+
         }
 
         @Test
@@ -156,6 +200,7 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
             // given
             User user = userService.getUser(user1Id);
             user.getWallet().withdraw(10000L);
+            userRepository.save(user);
             List<OrderItemRequest> orderItems = new ArrayList<>();
 
             orderItems.add(OrderItemRequest
@@ -177,9 +222,11 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.WALLET_BALANCE_EXCEPTION.getCode()));
 //
-//            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(0L);
-//            assertThat(productService.getProductDetail(productDetail1Id).getInventory().getQuantity()).isEqualTo(10);
-//            assertThat(productService.getProductDetail(productDetail2Id).getInventory().getQuantity()).isEqualTo(10);
+            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(0L);
+            Inventory inventory1 = productService.getProductDetail(productDetail1Id).getInventory();
+            Inventory inventory2 = productService.getProductDetail(productDetail2Id).getInventory();
+            assertThat(inventoryRepository.findById(inventory1.getId()).get().getQuantity()).isEqualTo(10);
+            assertThat(inventoryRepository.findById(inventory2.getId()).get().getQuantity()).isEqualTo(10);
         }
 
         @Test
@@ -207,9 +254,11 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.NEGATIVE_QUANTITY_EXCEPTION.getCode()));
 
-//            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(10000L);
-//            assertThat(productService.getProductDetail(productDetail1Id).getInventory().getQuantity()).isEqualTo(10);
-//            assertThat(productService.getProductDetail(productDetail2Id).getInventory().getQuantity()).isEqualTo(10);
+            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(10000L);
+            Inventory inventory1 = productService.getProductDetail(productDetail1Id).getInventory();
+            Inventory inventory2 = productService.getProductDetail(productDetail2Id).getInventory();
+            assertThat(inventoryRepository.findById(inventory1.getId()).get().getQuantity()).isEqualTo(10);
+            assertThat(inventoryRepository.findById(inventory2.getId()).get().getQuantity()).isEqualTo(10);
         }
 
         @Test
@@ -237,9 +286,11 @@ public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.ORDER_PRICE_MISMATCH.getCode()));
 
-//            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(10000L);
-//            assertThat(productService.getProductDetail(productDetail1Id).getInventory().getQuantity()).isEqualTo(10);
-//            assertThat(productService.getProductDetail(productDetail2Id).getInventory().getQuantity()).isEqualTo(10);
+            assertThat(userService.getUser(user1Id).getWallet().getBalance()).isEqualTo(10000L);
+            Inventory inventory1 = productService.getProductDetail(productDetail1Id).getInventory();
+            Inventory inventory2 = productService.getProductDetail(productDetail2Id).getInventory();
+            assertThat(inventoryRepository.findById(inventory1.getId()).get().getQuantity()).isEqualTo(10);
+            assertThat(inventoryRepository.findById(inventory2.getId()).get().getQuantity()).isEqualTo(10);
         }
     }
 }

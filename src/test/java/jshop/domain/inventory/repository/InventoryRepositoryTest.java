@@ -13,7 +13,6 @@ import jshop.domain.inventory.entity.Inventory;
 import jshop.global.config.P6SpyConfig;
 import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] InventoryRepository")
-@Transactional
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 class InventoryRepositoryTest extends BaseTestContainers {
 
@@ -82,7 +80,7 @@ class InventoryRepositoryTest extends BaseTestContainers {
         executor.shutdown();
         executor.awaitTermination(1L, TimeUnit.MINUTES);
 
-        Inventory findInventory = inventoryRepository.findById(inventory.getId()).get();
+        Inventory findInventory = inventoryRepository.findByIdWithPessimisticLock(inventory.getId()).get();
         assertThat(findInventory.getQuantity()).isNotEqualTo(5);
     }
 }

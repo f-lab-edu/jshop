@@ -9,10 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.FixedPriceCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
+import jshop.domain.coupon.repository.UserCouponRepository;
 import jshop.domain.coupon.service.CouponService;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.utils.config.BaseTestContainers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,9 +38,11 @@ public class CouponIssueSyncBaseTestContainer extends BaseTestContainers {
 
     private Coupon coupon;
     private User user;
+    @Autowired
+    private UserCouponRepository userCouponRepository;
 
     @BeforeEach
-    public void init() {
+    public void beforeEach() {
         coupon = FixedPriceCoupon
             .builder()
             .name("쿠폰")
@@ -53,6 +57,13 @@ public class CouponIssueSyncBaseTestContainer extends BaseTestContainers {
 
         couponRepository.save(coupon);
         userRepository.save(user);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        userCouponRepository.deleteAll();
+        couponRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

@@ -18,18 +18,18 @@
     </encoder>
   </appender>
 
-  <logger name="jdbc" level="OFF" additive="false">
-    <appender-ref ref="FILE"/>
-  </logger>
-  <logger name="jdbc.sqlonly" level="DEBUG" additive="false">
-    <appender-ref ref="FILE"/>
-  </logger>
-  <logger name="jdbc.sqltiming" level="OFF" additive="false">
-    <appender-ref ref="FILE"/>
-  </logger>
-  <logger name="org.hibernate.SQL" level="DEBUG" additive="false">
-    <appender-ref ref="FILE"/>
-  </logger>
+  <!--  <logger name="jdbc" level="OFF" additive="false">-->
+  <!--    <appender-ref ref="FILE"/>-->
+  <!--  </logger>-->
+  <!--  <logger name="jdbc.sqlonly" level="DEBUG" additive="false">-->
+  <!--    <appender-ref ref="FILE"/>-->
+  <!--  </logger>-->
+  <!--  <logger name="jdbc.sqltiming" level="OFF" additive="false">-->
+  <!--    <appender-ref ref="FILE"/>-->
+  <!--  </logger>-->
+  <!--  <logger name="org.hibernate.SQL" level="DEBUG" additive="false">-->
+  <!--    <appender-ref ref="FILE"/>-->
+  <!--  </logger>-->
 
   <root level="INFO">
     <appender-ref ref="FILE"/>

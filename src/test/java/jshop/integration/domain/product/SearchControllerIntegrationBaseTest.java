@@ -177,7 +177,6 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Test
     @DisplayName("특정 속성으로 필터링해 검색")
-    @Disabled("MySQL에서만 동작함.")
     public void search_filter_attribute() throws Exception {
         // given
         Map<String, String> attribute = new HashMap<>();

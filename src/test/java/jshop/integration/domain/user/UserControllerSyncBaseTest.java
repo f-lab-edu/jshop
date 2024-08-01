@@ -123,7 +123,6 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
 
         @Test
         @DisplayName("너무 많은 재시도를 시도 하면 예외를 발생시킴")
-        @Disabled("jenkins 환경에서 정상동작 안함")
         public void updateBalance_many_retry() throws Exception {
             ExecutorService executors = Executors.newFixedThreadPool(10);
 
