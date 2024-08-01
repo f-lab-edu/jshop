@@ -12,13 +12,15 @@ import jshop.domain.user.service.UserService;
 import jshop.global.config.SecurityConfig;
 import jshop.global.jwt.dto.CustomUserDetails;
 import jshop.global.jwt.filter.JwtUtil;
+import jshop.utils.config.BaseTestContainers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -33,8 +35,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest(classes = {SecurityConfig.class, JwtUtil.class, ObjectMapper.class, AccountController.class})
-@AutoConfigureMockMvc
-public class LoginTest {
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
+@DisplayName("[통합 테스트] SpringSecurity")
+public class LoginBaseTest extends BaseTestContainers {
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -63,7 +66,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 정상로그인테스트() throws Exception {
+    @DisplayName("회원가입한 유저는, 자신의 이메일과 비밀번호로 로그인을 할 수 있다.")
+    public void login_success() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
         requestBody.put("email", "user");
@@ -80,7 +84,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 비정상로그인테스트() throws Exception {
+    @DisplayName("가입되지 않은 계정으로 로그인 시도시 Unauth 를 떨군다.")
+    public void login_noAuth() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
         requestBody.put("email", "unknown_user");
@@ -96,7 +101,8 @@ public class LoginTest {
 
 
     @Test
-    public void 로그인토큰테스트() throws Exception {
+    @DisplayName("로그인에 성공하면, 헤더로 JWT를 내려준다.")
+    public void login_jwt() throws Exception {
         // given
         BCryptPasswordEncoder bpe = new BCryptPasswordEncoder();
         User u = User
@@ -125,7 +131,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 잘못된토큰1_jwt형식() throws Exception {
+    @DisplayName("로그인 헤더에 잘못된 형식의 jwt를 보내면 예외가 발생한다.")
+    public void invalid_jwt() throws Exception {
         // given
 
         // invalid jwt
@@ -138,7 +145,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 잘못된토큰2_이상한문자열() throws Exception {
+    @DisplayName("로그인 헤더에 잘못된 형식의 jwt를 보내면 예외가 발생한다. (이상한 문자열)")
+    public void invalid_jwt_string() throws Exception {
         // given
 
         // invalid jwt
@@ -151,7 +159,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 잘못된토큰3_Bearer로시작() throws Exception {
+    @DisplayName("로그인 헤더에 jwt를 보낼때 Bearer로 시작하더라도, 잘못된 토큰이면 예외가 발생한다.")
+    public void invalid_token_start_bearer() throws Exception {
         // given
 
         // invalid jwt
@@ -164,7 +173,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 잘못된토큰4_없음() throws Exception {
+    @DisplayName("로그인 헤더에 토큰을 보내지 않으면 예외가 발생한다.")
+    public void noToken() throws Exception {
         // given
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/test"));
@@ -174,7 +184,8 @@ public class LoginTest {
 
 
     @Test
-    public void 인가받은유저_페이지접속() throws Exception {
+    @DisplayName("정상 로그인으로 토큰을 얻은 유저가 토큰을 헤더에 포함하면, 인가를 받을 수 있다.")
+    public void login_success_jwt() throws Exception {
         // given
         JSONObject requestBody = new JSONObject();
         requestBody.put("email", "user");
@@ -198,7 +209,8 @@ public class LoginTest {
     }
 
     @Test
-    public void 인가받지못한유저_페이지접속실패() throws Exception {
+    @DisplayName("정상적이지 않은 토큰으로 인가를 시도하면 실패한다.")
+    public void invalid_token() throws Exception {
         // given
         // invalid token
         String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
