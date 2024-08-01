@@ -26,6 +26,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,13 +40,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @EnableWebMvc
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
 @DisplayName("[통합 테스트] CartController")
 @Transactional
-public class CartControllerIntegrationTest {
+@Testcontainers
+public class CartControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
     private CartProductDetailRepository cartProductDetailRepository;

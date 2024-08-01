@@ -17,10 +17,13 @@ import jshop.domain.user.entity.User;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.config.P6SpyConfig;
 import jshop.global.exception.JshopException;
+import jshop.utils.config.BaseTestContainers;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] UserRepository")
 @Transactional
-public class UserRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+public class UserRepositoryTest extends BaseTestContainers {
 
     @PersistenceContext
     private EntityManager em;
@@ -45,7 +49,8 @@ public class UserRepositoryTest {
 
 
     @Test
-    public void 회원가입() {
+    @DisplayName("이메일이 중복되지 않는 유저를 생성할 수 있다.")
+    public void createUser() {
         // given
         User user = User
             .builder().email("test").userType(UserType.USER).username("kim").password("kim").build();
@@ -59,7 +64,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void 중복이메일_제약조건() {
+    @DisplayName("이메일이 중복된다면 중복 이메일 제약조건에 걸린다.")
+    public void constraints_dup_email() {
         // given
         User user1 = User
             .builder().email("test").userType(UserType.USER).username("kim").password("kim").build();
@@ -77,7 +83,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void 패치조인확인() {
+    @DisplayName("유저 조회시 같이 가져올 데이터의 패치 조인을 검증한다. (proxy인지 확인)")
+    public void check_patchjoin() {
         /**
          * findById의 패치조인 확인.
          */

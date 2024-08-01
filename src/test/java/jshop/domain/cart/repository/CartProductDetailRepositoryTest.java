@@ -13,9 +13,12 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @Transactional
 @DisplayName("[단위 테스트] CartProductDetailRepository")
-class CartProductDetailRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+class CartProductDetailRepositoryTest extends BaseTestContainers {
 
     @Autowired
     private CartProductDetailRepository cartProductDetailRepository;

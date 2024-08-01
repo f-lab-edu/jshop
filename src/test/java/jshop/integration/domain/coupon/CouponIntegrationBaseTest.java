@@ -12,11 +12,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import jshop.domain.cart.repository.CartProductDetailRepository;
+import javax.sql.DataSource;
 import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.coupon.dto.CreateCouponRequest;
-import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.CouponType;
 import jshop.domain.coupon.entity.UserCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
@@ -33,7 +32,7 @@ import jshop.domain.user.repository.UserRepository;
 import jshop.global.dto.Response;
 import jshop.global.utils.UUIDUtils;
 import jshop.utils.command.DeleteDBUtils;
-import lombok.Getter;
+import jshop.utils.config.BaseTestContainers;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,21 +41,24 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @EnableWebMvc
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
 @DisplayName("[통합 테스트] CouponController")
-public class CouponIntegrationTest {
+@Testcontainers
+public class CouponIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
     private UserCouponRepository userCouponRepository;
@@ -105,9 +107,14 @@ public class CouponIntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private DataSource dataSource;
+
 
     @BeforeEach
     public void init() throws Exception {
+
+        log.info("url : {}", dataSource.getConnection().getMetaData().getURL());
         /**
          * 일반 유저 생성
          */

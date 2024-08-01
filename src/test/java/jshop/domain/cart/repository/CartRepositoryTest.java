@@ -5,15 +5,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import jshop.domain.cart.entity.Cart;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 @DisplayName("[단위 테스트] CartRepository")
-class CartRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+class CartRepositoryTest extends BaseTestContainers {
 
     @Autowired
     private CartRepository cartRepository;

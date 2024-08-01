@@ -26,12 +26,14 @@ import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,10 +43,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @DisplayName("[통합 테스트] OrderController")
 @Transactional
-public class OrderControllerIntegrationTest {
+public class OrderControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
     private MockMvc mockMvc;
