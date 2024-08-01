@@ -3,7 +3,7 @@ spring:
     name: jshop
   datasource:
     hikari:
-      idle-timeout: 250
+      maximum-pool-size: 20
   jpa:
     hibernate:
       ddl-auto: update
