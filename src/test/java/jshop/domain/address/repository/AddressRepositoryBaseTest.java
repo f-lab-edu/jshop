@@ -8,18 +8,22 @@ import java.util.List;
 import jshop.domain.address.entity.Address;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @DisplayName("[단위 테스트] AddressRepository")
 @Transactional
-public class AddressRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+public class AddressRepositoryBaseTest extends BaseTestContainers {
 
     @PersistenceContext
     private EntityManager em;

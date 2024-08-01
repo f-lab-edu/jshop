@@ -7,22 +7,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.stream.Stream;
-import jshop.domain.cart.repository.CartRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import jshop.domain.user.dto.UpdateWalletBalanceRequest;
 import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
-import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.common.ErrorCode;
+import jshop.utils.config.BaseTestContainers;
 import jshop.utils.dto.UserDtoUtils;
-import org.hibernate.annotations.Parent;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,8 +27,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -42,17 +37,17 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @DisplayName("[통합 테스트] UserController")
 @Transactional
-public class UserControllerIntegrationTest {
+public class UserControllerIntegrationBaseTest extends BaseTestContainers {
 
     private Long userId;
     private String userToken;
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private MockMvc mockMvc;
 

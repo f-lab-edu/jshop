@@ -12,6 +12,7 @@ import jshop.domain.product.dto.SearchCondition;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("[단위 테스트] SearchRepository")
-class SearchRepositoryTest {
+class SearchRepositoryTest extends BaseTestContainers {
 
     @Autowired
     CategoryRepository categoryRepository;
