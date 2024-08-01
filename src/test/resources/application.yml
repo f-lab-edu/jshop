@@ -3,6 +3,12 @@ spring:
     name: jshop
 
   datasource:
+    # 테스트 컨테이너 설정
+    #    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    #    url: jdbc:tc:mysql:8.0:///jshop_text
+    #    username: root
+    #    password: 1234
+    # 테스트 컨테이너 설정
     hikari:
       maximum-pool-size: 11
     p6spy:
@@ -11,22 +17,17 @@ spring:
       logging: slf4j
       tracing:
         include-parameter-values: true
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password: 1234
+
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  #      password: 1234
   jwt:
     secret: 61dd10f1-cee2-454b-964f-9bda4cb993d861dd10f1-cee2-454b-964f-9bda4cb993d8
   jpa:
     hibernate:
       ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      jdbc.hibernate.jdbc.batch_size: 100
-      org.hibernate:
-        envers:
-          audit_table_suffix: _history
+
 logging:
   config: classpath:logback-spring-dev.xml
