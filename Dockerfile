@@ -31,4 +31,4 @@ COPY . /app
 RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
-CMD ["java", "-jar", "-Dspring.profiles.active=product",  "build/libs/jshop-0.0.5.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=product,admin",  "build/libs/jshop-0.0.6.jar"]
