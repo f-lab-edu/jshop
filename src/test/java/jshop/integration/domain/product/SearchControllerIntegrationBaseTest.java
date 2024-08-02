@@ -8,20 +8,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jshop.domain.category.entity.Category;
 import jshop.domain.category.repository.CategoryRepository;
-import jshop.domain.product.dto.SearchCondition;
-import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
 import jshop.domain.product.repository.SearchRepository;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -29,24 +27,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
 @Transactional
 @DisplayName("[통합 테스트] SearchController")
-class SearchControllerIntegrationTest {
+class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
     MockMvc mockMvc;
@@ -184,7 +177,6 @@ class SearchControllerIntegrationTest {
 
     @Test
     @DisplayName("특정 속성으로 필터링해 검색")
-    @Disabled("MySQL에서만 동작함.")
     public void search_filter_attribute() throws Exception {
         // given
         Map<String, String> attribute = new HashMap<>();

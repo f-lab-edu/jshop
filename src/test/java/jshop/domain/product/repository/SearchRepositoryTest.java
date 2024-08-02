@@ -12,6 +12,7 @@ import jshop.domain.product.dto.SearchCondition;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("[단위 테스트] SearchRepository")
-class SearchRepositoryTest {
+class SearchRepositoryTest extends BaseTestContainers {
 
     @Autowired
     CategoryRepository categoryRepository;
@@ -173,7 +174,6 @@ class SearchRepositoryTest {
 
     @Test
     @DisplayName("특정 속성으로 필터링해 검색")
-    @Disabled("MySQL에서만 동작함.")
     public void search_filter_attribute() {
         // given
         Map<String, String> attribute = new HashMap<>();

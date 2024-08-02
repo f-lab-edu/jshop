@@ -19,8 +19,13 @@ public interface CartProductDetailRepository extends JpaRepository<CartProductDe
 
     Optional<CartProductDetail> findByCartAndProductDetail(Cart cart, ProductDetail productDetail);
 
-    @Query("select new jshop.domain.cart.dto.CartProductQueryResult(cpd.id, pd.id, p.name, p.manufacturer, pd.price,"
-        + " cpd.quantity, pd.attribute) from CartProductDetail cpd join cpd"
-        + ".productDetail pd join pd.product p where cpd.cart = :cart")
+    // @formatter:off
+    @Query("select "
+        + "new jshop.domain.cart.dto.CartProductQueryResult(cpd.id, pd.id, p.name, p.manufacturer, pd.price, cpd.quantity, pd.attribute) "
+        + "from CartProductDetail cpd "
+        + "join cpd.productDetail pd "
+        + "join pd.product p "
+        + "where cpd.cart = :cart")
     Page<CartProductQueryResult> findCartProductInfoByQuery(@Param("cart") Cart cart, Pageable pageable);
+    // @formatter:off
 }

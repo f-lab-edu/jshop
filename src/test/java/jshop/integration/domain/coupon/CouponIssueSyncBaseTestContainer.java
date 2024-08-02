@@ -2,8 +2,6 @@ package jshop.integration.domain.coupon;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.FixedPriceCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
+import jshop.domain.coupon.repository.UserCouponRepository;
 import jshop.domain.coupon.service.CouponService;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
+import jshop.utils.config.BaseTestContainers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class CouponIssueSyncTest {
+@DisplayName("[통합 테스트] CouponController - sync")
+public class CouponIssueSyncBaseTestContainer extends BaseTestContainers {
 
     @Autowired
     CouponService couponService;
@@ -36,9 +38,11 @@ public class CouponIssueSyncTest {
 
     private Coupon coupon;
     private User user;
+    @Autowired
+    private UserCouponRepository userCouponRepository;
 
     @BeforeEach
-    public void init() {
+    public void beforeEach() {
         coupon = FixedPriceCoupon
             .builder()
             .name("쿠폰")
@@ -53,6 +57,13 @@ public class CouponIssueSyncTest {
 
         couponRepository.save(coupon);
         userRepository.save(user);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        userCouponRepository.deleteAll();
+        couponRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

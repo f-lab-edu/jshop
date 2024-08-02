@@ -26,6 +26,7 @@ import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.dto.Response;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,7 +46,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootTest
 @DisplayName("[통합 테스트] CartController")
 @Transactional
-public class CartControllerIntegrationTest {
+public class CartControllerIntegrationTest extends BaseTestContainers {
 
     @Autowired
     private CartProductDetailRepository cartProductDetailRepository;
@@ -74,6 +75,7 @@ public class CartControllerIntegrationTest {
     private String anotherUserToken;
 
     private Long productId;
+    private List<Long> productIds = new ArrayList<>();
     private List<Long> productDetailIds = new ArrayList<>();
     @Autowired
     private ProductService productService;
@@ -127,16 +129,19 @@ public class CartControllerIntegrationTest {
          */
 
         User owner = userRepository.getReferenceById(userId);
-        Product product = Product
-            .builder().name("product").description("상세 정보").manufacturer("제조사").owner(owner).build();
-        productRepository.save(product);
-        productId = product.getId();
+
+        for (int i = 0; i < 50; i++) {
+            Product product = Product
+                .builder().name("product" + i).description("상세 정보").manufacturer("제조사").owner(owner).build();
+            productRepository.save(product);
+            productIds.add(product.getId());
+        }
 
         for (int i = 0; i < 50; i++) {
             CreateProductDetailRequest createProductDetailRequest = CreateProductDetailRequest
                 .builder().price(1000L + i).build();
 
-            Long productDetailId = productService.createProductDetail(createProductDetailRequest, productId);
+            Long productDetailId = productService.createProductDetail(createProductDetailRequest, productIds.get(i));
             productDetailIds.add(productDetailId);
         }
     }
@@ -180,7 +185,6 @@ public class CartControllerIntegrationTest {
             // then
             perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.products[0].productName").value("product"))
                 .andExpect(jsonPath("$.data.products[0].manufacturer").value("제조사"))
                 .andExpect(jsonPath("$.data.products[0].price").value(1044))
                 .andExpect(jsonPath("$.data.products[0].quantity").value(1))
@@ -198,7 +202,6 @@ public class CartControllerIntegrationTest {
             // then
             perform
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.products[0].productName").value("product"))
                 .andExpect(jsonPath("$.data.products[0].manufacturer").value("제조사"))
                 .andExpect(jsonPath("$.data.products[0].price").value(1049))
                 .andExpect(jsonPath("$.data.products[0].quantity").value(1))

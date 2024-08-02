@@ -134,7 +134,10 @@ public class Order extends BaseEntity {
         delivery.cancel();
 
         user.getWallet().refund(paymentPrice);
-        userCoupon.cancelUse();
+
+        if (userCoupon != null) {
+            userCoupon.cancelUse();
+        }
 
         for (OrderProductDetail orderProductDetail : productDetails) {
             orderProductDetail.cancel();

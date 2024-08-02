@@ -126,7 +126,7 @@ public class ProductService {
     }
 
     public Inventory getInventory(Long inventoryId) {
-        Optional<Inventory> optionalInventory = inventoryRepository.findById(inventoryId);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdWithPessimisticLock(inventoryId);
         return ProductUtils.getInventoryOrThrow(optionalInventory, inventoryId);
     }
 
