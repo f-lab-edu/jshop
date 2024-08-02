@@ -70,7 +70,7 @@ class CouponServiceTest {
                 .id(uuid)
                 .name("test")
                 .quantity(10L)
-                .coupontType(CouponType.FIXED_RATE)
+                .couponType(CouponType.FIXED_RATE)
                 .value1(10L)
                 .build();
 
