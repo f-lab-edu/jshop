@@ -183,7 +183,7 @@ public class CouponIntegrationTest extends BaseTestContainers {
                 .id(uuid)
                 .name("test")
                 .quantity(10L)
-                .coupontType(CouponType.FIXED_RATE)
+                .couponType(CouponType.FIXED_RATE)
                 .value1(10L)
                 .build();
 
@@ -209,7 +209,7 @@ public class CouponIntegrationTest extends BaseTestContainers {
                 .id(uuid)
                 .name("test")
                 .quantity(10L)
-                .coupontType(CouponType.FIXED_RATE)
+                .couponType(CouponType.FIXED_RATE)
                 .value1(10L)
                 .build();
 

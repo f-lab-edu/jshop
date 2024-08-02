@@ -1,5 +1,6 @@
 package jshop.domain.coupon.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -29,7 +30,8 @@ public class CreateCouponRequest {
     private Long quantity;
 
     @NotNull(message = "쿠폰 타입은 공백일 수 없습니다.")
-    private CouponType coupontType;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private CouponType couponType;
     private LocalDateTime issueStartDate;
     private LocalDateTime issueEndDate;
     private LocalDateTime useStartDate;
