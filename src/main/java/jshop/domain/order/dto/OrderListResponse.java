@@ -39,6 +39,7 @@ public class OrderListResponse {
         private Long id;
         private Long orderTimestamp;
         private Long price;
+        private Long paymentPrice;
         private Integer quantity;
         private DeliveryState deliveryState;
         private Long deliveredTimestamp;
@@ -54,6 +55,7 @@ public class OrderListResponse {
                 .builder()
                 .id(order.getId())
                 .orderTimestamp(TimeUtils.localDateTimeToTimestamp(order.getCreatedAt()))
+                .paymentPrice(order.getPaymentPrice())
                 .price(order.getTotalPrice())
                 .quantity(order.getTotalQuantity())
                 .deliveryState(delivery.getDeliveryState())

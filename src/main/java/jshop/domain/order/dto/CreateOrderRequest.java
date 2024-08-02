@@ -29,4 +29,6 @@ public class CreateOrderRequest {
 
     @NotNull(message = "주문 가격은 공백일 수 없습니다.")
     private Long totalPrice;
+
+    private Long userCouponId;
 }

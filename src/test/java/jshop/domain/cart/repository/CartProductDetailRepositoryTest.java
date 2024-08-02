@@ -13,20 +13,31 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.domain.product.repository.ProductRepository;
+import jshop.global.config.P6SpyConfig;
+import jshop.utils.config.BaseTestContainers;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @DataJpaTest
+@EnableJpaAuditing
 @Transactional
 @DisplayName("[단위 테스트] CartProductDetailRepository")
-class CartProductDetailRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@Import(P6SpyConfig.class)
+class CartProductDetailRepositoryTest extends BaseTestContainers {
 
     @Autowired
     private CartProductDetailRepository cartProductDetailRepository;
@@ -112,6 +123,8 @@ class CartProductDetailRepositoryTest {
         assertThat(page.getNumberOfElements()).isEqualTo(5);
         assertThat(page.getTotalElements()).isEqualTo(10);
         assertThat(page.getNumber()).isEqualTo(0);
+        log.info("d : {}", page.getContent());
+        log.info("d2 : {}", productDetails);
         assertThat(page.getContent().get(0).getProductDetailId()).isEqualTo(productDetails.get(9).getId());
     }
 }

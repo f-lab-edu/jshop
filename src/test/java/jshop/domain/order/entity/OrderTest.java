@@ -14,14 +14,18 @@ import jshop.domain.user.entity.User;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 @DisplayName("[단위 테스트]  Order")
-class OrderTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+class OrderTest extends BaseTestContainers {
 
     @Nested
     @DisplayName("주문 취소 로직 검증")

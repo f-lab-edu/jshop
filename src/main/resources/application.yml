@@ -1,6 +1,9 @@
 spring:
   application:
     name: jshop
+  datasource:
+    hikari:
+      maximum-pool-size: 20
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,6 +15,7 @@ spring:
         envers:
           audit_table_suffix: _history
 logging:
+  config: classpath:logback-spring-dev.xml
   level:
     sql: error
 
@@ -38,7 +42,7 @@ spring:
       on-profile: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: root
     password: 1234
 
@@ -70,3 +74,6 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+
+logging:
+  config: classpath:logback-spring-prod.xml

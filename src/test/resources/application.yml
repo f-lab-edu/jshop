@@ -1,50 +1,33 @@
 spring:
   application:
     name: jshop
+
   datasource:
-    hikari:
-      maximum-pool-size: 11
-        #    url: jdbc:h2:tcp://localhost:1521/jshop;AUTO_SERVER=true;LOCK_TIMEOUT=1000000
-      #    username: sa
-      #    password:
-    #    url: jdbc:mysql://localhost:3306/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    # 테스트 컨테이너 설정
+    #    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    #    url: jdbc:tc:mysql:8.0:///jshop_text
     #    username: root
     #    password: 1234
-    #    url: jdbc:postgresql://localhost:5432/jshop
-    #    username: myuser
-    #    password: mypassword
+    # 테스트 컨테이너 설정
+    hikari:
+      maximum-pool-size: 11
     p6spy:
       enable-logging: true
       multiline: true
       logging: slf4j
       tracing:
         include-parameter-values: true
-  test:
-    mockmvc:
-      print: none
-  jpa:
-    #    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: create
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-    properties:
-      #      hibernate:
-      #        dialect: org.hibernate.dialect.MySQLDialect
-      #        dialect: org.hibernate.dialect.H2Dialect
-      #        dialect: org.hibernate.dialect.PostgreSQLDialect
-      org.hibernate:
-        envers:
-          audit_table_suffix: _history
-
-
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  #      password: 1234
   jwt:
     secret: 61dd10f1-cee2-454b-964f-9bda4cb993d861dd10f1-cee2-454b-964f-9bda4cb993d8
-  data:
-    jdbc:
-      dialect: h2
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 logging:
-  level:
-    sql: error
+  config: classpath:logback-spring-dev.xml

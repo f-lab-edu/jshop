@@ -11,21 +11,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.global.config.P6SpyConfig;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @DataJpaTest
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] InventoryRepository")
-@Transactional
-class InventoryRepositoryTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+class InventoryRepositoryTest extends BaseTestContainers {
 
 
     @Autowired
@@ -51,7 +52,7 @@ class InventoryRepositoryTest {
             transaction.rollback();
         }
     }
-    
+
     @Test
     @DisplayName("Inventory 재고 변경 동기화 테스트 (문제 발생)")
     public void changeStock_nolock() throws Exception {
@@ -78,7 +79,7 @@ class InventoryRepositoryTest {
         executor.shutdown();
         executor.awaitTermination(1L, TimeUnit.MINUTES);
 
-        Inventory findInventory = inventoryRepository.findById(inventory.getId()).get();
+        Inventory findInventory = inventoryRepository.findByIdWithPessimisticLock(inventory.getId()).get();
         assertThat(findInventory.getQuantity()).isNotEqualTo(5);
     }
 }

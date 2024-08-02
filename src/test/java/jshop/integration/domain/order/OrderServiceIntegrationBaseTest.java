@@ -1,4 +1,4 @@
-package jshop.integration.order;
+package jshop.integration.domain.order;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +19,7 @@ import jshop.domain.product.service.ProductService;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.service.UserService;
 import jshop.global.utils.TimeUtils;
+import jshop.utils.config.BaseTestContainers;
 import jshop.utils.dto.AddressDtoUtils;
 import jshop.utils.dto.CategoryDtoUtils;
 import jshop.utils.dto.ProductDtoUtils;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("[통합 테스트] OrderService")
-class OrderServiceIntegrationTest {
+class OrderServiceIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
     ObjectMapper objectMapper;

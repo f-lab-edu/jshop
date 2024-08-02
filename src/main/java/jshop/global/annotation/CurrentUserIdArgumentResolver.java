@@ -22,8 +22,7 @@ public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResol
     public Long resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
         NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
             return userDetails.getId();
         }
         throw JshopException.of(ErrorCode.JWT_USER_NOT_FOUND);

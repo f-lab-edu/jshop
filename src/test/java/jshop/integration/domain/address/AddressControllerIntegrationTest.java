@@ -19,9 +19,11 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.repository.AddressRepository;
 import jshop.domain.user.dto.JoinUserResponse;
 import jshop.domain.user.dto.UserInfoResponse;
+import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.domain.user.service.UserService;
 import jshop.global.dto.Response;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +31,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,10 +42,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @Transactional
 @DisplayName("[통합 테스트] AddressController")
-public class AddressControllerIntegrationTest {
+public class AddressControllerIntegrationTest extends BaseTestContainers {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -52,13 +56,16 @@ public class AddressControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private Long user1Id;
     private String user1Token;
 
     @Autowired
     private MockMvc mockMvc;
 
-    private String createAddressRequestStr = """
+    private final String createAddressRequestStr = """
         {
             "receiverName" : "kim",
             "receiverNumber" : "1234",
@@ -72,7 +79,7 @@ public class AddressControllerIntegrationTest {
         }
         """;
 
-    private String updateAddressRequestStr = """
+    private final String updateAddressRequestStr = """
                 {
             "receiverName" : "kim2",
             "receiverNumber" : "12342",
@@ -90,6 +97,15 @@ public class AddressControllerIntegrationTest {
 
     @BeforeEach
     public void init() throws Exception {
+        User admin = User
+            .builder()
+            .username("admin")
+            .password(bCryptPasswordEncoder.encode("admin"))
+            .email("admin@admin.com")
+            .role("ROLE_ADMIN")
+            .build();
+
+        userRepository.save(admin);
 
         String joinUser1 = """
             { "username" : "username", "email" : "email@email.com", "password" : "password", "userType" : "USER"}""";

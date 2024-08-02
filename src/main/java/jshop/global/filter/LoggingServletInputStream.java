@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class LoggingServletInputStream extends ServletInputStream {
 
-    private ByteArrayOutputStream byteArrayOutputStream;
-    private ServletInputStream original;
+    private final ByteArrayOutputStream byteArrayOutputStream;
+    private final ServletInputStream original;
 
     public LoggingServletInputStream(ServletInputStream original) {
         this.original = original;

@@ -2,6 +2,7 @@ package jshop.domain.user.controller;
 
 import static jshop.utils.MockSecurityContextUtil.getSecurityContextMockUserId;
 import static jshop.utils.MockSecurityContextUtil.mockUserSecurityContext;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,9 +33,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @WebMvcTest(UserController.class)
 @Import({TestSecurityConfig.class, GlobalExceptionHandler.class})

@@ -12,8 +12,8 @@ import jshop.domain.product.dto.SearchCondition;
 import jshop.domain.product.dto.SearchProductDetailQueryResult;
 import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("[단위 테스트] SearchRepository")
-class SearchRepositoryTest {
+class SearchRepositoryTest extends BaseTestContainers {
 
     @Autowired
     CategoryRepository categoryRepository;
@@ -121,7 +121,7 @@ class SearchRepositoryTest {
         Page<SearchProductDetailQueryResult> page = searchRepository.search(condition, pageRequest);
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(productN * pdN);
+        assertThat(page.getTotalElements()).isEqualTo((long) productN * pdN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
     }
 
@@ -164,7 +164,7 @@ class SearchRepositoryTest {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo((productN * pdN) / categoryN);
+        assertThat(page.getTotalElements()).isEqualTo(((long) productN * pdN) / categoryN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo("product2");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer2");
@@ -173,7 +173,6 @@ class SearchRepositoryTest {
 
     @Test
     @DisplayName("특정 속성으로 필터링해 검색")
-    @Disabled("MySQL에서만 동작함.")
     public void search_filter_attribute() {
         // given
         Map<String, String> attribute = new HashMap<>();
@@ -214,7 +213,7 @@ class SearchRepositoryTest {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getId()).isEqualTo(productDetails.get(0).getId());
         assertThat(content.get(0).getName()).isEqualTo("product0");
@@ -239,7 +238,7 @@ class SearchRepositoryTest {
         // then
         ProductDetail productDetail = productDetails.get(productDetails.size() - 1);
         Product product = productDetail.getProduct();
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo(product.getName());
         assertThat(content.get(0).getManufacturer()).isEqualTo(product.getManufacturer());
@@ -263,7 +262,7 @@ class SearchRepositoryTest {
         // then
         ProductDetail productDetail = productDetails.get(productDetails.size() - 1);
         Product product = productDetail.getProduct();
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo(product.getName());
         assertThat(content.get(0).getManufacturer()).isEqualTo(product.getManufacturer());
@@ -285,7 +284,7 @@ class SearchRepositoryTest {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo("product9");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer9");

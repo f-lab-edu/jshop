@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
@@ -22,31 +21,28 @@ import jshop.domain.user.service.UserService;
 import jshop.domain.wallet.entity.Wallet;
 import jshop.domain.wallet.repository.WalletRepository;
 import jshop.global.common.ErrorCode;
+import jshop.utils.config.BaseTestContainers;
 import jshop.utils.dto.UserDtoUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @DisplayName("[통합 테스트] UserController - Sync")
-public class UserControllerSyncTest {
+public class UserControllerSyncBaseTest extends BaseTestContainers {
 
     private Long userId;
     private String userToken;
@@ -126,7 +122,6 @@ public class UserControllerSyncTest {
 
         @Test
         @DisplayName("너무 많은 재시도를 시도 하면 예외를 발생시킴")
-        @Disabled("jenkins 환경에서 정상동작 안함")
         public void updateBalance_many_retry() throws Exception {
             ExecutorService executors = Executors.newFixedThreadPool(10);
 

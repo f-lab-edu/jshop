@@ -1,6 +1,5 @@
 package jshop.domain.user.service;
 
-import jakarta.persistence.OptimisticLockException;
 import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.entity.Address;

@@ -10,15 +10,21 @@ import jshop.domain.product.entity.ProductDetail;
 import jshop.domain.product.repository.ProductDetailRepository;
 import jshop.global.common.ErrorCode;
 import jshop.global.exception.JshopException;
+import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @DisplayName("[단위 테스트] Cart")
-class CartTest {
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@Transactional
+class CartTest extends BaseTestContainers {
 
     @Autowired
     ProductDetailRepository productDetailRepository;

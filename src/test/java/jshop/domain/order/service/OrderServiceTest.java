@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import jshop.domain.address.entity.Address;
 import jshop.domain.address.service.AddressService;
+import jshop.domain.coupon.entity.Coupon;
+import jshop.domain.coupon.entity.FixedPriceCoupon;
+import jshop.domain.coupon.entity.UserCoupon;
+import jshop.domain.coupon.service.CouponService;
 import jshop.domain.delivery.entity.DeliveryState;
 import jshop.domain.inventory.entity.Inventory;
 import jshop.domain.order.dto.CreateOrderRequest;
@@ -49,6 +53,9 @@ class OrderServiceTest {
 
     @Mock
     OrderRepository orderRepository;
+
+    @Mock
+    CouponService couponService;
 
     @Mock
     UserRepository userRepository;
@@ -310,6 +317,126 @@ class OrderServiceTest {
             // then
             JshopException jshopException = assertThrows(JshopException.class, () -> orderService.deleteOrder(1L));
             assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.ALREADY_SHIPPING_ORDER);
+        }
+    }
+
+    @Nested
+    @DisplayName("쿠폰 사용 검증")
+    public class CouponOrder {
+
+        User user;
+        Address address;
+        ProductDetail productDetail1, productDetail2;
+        Inventory inventory1, inventory2;
+        private Coupon coupon;
+        private UserCoupon userCoupon;
+        Order order;
+
+        @Captor
+        ArgumentCaptor<Order> orderArgumentCaptor;
+
+        @BeforeEach
+        public void init() {
+            JoinUserRequest joinUserRequest = JoinUserRequest
+                .builder().build();
+            user = User.of(joinUserRequest, "password");
+            user.getWallet().deposit(10000L);
+            address = Address
+                .builder().id(1L).build();
+            inventory1 = Inventory.create();
+            inventory2 = Inventory.create();
+
+            productDetail1 = ProductDetail
+                .builder().id(1L).price(1000L).inventory(inventory1).build();
+
+            productDetail2 = ProductDetail
+                .builder().id(2L).price(2000L).inventory(inventory2).build();
+
+            inventory1.addStock(10);
+            inventory2.addStock(10);
+
+            coupon = FixedPriceCoupon
+                .builder()
+                .id("1234")
+                .name("test")
+                .minOriginPrice(1000L)
+                .discountPrice(1000L)
+                .totalQuantity(10L)
+                .remainingQuantity(10L)
+                .build();
+
+            userCoupon = coupon.issueCoupon(user);
+        }
+
+        @Test
+        @DisplayName("쿠폰 사용시 전체 금액에서 쿠폰금액만큼 제외")
+        public void useCoupon_success() {
+            // given
+            List<OrderItemRequest> orderItems = new ArrayList<>();
+
+            orderItems.add(OrderItemRequest
+                .builder().productDetailId(1L).quantity(3).price(1000L).build());
+            orderItems.add(OrderItemRequest
+                .builder().productDetailId(2L).quantity(3).price(2000L).build());
+
+            CreateOrderRequest createOrderRequest = CreateOrderRequest
+                .builder()
+                .addressId(1L)
+                .userCouponId(1L)
+                .totalPrice(9000L)
+                .totalQuantity(6)
+                .orderItems(orderItems)
+                .build();
+
+            // when
+            when(userService.getUser(1L)).thenReturn(user);
+            when(addressService.getAddress(1L)).thenReturn(address);
+            when(productService.getProductDetail(1L)).thenReturn(productDetail1);
+            when(productService.getProductDetail(2L)).thenReturn(productDetail2);
+            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
+            orderService.createOrder(createOrderRequest, 1L);
+
+            // then
+            assertThat(user.getWallet().getBalance()).isEqualTo(2000L);
+            assertThat(userCoupon.isUsed()).isTrue();
+            assertThat(coupon.getRemainingQuantity()).isEqualTo(9L);
+        }
+
+        @Test
+        @DisplayName("쿠폰을 사용한 주문 취소시, 쿠폰이 적용된 최종 결제만큼 환불하고, 쿠폰은 다시 사용가능한 상태로 되돌린다.")
+        public void order_cancel_coupon_rollback() {
+            // given
+            List<OrderItemRequest> orderItems = new ArrayList<>();
+
+            orderItems.add(OrderItemRequest
+                .builder().productDetailId(1L).quantity(3).price(1000L).build());
+            orderItems.add(OrderItemRequest
+                .builder().productDetailId(2L).quantity(3).price(2000L).build());
+
+            CreateOrderRequest createOrderRequest = CreateOrderRequest
+                .builder()
+                .addressId(1L)
+                .userCouponId(1L)
+                .totalPrice(9000L)
+                .totalQuantity(6)
+                .orderItems(orderItems)
+                .build();
+
+            when(userService.getUser(1L)).thenReturn(user);
+            when(addressService.getAddress(1L)).thenReturn(address);
+            when(productService.getProductDetail(1L)).thenReturn(productDetail1);
+            when(productService.getProductDetail(2L)).thenReturn(productDetail2);
+            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
+            orderService.createOrder(createOrderRequest, 1L);
+            verify(orderRepository, times(1)).save(orderArgumentCaptor.capture());
+            order = orderArgumentCaptor.getValue();
+
+            // when
+            order.cancel();
+
+            // then
+            assertThat(user.getWallet().getBalance()).isEqualTo(10000L);
+            assertThat(userCoupon.isUsed()).isFalse();
         }
     }
 }

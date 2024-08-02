@@ -35,6 +35,14 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "product_detail")
 public class ProductDetail extends BaseEntity {
 
+    @Override
+    public String toString() {
+        return "ProductDetail{" +
+            "id=" + id +
+            ", attribute=" + attribute +
+            '}' + getCreatedAt();
+    }
+
     @Id
     @GeneratedValue
     @Column(name = "product_detail_id")
