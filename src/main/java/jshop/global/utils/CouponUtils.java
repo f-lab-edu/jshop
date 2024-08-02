@@ -1,7 +1,6 @@
 package jshop.global.utils;
 
 import java.util.Optional;
-import java.util.UUID;
 import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.UserCoupon;
 import jshop.global.common.ErrorCode;

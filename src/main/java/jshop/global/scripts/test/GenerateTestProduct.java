@@ -1,4 +1,4 @@
-package jshop.global.command.test;
+package jshop.global.scripts.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class GenerateTestProduct implements CommandLineRunner {
                 User user = users.poll();
                 log.warn("user : {} start", user.getId());
                 int productN = random.nextInt(1, 1000);
-                long categoryId = random.nextInt(1, 20) * 1L;
+                long categoryId = (long) random.nextInt(1, 20);
                 List<Long> productIds = new ArrayList<>();
 
                 for (int i = 0; i < productN; i++) {

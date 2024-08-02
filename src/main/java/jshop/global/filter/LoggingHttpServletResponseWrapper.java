@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class LoggingHttpServletResponseWrapper extends HttpServletResponseWrapper {
 
-    private LoggingServletOutputStream loggingServletOutputStream;
-    private ServletOutputStream original;
+    private final LoggingServletOutputStream loggingServletOutputStream;
+    private final ServletOutputStream original;
 
     public LoggingHttpServletResponseWrapper(HttpServletResponse response) throws IOException {
         super(response);

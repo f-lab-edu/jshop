@@ -68,11 +68,11 @@ class UserServiceTest {
     @DisplayName("회원 가입 검증")
     class JoinUser {
 
-        private String username = "test";
-        private String email = "email@email.com";
-        private String password = "test";
-        private UserType userType = UserType.USER;
-        private String role = "ROLE_USER";
+        private final String username = "test";
+        private final String email = "email@email.com";
+        private final String password = "test";
+        private final UserType userType = UserType.USER;
+        private final String role = "ROLE_USER";
 
         @Test
         @DisplayName("중복된 이메일이 없다면 회원가입이 가능")

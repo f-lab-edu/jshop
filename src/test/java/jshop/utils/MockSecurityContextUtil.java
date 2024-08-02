@@ -11,11 +11,11 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 public class MockSecurityContextUtil {
 
-    private static Long userId = 1L;
-    private static String username = "username";
-    private static String password = "password";
-    private static String role = "ROLE_USER";
-    private static String email = "email@email.com";
+    private static final Long userId = 1L;
+    private static final String username = "username";
+    private static final String password = "password";
+    private static final String role = "ROLE_USER";
+    private static final String email = "email@email.com";
 
     public static RequestPostProcessor mockUserSecurityContext() {
         return request -> {

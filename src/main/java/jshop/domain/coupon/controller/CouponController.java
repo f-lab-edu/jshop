@@ -6,8 +6,6 @@ import jshop.domain.coupon.service.CouponService;
 import jshop.global.annotation.CurrentUserId;
 import jshop.global.dto.Response;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import org.springframework.context.annotation.Role;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;

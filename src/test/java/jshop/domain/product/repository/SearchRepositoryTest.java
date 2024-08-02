@@ -14,7 +14,6 @@ import jshop.domain.product.entity.Product;
 import jshop.domain.product.entity.ProductDetail;
 import jshop.utils.config.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +121,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         Page<SearchProductDetailQueryResult> page = searchRepository.search(condition, pageRequest);
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(productN * pdN);
+        assertThat(page.getTotalElements()).isEqualTo((long) productN * pdN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
     }
 
@@ -165,7 +164,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo((productN * pdN) / categoryN);
+        assertThat(page.getTotalElements()).isEqualTo(((long) productN * pdN) / categoryN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo("product2");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer2");
@@ -214,7 +213,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getId()).isEqualTo(productDetails.get(0).getId());
         assertThat(content.get(0).getName()).isEqualTo("product0");
@@ -239,7 +238,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         // then
         ProductDetail productDetail = productDetails.get(productDetails.size() - 1);
         Product product = productDetail.getProduct();
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo(product.getName());
         assertThat(content.get(0).getManufacturer()).isEqualTo(product.getManufacturer());
@@ -263,7 +262,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         // then
         ProductDetail productDetail = productDetails.get(productDetails.size() - 1);
         Product product = productDetail.getProduct();
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo(product.getName());
         assertThat(content.get(0).getManufacturer()).isEqualTo(product.getManufacturer());
@@ -285,7 +284,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         List<SearchProductDetailQueryResult> content = page.getContent();
 
         // then
-        assertThat(page.getTotalElements()).isEqualTo(pdN * productN);
+        assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getName()).isEqualTo("product9");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer9");

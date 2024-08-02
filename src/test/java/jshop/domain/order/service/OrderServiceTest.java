@@ -13,7 +13,6 @@ import jshop.domain.address.entity.Address;
 import jshop.domain.address.service.AddressService;
 import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.FixedPriceCoupon;
-import jshop.domain.coupon.entity.FixedRateCoupon;
 import jshop.domain.coupon.entity.UserCoupon;
 import jshop.domain.coupon.service.CouponService;
 import jshop.domain.delivery.entity.DeliveryState;

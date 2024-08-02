@@ -1,8 +1,6 @@
 package jshop.domain.user.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jshop.domain.wallet.entity.WalletChangeType;
 import lombok.AllArgsConstructor;

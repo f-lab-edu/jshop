@@ -58,14 +58,14 @@ public class AddressControllerIntegrationTest extends BaseTestContainers {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
-    
+
     private Long user1Id;
     private String user1Token;
 
     @Autowired
     private MockMvc mockMvc;
 
-    private String createAddressRequestStr = """
+    private final String createAddressRequestStr = """
         {
             "receiverName" : "kim",
             "receiverNumber" : "1234",
@@ -79,7 +79,7 @@ public class AddressControllerIntegrationTest extends BaseTestContainers {
         }
         """;
 
-    private String updateAddressRequestStr = """
+    private final String updateAddressRequestStr = """
                 {
             "receiverName" : "kim2",
             "receiverNumber" : "12342",

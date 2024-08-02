@@ -45,7 +45,7 @@ public class DeleteDBUtils {
     public void destroy() {
         userCouponRepository.deleteAll();
         couponRepository.deleteAll();
-        
+
         orderProductDetailRepository.deleteAll();
         orderRepository.deleteAll();
 

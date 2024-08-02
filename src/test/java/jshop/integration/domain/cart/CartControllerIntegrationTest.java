@@ -75,8 +75,8 @@ public class CartControllerIntegrationTest extends BaseTestContainers {
     private String anotherUserToken;
 
     private Long productId;
-    private List<Long> productIds = new ArrayList<>();
-    private List<Long> productDetailIds = new ArrayList<>();
+    private final List<Long> productIds = new ArrayList<>();
+    private final List<Long> productDetailIds = new ArrayList<>();
     @Autowired
     private ProductService productService;
 

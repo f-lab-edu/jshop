@@ -2,7 +2,6 @@ package jshop.domain.product.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

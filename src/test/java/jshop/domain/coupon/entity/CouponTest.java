@@ -116,7 +116,7 @@ class CouponTest {
             .remainingQuantity(10L)
             .minOriginPrice(10000L)
             .build();
-        
+
         // then
         JshopException jshopException = assertThrows(JshopException.class, () -> coupon.discount(5000L));
         assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);

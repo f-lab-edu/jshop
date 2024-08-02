@@ -8,7 +8,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public abstract class BaseTestContainers {
-    
+
     static final MySQLContainer<?> mysqlContainer;
 
     static final RedisContainer redisContainer;

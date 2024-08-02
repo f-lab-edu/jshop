@@ -50,11 +50,11 @@ class AccountControllerTest {
     @DisplayName("회원 가입 검증")
     class Join {
 
-        private String username = "test";
-        private String email = "email@email.com";
-        private String password = "testtest";
-        private UserType userType = UserType.USER;
-        private JSONObject requestBody = new JSONObject();
+        private final String username = "test";
+        private final String email = "email@email.com";
+        private final String password = "testtest";
+        private final UserType userType = UserType.USER;
+        private final JSONObject requestBody = new JSONObject();
 
         @BeforeEach
         public void init() throws Exception {

@@ -1,7 +1,6 @@
 package jshop.domain.coupon.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jshop.domain.coupon.entity.Coupon;
 import jshop.domain.coupon.entity.FixedPriceCoupon;

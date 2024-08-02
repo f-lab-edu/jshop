@@ -9,15 +9,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
 import jshop.domain.cart.repository.CartRepository;
 import jshop.domain.category.repository.CategoryRepository;
 import jshop.domain.coupon.dto.CreateCouponRequest;
 import jshop.domain.coupon.entity.CouponType;
-import jshop.domain.coupon.entity.UserCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
 import jshop.domain.coupon.repository.UserCouponRepository;
 import jshop.domain.coupon.service.CouponService;
@@ -48,9 +44,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @EnableWebMvc
@@ -99,7 +92,7 @@ public class CouponIntegrationTest extends BaseTestContainers {
     private String anotherUserToken;
 
     private Long productId;
-    private List<Long> productDetailIds = new ArrayList<>();
+    private final List<Long> productDetailIds = new ArrayList<>();
     @Autowired
     private ProductService productService;
     @Autowired

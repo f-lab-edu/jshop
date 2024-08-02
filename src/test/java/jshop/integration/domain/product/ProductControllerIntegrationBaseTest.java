@@ -245,7 +245,7 @@ public class ProductControllerIntegrationBaseTest extends BaseTestContainers {
     @DisplayName("자신이 등록한 상품 가져오기")
     class GetOwnProducts {
 
-        private int totalCount = 30;
+        private final int totalCount = 30;
 
         @BeforeEach
         public void init(@Autowired ProductService productService) {
@@ -272,7 +272,7 @@ public class ProductControllerIntegrationBaseTest extends BaseTestContainers {
 
             assertThat(ownProductsResponse.getPage()).isEqualTo(pageNumber);
             assertThat(ownProductsResponse.getTotalCount()).isEqualTo(totalCount);
-            assertThat(ownProductsResponse.getTotalPage()).isEqualTo((int) totalCount / pageSize);
+            assertThat(ownProductsResponse.getTotalPage()).isEqualTo(totalCount / pageSize);
         }
 
         @Test
