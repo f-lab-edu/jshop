@@ -22,10 +22,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@DataJpaTest
+
 @DisplayName("[단위 테스트]  Order")
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-class OrderTest extends BaseTestContainers {
+class OrderTest {
 
     @Nested
     @DisplayName("주문 취소 로직 검증")
