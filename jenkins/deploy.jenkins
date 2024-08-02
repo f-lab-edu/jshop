@@ -16,7 +16,7 @@ pipeline {
         REDIS_PORT = credentials('REDIS_PORT')
         REDIS_PASSWORD = credentials('REDIS_PASSWORD')
 
-        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.6'
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.6-hotfix.1'
     }
 
     stages {
