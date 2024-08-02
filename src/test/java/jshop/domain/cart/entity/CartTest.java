@@ -18,22 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
 @DisplayName("[단위 테스트] Cart")
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-@Transactional
-class CartTest extends BaseTestContainers {
-
-    @Autowired
-    ProductDetailRepository productDetailRepository;
-
-    @Autowired
-    CartRepository cartRepository;
-
-    @PersistenceContext
-    EntityManager em;
+class CartTest {
 
     @Nested
     @DisplayName("장바구니 추가 검증")
@@ -48,21 +35,14 @@ class CartTest extends BaseTestContainers {
 
             Cart cart = Cart.create();
 
-            productDetailRepository.save(productDetail);
-            cartRepository.save(cart);
-
             // when
             cart.addCart(productDetail, 3);
 
-            em.flush();
-            em.clear();
-
             // then
-            Cart foundCart = cartRepository.findById(cart.getId()).get();
-            assertThat(foundCart.getCartProductDetails().size()).isEqualTo(1);
-            assertThat(foundCart.getCartProductDetails().get(0).getProductDetail().getId()).isEqualTo(
+            assertThat(cart.getCartProductDetails().size()).isEqualTo(1);
+            assertThat(cart.getCartProductDetails().get(0).getProductDetail().getId()).isEqualTo(
                 productDetail.getId());
-            assertThat(foundCart.getCartProductDetails().get(0).getQuantity()).isEqualTo(3);
+            assertThat(cart.getCartProductDetails().get(0).getQuantity()).isEqualTo(3);
         }
 
         @Test
@@ -70,25 +50,19 @@ class CartTest extends BaseTestContainers {
         public void addCart_secondAdd() {
             // given
             ProductDetail productDetail = ProductDetail
-                .builder().build();
+                .builder().id(1L).build();
 
             Cart cart = Cart.create();
-
-            productDetailRepository.save(productDetail);
-            cartRepository.save(cart);
 
             // when
             cart.addCart(productDetail, 3);
             cart.addCart(productDetail, 3);
-            em.flush();
-            em.clear();
 
             // then
-            Cart foundCart = cartRepository.findById(cart.getId()).get();
-            assertThat(foundCart.getCartProductDetails().size()).isEqualTo(1);
-            assertThat(foundCart.getCartProductDetails().get(0).getProductDetail().getId()).isEqualTo(
+            assertThat(cart.getCartProductDetails().size()).isEqualTo(1);
+            assertThat(cart.getCartProductDetails().get(0).getProductDetail().getId()).isEqualTo(
                 productDetail.getId());
-            assertThat(foundCart.getCartProductDetails().get(0).getQuantity()).isEqualTo(6);
+            assertThat(cart.getCartProductDetails().get(0).getQuantity()).isEqualTo(6);
         }
 
         @Test
@@ -99,10 +73,6 @@ class CartTest extends BaseTestContainers {
                 .builder().build();
 
             Cart cart = Cart.create();
-
-            productDetailRepository.save(productDetail);
-            cartRepository.save(cart);
-
             // when
             JshopException jshopException = assertThrows(JshopException.class, () -> cart.addCart(productDetail, 0));
 
