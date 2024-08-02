@@ -11,10 +11,11 @@ import jshop.domain.coupon.repository.UserCouponRepository;
 import jshop.domain.user.entity.User;
 import jshop.domain.user.repository.UserRepository;
 import jshop.global.annotation.RedisLock;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import jshop.global.utils.CouponUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,12 @@ public class CouponService {
     @Transactional
     public String createCoupon(CreateCouponRequest createCouponRequest) {
         Coupon coupon = null;
+        if (createCouponRequest.getCoupontType() == null) {
+            log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
+                createCouponRequest.getCoupontType());
+            throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
+        }
+
         switch (createCouponRequest.getCoupontType()) {
             case FIXED_PRICE:
                 coupon = FixedPriceCoupon.of(createCouponRequest);
@@ -40,17 +47,23 @@ public class CouponService {
             case FIXED_RATE:
                 coupon = FixedRateCoupon.of(createCouponRequest);
                 break;
+            default:
+                log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
+                    createCouponRequest.getCoupontType());
+                throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 
-        if (coupon != null) {
-            couponRepository.save(coupon);
+        if (coupon == null) {
+            log.error(ErrorCode.COUPON_CREATE_EXCEPTION.getLogMessage(), createCouponRequest.getId());
+            throw JshopException.of(ErrorCode.COUPON_CREATE_EXCEPTION);
         }
 
+        couponRepository.save(coupon);
         return coupon.getId();
     }
 
     @Transactional
-    @RedisLock("coupon")
+    @RedisLock(key = "coupon")
     public Long issueCoupon(String couponId, Long userId) {
         Coupon coupon = getCoupon(couponId);
         User user = userRepository.getReferenceById(userId);

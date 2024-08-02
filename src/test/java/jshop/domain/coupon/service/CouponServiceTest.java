@@ -11,6 +11,8 @@ import jshop.domain.coupon.entity.CouponType;
 import jshop.domain.coupon.entity.FixedPriceCoupon;
 import jshop.domain.coupon.repository.CouponRepository;
 import jshop.domain.user.entity.User;
+import jshop.global.common.ErrorCode;
+import jshop.global.exception.JshopException;
 import jshop.global.utils.UUIDUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,6 +83,26 @@ class CouponServiceTest {
             assertThat(savedCoupon.getId()).isEqualTo(uuid);
             assertThat(savedCoupon.getName()).isEqualTo("test");
             assertThat(savedCoupon.getRemainingQuantity()).isEqualTo(10L);
+        }
+
+        @Test
+        @DisplayName("쿠폰 생성시 타입이 없으면 예외를 발생시킴")
+        public void createCoupon_undefined_type() {
+            // given
+            String uuid = UUIDUtils.generateB64UUID();
+            CreateCouponRequest createCouponRequest = CreateCouponRequest
+                .builder()
+                .id(uuid)
+                .name("test")
+                .quantity(10L)
+                .value1(10L)
+                .build();
+
+            // then
+            JshopException jshopException = assertThrows(JshopException.class,
+                () -> couponService.createCoupon(createCouponRequest));
+            assertThat(jshopException.getErrorCode()).isEqualTo(ErrorCode.COUPON_TYPE_NOT_DEFINED);
+
         }
     }
 }
