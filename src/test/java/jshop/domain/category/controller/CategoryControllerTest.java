@@ -49,7 +49,6 @@ class CategoryControllerTest {
 
         @Test
         @DisplayName("카테고리 생성 서비스로 요청과 권한을 넘겨줌")
-        @WithMockUser(roles = {"ADMIN"})
         public void createCategory_success() throws Exception {
             // given
             JSONObject createCategoryRequestJson = new JSONObject();

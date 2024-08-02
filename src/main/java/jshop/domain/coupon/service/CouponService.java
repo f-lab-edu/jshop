@@ -34,13 +34,13 @@ public class CouponService {
     @Transactional
     public String createCoupon(CreateCouponRequest createCouponRequest) {
         Coupon coupon = null;
-        if (createCouponRequest.getCoupontType() == null) {
+        if (createCouponRequest.getCouponType() == null) {
             log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
-                createCouponRequest.getCoupontType());
+                createCouponRequest.getCouponType());
             throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 
-        switch (createCouponRequest.getCoupontType()) {
+        switch (createCouponRequest.getCouponType()) {
             case FIXED_PRICE:
                 coupon = FixedPriceCoupon.of(createCouponRequest);
                 break;
@@ -49,7 +49,7 @@ public class CouponService {
                 break;
             default:
                 log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
-                    createCouponRequest.getCoupontType());
+                    createCouponRequest.getCouponType());
                 throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 

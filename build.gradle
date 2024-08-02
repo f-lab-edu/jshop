@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'jshop'
-version = '0.0.6'
+version = '0.0.6-hotfix.1'
 
 java {
     sourceCompatibility = '17'
