@@ -4,6 +4,12 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 20
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+      tracing:
+        include-parameter-values: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -65,6 +71,7 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+
 
   jwt:
     secret: ${JWT_SECRET_KEY}

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
+import jshop.core.config.P6SpyConfig;
 import jshop.core.domain.address.dto.CreateAddressResponse;
 import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.address.repository.AddressRepository;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,6 +47,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @Transactional
 @DisplayName("[통합 테스트] AddressController")
+@Import(P6SpyConfig.class)
 public class AddressAcceptanceTest extends BaseTestContainers {
 
     @Autowired
