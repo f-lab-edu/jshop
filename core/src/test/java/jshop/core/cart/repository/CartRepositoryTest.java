@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @DisplayName("[단위 테스트] CartRepository")
-@Transactional
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 class CartRepositoryTest extends BaseTestContainers {
 

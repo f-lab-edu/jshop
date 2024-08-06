@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @DataJpaTest
 @EnableJpaAuditing
-@Transactional
 @DisplayName("[단위 테스트] CartProductDetailRepository")
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @Import(P6SpyConfig.class)

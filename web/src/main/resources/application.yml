@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: jshop
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      jdbc.hibernate.jdbc.batch_size: 100
+      org.hibernate:
+        envers:
+          audit_table_suffix: _history
+logging:
+  config: classpath:logback-spring-dev.xml
+  level:
+    sql: error
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+management:
+  endpoints:
+    prometheus:
+      enabled: true
+    web:
+      exposure:
+        include: prometheus
+  prometheus:
+    metrics:
+      export:
+        step: 5s
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+
+  jwt:
+    secret: 61dd10f1-cee2-454b-964f-9bda4cb993d861dd10f1-cee2-454b-964f-9bda4cb993d8
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1234
+
+---
+spring:
+  config:
+    activate:
+      on-profile: product
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/jshop?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+logging:
+  config: classpath:logback-spring-prod.xml

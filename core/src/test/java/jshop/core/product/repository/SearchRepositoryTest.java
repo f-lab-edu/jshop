@@ -16,20 +16,38 @@ import jshop.core.domain.product.repository.ProductDetailRepository;
 import jshop.core.domain.product.repository.ProductRepository;
 import jshop.core.domain.product.repository.SearchRepository;
 import jshop.common.test.BaseTestContainers;
+import jshop.core.domain.product.repository.SearchRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @DataJpaTest 는 일반 @Repository 를 인식하지 못한다.
+ * 때문에 QueryDSL 레포인 SearchRepository를 빈으로 등록하고 QueryDSL을 사용하기 위해 SpringBootTest 적용
+ */
 @SpringBootTest
+@EnableJpaAuditing
+@Import(BCryptPasswordEncoder.class)
 @Transactional
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 @DisplayName("[단위 테스트] SearchRepository")
 class SearchRepositoryTest extends BaseTestContainers {
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Autowired
     CategoryRepository categoryRepository;

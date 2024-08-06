@@ -16,5 +16,5 @@ import org.springframework.retry.annotation.EnableRetry;
     + ".core")
 @EntityScan(basePackages = "jshop.core")
 @EnableAspectJAutoProxy
-@ComponentScan(basePackages = "jshop")
+@ComponentScan(basePackages = {"jshop.common", "jshop.core"})
 public class InitConfig {}
