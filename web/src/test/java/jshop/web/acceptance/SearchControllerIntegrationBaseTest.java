@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
 @Transactional
+@EnableJpaAuditing
 @DisplayName("[통합 테스트] SearchController")
 class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 

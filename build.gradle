@@ -38,7 +38,6 @@ subprojects {
         implementation 'org.springframework.boot:spring-boot-starter-aop'
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
-        implementation 'org.springframework.data:spring-data-envers'
         // spring
 
         // utils
@@ -122,6 +121,7 @@ project(':core') {
         implementation project(':common')
 
         runtimeOnly 'com.mysql:mysql-connector-j'
+        implementation 'org.springframework.data:spring-data-envers'
 
         //QueryDSL
         implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
