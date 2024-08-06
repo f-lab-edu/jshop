@@ -1,7 +1,7 @@
 package jshop.global.scripts;
 
-import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
+import jshop.core.domain.user.entity.User;
+import jshop.core.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;

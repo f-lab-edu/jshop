@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import jshop.domain.cart.repository.CartRepository;
-import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
-import jshop.domain.user.service.UserService;
-import jshop.domain.wallet.entity.Wallet;
-import jshop.domain.wallet.repository.WalletRepository;
-import jshop.global.common.ErrorCode;
-import jshop.utils.config.BaseTestContainers;
-import jshop.utils.dto.UserDtoUtils;
+import jshop.core.domain.cart.repository.CartRepository;
+import jshop.core.domain.user.dto.JoinUserRequest;
+import jshop.core.domain.user.dto.UserType;
+import jshop.core.domain.user.entity.User;
+import jshop.core.domain.user.repository.UserRepository;
+import jshop.core.domain.user.service.UserService;
+import jshop.core.domain.wallet.entity.Wallet;
+import jshop.core.domain.wallet.repository.WalletRepository;
+import jshop.common.exception.ErrorCode;
+import jshop.common.test.BaseTestContainers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,9 +69,21 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
 
     @BeforeEach
     public void init() throws Exception {
-        userId = userService.joinUser(UserDtoUtils.getJoinUserRequestDto());
+        String userJoinStr = """
+            { "email" : "email@email.com", "password" : "password"}
+            """;
+
+        JoinUserRequest joinUserRequest = JoinUserRequest
+            .builder()
+            .email("email@email.com")
+            .username("username")
+            .password("password")
+            .userType(UserType.SELLER)
+            .build();
+
+        userId = userService.joinUser(joinUserRequest);
         ResultActions login = mockMvc.perform(
-            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(UserDtoUtils.getLoginJsonStr()));
+            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(userJoinStr));
         userToken = login.andReturn().getResponse().getHeader("Authorization");
     }
 

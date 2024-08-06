@@ -10,11 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.stream.Stream;
-import jshop.domain.user.entity.User;
-import jshop.domain.user.service.UserService;
-import jshop.global.common.ErrorCode;
-import jshop.utils.config.BaseTestContainers;
-import jshop.utils.dto.UserDtoUtils;
+import jshop.core.domain.user.dto.JoinUserRequest;
+import jshop.core.domain.user.dto.UserType;
+import jshop.core.domain.user.entity.User;
+import jshop.core.domain.user.service.UserService;
+import jshop.common.exception.ErrorCode;
+import jshop.common.test.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,9 +55,20 @@ public class UserControllerIntegrationBaseTest extends BaseTestContainers {
 
     @BeforeEach
     public void init() throws Exception {
-        userId = userService.joinUser(UserDtoUtils.getJoinUserRequestDto());
+        String userJoinStr = """
+            { "email" : "email@email.com", "password" : "password"}
+            """;
+        JoinUserRequest joinUserRequest = JoinUserRequest
+            .builder()
+            .email("email@email.com")
+            .username("username")
+            .password("password")
+            .userType(UserType.SELLER)
+            .build();
+
+        userId = userService.joinUser(joinUserRequest);
         ResultActions login = mockMvc.perform(
-            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(UserDtoUtils.getLoginJsonStr()));
+            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(userJoinStr));
         userToken = login.andReturn().getResponse().getHeader("Authorization");
     }
 

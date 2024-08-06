@@ -10,25 +10,24 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
-import jshop.domain.cart.repository.CartRepository;
-import jshop.domain.category.repository.CategoryRepository;
-import jshop.domain.coupon.dto.CreateCouponRequest;
-import jshop.domain.coupon.entity.CouponType;
-import jshop.domain.coupon.repository.CouponRepository;
-import jshop.domain.coupon.repository.UserCouponRepository;
-import jshop.domain.coupon.service.CouponService;
-import jshop.domain.product.dto.CreateProductDetailRequest;
-import jshop.domain.product.entity.Product;
-import jshop.domain.product.repository.ProductDetailRepository;
-import jshop.domain.product.repository.ProductRepository;
-import jshop.domain.product.service.ProductService;
-import jshop.domain.user.dto.JoinUserResponse;
-import jshop.domain.user.entity.User;
-import jshop.domain.user.repository.UserRepository;
-import jshop.global.dto.Response;
-import jshop.global.utils.UUIDUtils;
-import jshop.utils.command.DeleteDBUtils;
-import jshop.utils.config.BaseTestContainers;
+import jshop.core.domain.cart.repository.CartRepository;
+import jshop.core.domain.category.repository.CategoryRepository;
+import jshop.core.domain.coupon.dto.CreateCouponRequest;
+import jshop.core.domain.coupon.entity.CouponType;
+import jshop.core.domain.coupon.repository.CouponRepository;
+import jshop.core.domain.coupon.repository.UserCouponRepository;
+import jshop.core.domain.coupon.service.CouponService;
+import jshop.core.domain.product.dto.CreateProductDetailRequest;
+import jshop.core.domain.product.entity.Product;
+import jshop.core.domain.product.repository.ProductDetailRepository;
+import jshop.core.domain.product.repository.ProductRepository;
+import jshop.core.domain.product.service.ProductService;
+import jshop.core.domain.user.dto.JoinUserResponse;
+import jshop.core.domain.user.entity.User;
+import jshop.core.domain.user.repository.UserRepository;
+import jshop.web.dto.Response;
+import jshop.common.utils.UUIDUtils;
+import jshop.common.test.BaseTestContainers;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,13 +53,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class CouponIntegrationTest extends BaseTestContainers {
 
     @Autowired
-    private UserCouponRepository userCouponRepository;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private CouponRepository couponRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,18 +63,6 @@ public class CouponIntegrationTest extends BaseTestContainers {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    private DeleteDBUtils deleteDBUtils;
-
-    @Autowired
-    private CouponService couponService;
-
-    @PersistenceContext
-    private EntityManager em;
 
 
     private Long userId;

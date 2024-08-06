@@ -6,24 +6,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import jshop.domain.address.service.AddressService;
-import jshop.domain.category.service.CategoryService;
-import jshop.domain.order.dto.CreateOrderRequest;
-import jshop.domain.order.dto.OrderItemRequest;
-import jshop.domain.order.dto.OrderListResponse;
-import jshop.domain.order.entity.Order;
-import jshop.domain.order.service.OrderService;
-import jshop.domain.product.dto.CreateProductDetailRequest;
-import jshop.domain.product.service.ProductService;
-import jshop.domain.user.entity.User;
-import jshop.domain.user.service.UserService;
-import jshop.global.utils.TimeUtils;
-import jshop.utils.config.BaseTestContainers;
-import jshop.utils.dto.AddressDtoUtils;
-import jshop.utils.dto.CategoryDtoUtils;
-import jshop.utils.dto.ProductDtoUtils;
-import jshop.utils.dto.UserDtoUtils;
+import java.util.Map;
+import jshop.core.domain.address.dto.CreateAddressRequest;
+import jshop.core.domain.address.service.AddressService;
+import jshop.core.domain.category.dto.CreateCategoryRequest;
+import jshop.core.domain.category.service.CategoryService;
+import jshop.core.domain.order.dto.CreateOrderRequest;
+import jshop.core.domain.order.dto.OrderItemRequest;
+import jshop.core.domain.order.dto.OrderListResponse;
+import jshop.core.domain.order.entity.Order;
+import jshop.core.domain.order.service.OrderService;
+import jshop.core.domain.product.dto.CreateProductDetailRequest;
+import jshop.core.domain.product.dto.CreateProductRequest;
+import jshop.core.domain.product.service.ProductService;
+import jshop.core.domain.user.dto.JoinUserRequest;
+import jshop.core.domain.user.dto.UserType;
+import jshop.core.domain.user.entity.User;
+import jshop.core.domain.user.service.UserService;
+import jshop.common.utils.TimeUtils;
+import jshop.common.test.BaseTestContainers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -60,16 +63,51 @@ class OrderServiceIntegrationBaseTest extends BaseTestContainers {
     @BeforeEach
     public void init() {
 
-        userId = userService.joinUser(UserDtoUtils.getJoinUserRequestDto());
+        JoinUserRequest joinUserRequest = JoinUserRequest
+            .builder()
+            .email("email@email.com")
+            .username("username")
+            .password("password")
+            .userType(UserType.SELLER)
+            .build();
+
+
+
+        List<CreateProductDetailRequest> createProductDetailRequests = new ArrayList<>();
+        String[] props = {"a", "b", "c"};
+
+        for (String prop : props) {
+            Map<String, String> attribute = new HashMap<>();
+            attribute.put("attr1", prop);
+            createProductDetailRequests.add(CreateProductDetailRequest
+                .builder().price(1000L).attribute(attribute).build());
+        }
+
+        userId = userService.joinUser(joinUserRequest);
+        CreateCategoryRequest createCategoryRequest = CreateCategoryRequest
+            .builder().name("category").build();
+
         User user = userService.getUser(userId);
         user.getWallet().deposit(100_000_000L);
-        addressId = addressService.createAddress(AddressDtoUtils.getCreateAddressRequest(), userId);
-        categoryId = categoryService.createCategory(CategoryDtoUtils.getCreateCategoryRequest());
+        addressId = addressService.createAddress(getCreateAddressRequest(), userId);
+        categoryId = categoryService.createCategory(createCategoryRequest);
+
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("attr1", List.of("a", "b", "c"));
+        CreateProductRequest createProductRequest = CreateProductRequest
+            .builder()
+            .name("product")
+            .categoryId(categoryId)
+            .manufacturer("manufacturer")
+            .description("description")
+            .attributes(attributes)
+            .build();
+
         for (int i = 0; i < 10; i++) {
-            Long productId = productService.createProduct(ProductDtoUtils.getCreateProductRequest(categoryId), userId);
+            Long productId = productService.createProduct(createProductRequest, userId);
             productIds.add(productId);
 
-            for (CreateProductDetailRequest request : ProductDtoUtils.getCreateProductDetailRequest()) {
+            for (CreateProductDetailRequest request : createProductDetailRequests) {
                 Long productDetailId = productService.createProductDetail(request, productId);
                 productDetailIds.add(productDetailId);
                 productService.updateProductDetailStock(productDetailId, 100);
@@ -130,5 +168,20 @@ class OrderServiceIntegrationBaseTest extends BaseTestContainers {
             assertThat(orderListResponse.getOrders().size()).isEqualTo(0);
             assertThat(orderListResponse.getNextTimestamp()).isEqualTo(null);
         }
+    }
+
+    private CreateAddressRequest getCreateAddressRequest() {
+        return CreateAddressRequest
+            .builder()
+            .receiverName("username")
+            .receiverNumber("1234")
+            .province("province")
+            .city("city")
+            .district("district")
+            .street("street")
+            .detailAddress1("detail address 1")
+            .detailAddress2("detail address 2")
+            .message("message")
+            .build();
     }
 }
