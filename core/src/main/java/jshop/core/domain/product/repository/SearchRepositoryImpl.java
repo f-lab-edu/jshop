@@ -72,9 +72,9 @@ public class SearchRepositoryImpl implements SearchRepository {
 
 
         JPAQuery<Long> countQuery = queryFactory
-            .select(productDetail.count())
-            .from(productDetail)
-            .leftJoin(productDetail.product, product)
+            .select(product.count())
+            .from(product)
+            .leftJoin(product.productDetails, productDetail)
             .where(
                 nameLike(condition.getQuery()),
                 categoryEq(condition.getCategoryId()),
