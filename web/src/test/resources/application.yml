@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: jshop-web
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+      tracing:
+        include-parameter-values: true
+
+logging:
+  config: classpath:logback-spring-dev.xml
+  level:
+    sql: error
