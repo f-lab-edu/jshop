@@ -102,13 +102,6 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
     @AfterEach
     @Transactional
     public void afterEach() {
-        User user = userService.getUser(userId);
-        log.info("wallet : {}", user.getWallet().getVersion());
-        Revisions<Integer, Wallet> revisions = walletHistoryRepository.findRevisions(user.getWallet().getId());
-
-        for (Revision<Integer, Wallet> revision : revisions) {
-            log.info("revision : {}", revision);
-        }
         userRepository.deleteAll();
     }
 
@@ -157,7 +150,7 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
         @Test
         @DisplayName("너무 많은 재시도를 시도 하면 예외를 발생시킴")
         public void updateBalance_many_retry() throws Exception {
-            ExecutorService executors = Executors.newFixedThreadPool(5);
+            ExecutorService executors = Executors.newFixedThreadPool(10);
 
             List<ResultActions> performs = new ArrayList<>();
 

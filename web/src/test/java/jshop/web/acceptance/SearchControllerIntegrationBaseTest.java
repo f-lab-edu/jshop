@@ -34,6 +34,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -46,6 +48,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableJpaAuditing
 @DisplayName("[통합 테스트] SearchController")
 @Import(P6SpyConfig.class)
+@Sql(statements = "ALTER TABLE product ADD FULLTEXT(name)", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
