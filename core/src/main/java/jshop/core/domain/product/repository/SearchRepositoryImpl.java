@@ -55,8 +55,8 @@ public class SearchRepositoryImpl implements SearchRepository {
                 product.description,
                 productDetail.price,
                 productDetail.attribute))
-            .from(productDetail)
-            .leftJoin(productDetail.product, product)
+            .from(product)
+            .leftJoin(product.productDetails, productDetail)
             .leftJoin(product.category, category)
             .where(
                 nameLike(condition.getQuery()),
@@ -140,6 +140,7 @@ public class SearchRepositoryImpl implements SearchRepository {
             log.error(ErrorCode.NO_SEARCH_QUERY.getLogMessage());
             throw JshopException.of(ErrorCode.NO_SEARCH_QUERY);
         }
-        return product.name.like("%" + query + "%");
+
+        return Expressions.booleanTemplate("fulltext_match({0}, {1})", product.name, query);
     }
 }

@@ -12,17 +12,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class SearchService {
 
     private final SearchRepository searchRepository;
 
     public SearchProductDetailsResponse search(SearchCondition condition, Pageable pageable) {
-
+        log.info("TX : {}", TransactionSynchronizationManager.isSynchronizationActive());
+        log.info("TX : {}", TransactionSynchronizationManager.isCurrentTransactionReadOnly());
+        log.info("TX : {}", TransactionSynchronizationManager.isActualTransactionActive());
         Page<SearchProductDetailQueryResult> page = searchRepository.search(condition, pageable);
 
         List<ProductDetailResponse> contents = page.getContent().stream().map(ProductDetailResponse::of).toList();

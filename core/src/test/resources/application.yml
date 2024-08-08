@@ -1,4 +1,8 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+
+logging:
+  level:
+    sql: trace

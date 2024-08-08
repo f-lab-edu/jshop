@@ -4,6 +4,7 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 20
+      max-lifetime: 250_000
     p6spy:
       enable-logging: true
       multiline: true
