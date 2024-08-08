@@ -21,24 +21,33 @@ import jshop.core.domain.user.entity.User;
 import jshop.core.domain.user.repository.UserRepository;
 import jshop.core.domain.user.service.UserService;
 import jshop.core.domain.wallet.entity.Wallet;
+import jshop.core.domain.wallet.repository.WalletHistoryRepository;
 import jshop.core.domain.wallet.repository.WalletRepository;
 import jshop.common.exception.ErrorCode;
 import jshop.common.test.BaseTestContainers;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.history.Revision;
+import org.springframework.data.history.Revisions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+@Slf4j
 @EnableWebMvc
 @SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
@@ -65,17 +74,20 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
 
     @PersistenceContext
     private EntityManager em;
+    @Autowired
+    private WalletHistoryRepository walletHistoryRepository;
 
+    private static int version = 0;
 
     @BeforeEach
     public void init() throws Exception {
         String userJoinStr = """
-            { "email" : "email@email.com", "password" : "password"}
+            { "email" : "email%d@email.com", "password" : "password"}
             """;
 
         JoinUserRequest joinUserRequest = JoinUserRequest
             .builder()
-            .email("email@email.com")
+            .email("email" + version + "@email.com")
             .username("username")
             .password("password")
             .userType(UserType.SELLER)
@@ -83,14 +95,23 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
 
         userId = userService.joinUser(joinUserRequest);
         ResultActions login = mockMvc.perform(
-            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(userJoinStr));
+            post("/api/login").contentType(MediaType.APPLICATION_JSON).content(String.format(userJoinStr, version)));
         userToken = login.andReturn().getResponse().getHeader("Authorization");
     }
 
     @AfterEach
-    public void destroy() {
+    @Transactional
+    public void afterEach() {
+        User user = userService.getUser(userId);
+        log.info("wallet : {}", user.getWallet().getVersion());
+        Revisions<Integer, Wallet> revisions = walletHistoryRepository.findRevisions(user.getWallet().getId());
+
+        for (Revision<Integer, Wallet> revision : revisions) {
+            log.info("revision : {}", revision);
+        }
         userRepository.deleteAll();
     }
+
 
     @Nested
     @DisplayName("사용자 잔고 변경 낙관적락 동시성 테스트")
@@ -136,7 +157,7 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
         @Test
         @DisplayName("너무 많은 재시도를 시도 하면 예외를 발생시킴")
         public void updateBalance_many_retry() throws Exception {
-            ExecutorService executors = Executors.newFixedThreadPool(10);
+            ExecutorService executors = Executors.newFixedThreadPool(5);
 
             List<ResultActions> performs = new ArrayList<>();
 

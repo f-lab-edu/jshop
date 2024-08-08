@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+  sql:
+    init:
+      mode: always
+      encoding: utf-8
+      schema-locations: classpath:index.sql
+
+logging:
+  level:
+    sql: trace

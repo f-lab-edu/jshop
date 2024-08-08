@@ -6,10 +6,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jshop.core.config.P6SpyConfig;
 import jshop.core.domain.category.entity.Category;
 import jshop.core.domain.category.repository.CategoryRepository;
 import jshop.core.domain.product.entity.Product;
@@ -18,6 +21,9 @@ import jshop.core.domain.product.repository.ProductDetailRepository;
 import jshop.core.domain.product.repository.ProductRepository;
 import jshop.core.domain.product.repository.SearchRepository;
 import jshop.common.test.BaseTestContainers;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.processing.SQL;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,18 +32,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+@Slf4j
 @EnableWebMvc
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
-@Transactional
 @EnableJpaAuditing
 @DisplayName("[통합 테스트] SearchController")
+@Import(P6SpyConfig.class)
 class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
     @Autowired
@@ -55,6 +63,9 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
     @Autowired
     SearchRepository searchRepository;
 
+    @PersistenceContext
+    EntityManager em;
+
     List<Category> categories = new ArrayList<>();
     List<Product> products = new ArrayList<>();
     List<ProductDetail> productDetails = new ArrayList<>();
@@ -62,17 +73,19 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
     int categoryN = 3;
     int productN = 18;
     int pdN = 3;
+
     @Qualifier("objectMapper")
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     public void init() {
+
         for (int i = 0; i < categoryN; i++) {
             categories.add(categoryRepository.save(
                 Category
                     .builder()
-                    .name("category" + i)
+                    .name("category " + i)
                     .build()));
         }
 
@@ -95,7 +108,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
             Product product = productRepository.save(Product
                 .builder()
-                .name("product" + i)
+                .name("product " + i)
                 .attributes(attributes)
                 .manufacturer("manufacturer" + i)
                 .category(categories.get(i % 3))
@@ -123,10 +136,20 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
         }
     }
 
+    @AfterEach
+    public void afterEach() {
+        productDetailRepository.deleteAll();
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
+    }
+
     @Test
     @DisplayName("정렬, 필터 없이 검색")
     public void search_noCondition() throws Exception {
         // when
+        log.info("TX : {}", TransactionSynchronizationManager.isSynchronizationActive());
+        log.info("TX : {}", TransactionSynchronizationManager.isCurrentTransactionReadOnly());
+        log.info("TX : {}", TransactionSynchronizationManager.isActualTransactionActive());
         ResultActions perform = mockMvc.perform(get("/api/search?query=product"));
 
         // then
@@ -149,7 +172,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
                .andExpect(jsonPath("$.data.totalPages").value(1))
                .andExpect(jsonPath("$.data.currentPage").value(0))
                .andExpect(jsonPath("$.data.products", hasSize(3)))
-               .andExpect(jsonPath("$.data.products[0].name").value("product3"))
+               .andExpect(jsonPath("$.data.products[0].name").value("product 3"))
                .andExpect(jsonPath("$.data.products[0].manufacturer").value("manufacturer3"));
     }
 
@@ -169,7 +192,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
                .andExpect(jsonPath("$.data.totalPages").value(1))
                .andExpect(jsonPath("$.data.currentPage").value(0))
                .andExpect(jsonPath("$.data.products", hasSize(18)))
-               .andExpect(jsonPath("$.data.products[0].name").value("product2"))
+               .andExpect(jsonPath("$.data.products[0].name").value("product 2"))
                .andExpect(jsonPath("$.data.products[0].manufacturer").value("manufacturer2"))
                .andExpect(jsonPath("$.data.products[0].category").value(category.getName()));
     }
@@ -183,7 +206,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
 
         // when
         ResultActions perform = mockMvc.perform(
-            get("/api/search?query=product&attributeFilters[0][attr1]=1"));
+            get("/api/search?query=product&attributeFilters[0][attr1]=1&attributeFilters[1][attr2]=2"));
 
         // then
         perform.andExpect(status().isOk())
@@ -191,7 +214,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
                .andExpect(jsonPath("$.data.totalPages").value(1))
                .andExpect(jsonPath("$.data.currentPage").value(0))
                .andExpect(jsonPath("$.data.products", hasSize(9)))
-               .andExpect(jsonPath("$.data.products[0].name").value("product0"))
+               .andExpect(jsonPath("$.data.products[0].name").value("product 0"))
                .andExpect(jsonPath("$.data.products[0].manufacturer").value("manufacturer0"));
     }
 
@@ -207,7 +230,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
                .andExpect(jsonPath("$.data.totalPages").value(2))
                .andExpect(jsonPath("$.data.currentPage").value(0))
                .andExpect(jsonPath("$.data.products", hasSize(30)))
-               .andExpect(jsonPath("$.data.products[0].name").value("product0"))
+               .andExpect(jsonPath("$.data.products[0].name").value("product 0"))
                .andExpect(jsonPath("$.data.products[0].manufacturer").value("manufacturer0"))
                .andExpect(jsonPath("$.data.products[0].price").value(0));
     }
@@ -265,7 +288,7 @@ class SearchControllerIntegrationBaseTest extends BaseTestContainers {
                .andExpect(jsonPath("$.data.totalPages").value(2))
                .andExpect(jsonPath("$.data.currentPage").value(0))
                .andExpect(jsonPath("$.data.products", hasSize(30)))
-               .andExpect(jsonPath("$.data.products[0].name").value("product9"))
+               .andExpect(jsonPath("$.data.products[0].name").value("product 9"))
                .andExpect(jsonPath("$.data.products[0].manufacturer").value("manufacturer9"));
     }
 }

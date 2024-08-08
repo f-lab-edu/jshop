@@ -1,1 +1,2 @@
-jshop.core.common.hibernate.CustomFunctionContributor
+jshop.core.common.hibernate.mysql.JSON_CONTAINS_functionContributor
+jshop.core.common.hibernate.mysql.FULLTEXT_MATCH_functionContributor

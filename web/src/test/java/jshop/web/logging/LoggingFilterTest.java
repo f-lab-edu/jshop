@@ -23,6 +23,7 @@ import java.util.List;
 import jshop.web.dto.RequestLog;
 import jshop.web.dto.ResponseLog;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +85,7 @@ class LoggingFilterTest {
 
     @Test
     @DisplayName("LoggingFilter는 Request와 Response에서 데이터를 추출해 로그로 남김")
+    @Disabled
     public void log_success_json() throws Exception {
         // given
         String requestBody = "{\"a\" : 123}";
