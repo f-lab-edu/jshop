@@ -1,1 +1,6 @@
 rootProject.name = 'jshop'
+include ':web'
+include ':batch'
+include ':common'
+include ':infra'
+include ':core'

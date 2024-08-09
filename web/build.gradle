@@ -1,0 +1,27 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':common')
+
+    // spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // spring
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    // actuator
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    // swagger
+
+    //jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    // jwt
+
+    // test
+    implementation 'org.springframework.security:spring-security-test'
+    // test
+}

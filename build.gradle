@@ -1,83 +1,66 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.0'
-    id 'io.spring.dependency-management' version '1.1.5'
 }
 
-group = 'jshop'
-version = '0.0.6-hotfix.1'
+allprojects {
+    group = 'jshop'
+    version = '0.0.6-hotfix.1'
 
-java {
-    sourceCompatibility = '17'
-}
+    java {
+        sourceCompatibility = '17'
+    }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+    repositories {
+        mavenCentral()
     }
 }
 
-repositories {
-    mavenCentral()
-}
 
-dependencies {
-    // spring
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    // spring
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
 
-    // actuator
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.micrometer:micrometer-registry-prometheus'
-    // actuator
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-    // utils
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springframework.data:spring-data-envers'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-    implementation 'org.springframework.retry:spring-retry'
-    implementation 'net.datafaker:datafaker:2.3.1'
-    // utils
+    repositories {
+        mavenCentral()
+    }
 
-    // db
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.redisson:redisson-spring-boot-starter:3.33.0'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    // db
+    dependencies {
+        // spring
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-aop'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        // spring
 
-    //jwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-    // jwt
+        // utils
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+        implementation 'org.springframework.retry:spring-retry'
+        // utils
 
-    //QueryDSL
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    //QueryDSL
+        // test
+        implementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.testcontainers:testcontainers:1.20.0'
+        implementation 'org.testcontainers:junit-jupiter:1.20.0'
+        implementation 'org.testcontainers:mysql:1.20.0'
+        implementation "com.redis:testcontainers-redis:2.2.2"
+        // test
+    }
 
-    // test
-    implementation 'org.springframework.security:spring-security-test'
-    implementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.testcontainers:testcontainers:1.20.0'
-    testImplementation 'org.testcontainers:junit-jupiter:1.20.0'
-    testImplementation 'org.testcontainers:mysql:1.20.0'
-    testImplementation "com.redis:testcontainers-redis:2.2.2"
-    // test
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 }
