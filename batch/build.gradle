@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':common')
+    implementation project(':infra')
+
+    implementation 'net.datafaker:datafaker:2.3.1'
+}

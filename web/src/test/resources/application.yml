@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      max-lifetime: 250000
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    sql: trace
