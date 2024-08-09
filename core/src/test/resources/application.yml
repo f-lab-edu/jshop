@@ -1,7 +1,11 @@
 spring:
+  datasource:
+    hikari:
+      max-lifetime: 250000
+      maximum-pool-size: 10
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
 
 logging:
   level:

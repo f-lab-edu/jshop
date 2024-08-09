@@ -12,6 +12,7 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
@@ -55,8 +56,8 @@ public class SearchRepositoryImpl implements SearchRepository {
                 product.description,
                 productDetail.price,
                 productDetail.attribute))
-            .from(productDetail)
-            .leftJoin(productDetail.product, product)
+            .from(product)
+            .leftJoin(product.productDetails, productDetail)
             .leftJoin(product.category, category)
             .where(
                 nameLike(condition.getQuery()),
@@ -71,14 +72,22 @@ public class SearchRepositoryImpl implements SearchRepository {
             .fetch();
 
 
+
+
         JPAQuery<Long> countQuery = queryFactory
             .select(productDetail.count())
             .from(productDetail)
-            .leftJoin(productDetail.product, product)
             .where(
-                nameLike(condition.getQuery()),
-                categoryEq(condition.getCategoryId()),
-                manufacturerEq(condition.getManufacturer()),
+                productDetail.product.id.in(
+                    JPAExpressions
+                        .select(product.id)
+                        .from(product)
+                        .where(
+                            nameLike(condition.getQuery()),
+                            categoryEq(condition.getCategoryId()),
+                            manufacturerEq(condition.getManufacturer())
+                        )
+                ),
                 attributeEq(condition.getAttributeFilters()),
                 productDetail.isDeleted.isFalse()
             );
@@ -140,6 +149,7 @@ public class SearchRepositoryImpl implements SearchRepository {
             log.error(ErrorCode.NO_SEARCH_QUERY.getLogMessage());
             throw JshopException.of(ErrorCode.NO_SEARCH_QUERY);
         }
-        return product.name.like("%" + query + "%");
+
+        return Expressions.booleanTemplate("fulltext_match({0}, {1})", product.name, query);
     }
 }
