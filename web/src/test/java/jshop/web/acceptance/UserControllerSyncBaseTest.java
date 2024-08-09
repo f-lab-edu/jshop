@@ -21,24 +21,33 @@ import jshop.core.domain.user.entity.User;
 import jshop.core.domain.user.repository.UserRepository;
 import jshop.core.domain.user.service.UserService;
 import jshop.core.domain.wallet.entity.Wallet;
+import jshop.core.domain.wallet.repository.WalletHistoryRepository;
 import jshop.core.domain.wallet.repository.WalletRepository;
 import jshop.common.exception.ErrorCode;
 import jshop.common.test.BaseTestContainers;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.history.Revision;
+import org.springframework.data.history.Revisions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+@Slf4j
 @EnableWebMvc
 @SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
