@@ -46,19 +46,14 @@ public class LoggingFilter implements Filter {
         LoggingHttpServletRequestWrapper requestWrapper = new LoggingHttpServletRequestWrapper(httpRequest);
         LoggingHttpServletResponseWrapper responseWrapper = new LoggingHttpServletResponseWrapper(httpResponse);
 
-        chain.doFilter(requestWrapper, responseWrapper);
+        Enumeration<String> requestHeaderNames = httpRequest.getHeaderNames();
+        Map<String, String> requestHeaders = new HashMap<>();
 
         String requestData = new String(requestWrapper.getRequestData(), Charset.defaultCharset());
 
         if (httpRequest.getRequestURI().equals("/api/login")) {
             requestData = "Secure Info";
         }
-
-        String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());
-
-        // 로그에 기록
-        Enumeration<String> requestHeaderNames = httpRequest.getHeaderNames();
-        Map<String, String> requestHeaders = new HashMap<>();
 
         while (requestHeaderNames.hasMoreElements()) {
             String header = requestHeaderNames.nextElement();
@@ -80,6 +75,12 @@ public class LoggingFilter implements Filter {
             .body(requestData)
             .build();
 
+        log.info("Request Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestLog));
+
+        chain.doFilter(requestWrapper, responseWrapper);
+
+        String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());
+
         ResponseLog responseLog = ResponseLog
             .builder()
             .id(uuid)
@@ -94,7 +95,6 @@ public class LoggingFilter implements Filter {
             .body(responseData)
             .build();
 
-        log.info("Request Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestLog));
         log.info("Response Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLog));
     }
 
