@@ -31,4 +31,4 @@ COPY . /app
 RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
-CMD ["java", "-jar", "-Dspring.profiles.active=product",  "build/libs/jshop-0.0.6-hotfix.1.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=product",  "build/libs/web-cache-test.jar"]
