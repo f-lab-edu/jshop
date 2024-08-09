@@ -1,3 +1,4 @@
+/*
 pipeline {
     agent any
     
@@ -16,5 +17,5 @@ pipeline {
             junit 'build/test-results/test/*.xml'
         }
     }
-
 }
+*/

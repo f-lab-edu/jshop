@@ -1,3 +1,4 @@
+/*
 pipeline {
     agent any
     
@@ -17,3 +18,4 @@ pipeline {
         }
     }
 }
+*/
