@@ -39,6 +39,7 @@ public class SearchRepositoryImpl implements SearchRepository {
 
     private final JPAQueryFactory queryFactory;
     private final ObjectMapper objectMapper;
+    private final SearchCounterQueryRepository searchCounterQueryRepository;
 
     @Override
     public Page<SearchProductDetailQueryResult> search(SearchCondition condition, Pageable pageable) {
@@ -70,30 +71,10 @@ public class SearchRepositoryImpl implements SearchRepository {
             .limit(pageable.getPageSize())
             .orderBy(buildOrderSpecifier(pageable.getSort()))
             .fetch();
-
-
-
-
-        JPAQuery<Long> countQuery = queryFactory
-            .select(productDetail.count())
-            .from(productDetail)
-            .where(
-                productDetail.product.id.in(
-                    JPAExpressions
-                        .select(product.id)
-                        .from(product)
-                        .where(
-                            nameLike(condition.getQuery()),
-                            categoryEq(condition.getCategoryId()),
-                            manufacturerEq(condition.getManufacturer())
-                        )
-                ),
-                attributeEq(condition.getAttributeFilters()),
-                productDetail.isDeleted.isFalse()
-            );
         // @formatter:on
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable,
+            () -> searchCounterQueryRepository.getTotalCount(condition));
     }
 
     private OrderSpecifier[] buildOrderSpecifier(Sort sort) {
