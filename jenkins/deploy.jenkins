@@ -15,8 +15,8 @@ pipeline {
         REDIS_HOST = credentials('REDIS_HOST')
         REDIS_PORT = credentials('REDIS_PORT')
         REDIS_PASSWORD = credentials('REDIS_PASSWORD')
-
-        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop:v0.0.6-hotfix.1'
+        VERSION = '0.1.0'
+        IMAGE = 'jshop.kr.ncr.ntruss.com/jshop'
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     echo 'build'
-                    sh "docker build -t ${IMAGE} --build-arg MYSQL_HOST=${MYSQL_HOST} --build-arg MYSQL_PORT=${MYSQL_PORT} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg REDIS_HOST=${REDIS_HOST} --build-arg REDIS_PORT=${REDIS_PORT} --build-arg REDIS_PASSWORD=${REDIS_PASSWORD} ."
+                    sh "docker build -t ${IMAGE}:${VERSION} --build-arg MYSQL_HOST=${MYSQL_HOST} --build-arg MYSQL_PORT=${MYSQL_PORT} --build-arg MYSQL_USERNAME=${MYSQL_USERNAME} --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg REDIS_HOST=${REDIS_HOST} --build-arg REDIS_PORT=${REDIS_PORT} --build-arg REDIS_PASSWORD=${REDIS_PASSWORD} ."
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
                 script {
                     echo 'push'
                     sh "echo ${NCLOUD_SECRET_KEY} | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin"                
-                    sh "docker push ${IMAGE}"
+                    sh "docker push ${IMAGE}:${VERSION}"
                 }
             }
         }
@@ -64,7 +64,7 @@ pipeline {
                     SERVERS.each { server ->
                         sshagent(['ssh-deploy-key']) {
                             sh "ssh jhkim@${server} 'echo $NCLOUD_SECRET_KEY | docker login jshop.kr.ncr.ntruss.com -u ${NCLOUD_ACCESS_KEY_ID} --password-stdin'"
-                            sh "ssh jhkim@${server} 'docker service update --image ${IMAGE} jshop_jshop --with-registry-auth'"
+                            sh "ssh jhkim@${server} 'docker service update --image ${IMAGE}:${VERSION} jshop_jshop --with-registry-auth'"
                         }
                     }                                            
                 }

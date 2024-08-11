@@ -1,5 +1,7 @@
 FROM openjdk:17-oracle
 
+ARG VERSION
+
 ARG MYSQL_HOST
 ARG MYSQL_PORT
 ARG MYSQL_PASSWORD
@@ -11,7 +13,6 @@ ARG REDIS_HOST
 ARG REDIS_PORT
 ARG REDIS_PASSWORD
 
-
 ENV MYSQL_HOST=${MYSQL_HOST}
 ENV MYSQL_PORT=${MYSQL_PORT}
 ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
@@ -22,6 +23,7 @@ ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
 ENV REDIS_HOST=${REDIS_HOST}
 ENV REDIS_PORT=${REDIS_PORT}
 ENV REDIS_PASSWORD=${REDIS_PASSWORD}
+ENV VERSION=${VERSION}
 
 RUN microdnf install findutils
 
@@ -31,4 +33,4 @@ COPY . /app
 RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
-CMD ["java", "-jar", "-Dspring.profiles.active=product",  "build/libs/jshop-0.0.6-hotfix.1.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=product",  "build/libs/web-$VERSION.jar"]
