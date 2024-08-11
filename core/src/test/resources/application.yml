@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    hikari:
+      max-lifetime: 250000
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: create
+  cache:
+    type: redis
+    cache-names: cache1
+    redis:
+      time-to-live: 3600000
+logging:
+  level:
+    sql: trace
