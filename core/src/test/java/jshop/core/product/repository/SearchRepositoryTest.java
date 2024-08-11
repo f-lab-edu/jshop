@@ -17,6 +17,7 @@ import jshop.core.domain.product.repository.ProductRepository;
 import jshop.core.domain.product.repository.SearchRepository;
 import jshop.common.test.BaseTestContainers;
 import jshop.core.domain.product.repository.SearchRepositoryImpl;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -41,9 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @EnableJpaAuditing
 @Import(BCryptPasswordEncoder.class)
-@Transactional
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @DisplayName("[단위 테스트] SearchRepository")
+@Sql(statements = "ALTER TABLE product ADD FULLTEXT(name)", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 class SearchRepositoryTest extends BaseTestContainers {
 
     @Autowired
@@ -98,7 +101,7 @@ class SearchRepositoryTest extends BaseTestContainers {
 
             Product product = productRepository.save(Product
                 .builder()
-                .name("product" + i)
+                .name("product " + i)
                 .attributes(attributes)
                 .manufacturer("manufacturer" + i)
                 .category(categories.get(i % 3))
@@ -124,6 +127,13 @@ class SearchRepositoryTest extends BaseTestContainers {
                     .build()));
             }
         }
+    }
+
+    @AfterEach
+    public void afterEach() {
+        productDetailRepository.deleteAll();
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test
@@ -164,7 +174,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         // then
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getNumberOfElements()).isEqualTo(3);
-        assertThat(content.get(0).getName()).isEqualTo("product3");
+        assertThat(content.get(0).getName()).isEqualTo("product 3");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer3");
     }
 
@@ -187,7 +197,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         // then
         assertThat(page.getTotalElements()).isEqualTo(((long) productN * pdN) / categoryN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
-        assertThat(content.get(0).getName()).isEqualTo("product2");
+        assertThat(content.get(0).getName()).isEqualTo("product 2");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer2");
         assertThat(content.get(0).getCategory()).isEqualTo(category.getName());
     }
@@ -214,7 +224,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         System.out.println(content.get(0));
         assertThat(page.getTotalElements()).isEqualTo(9);
         assertThat(page.getNumberOfElements()).isEqualTo(9);
-        assertThat(content.get(0).getName()).isEqualTo("product0");
+        assertThat(content.get(0).getName()).isEqualTo("product 0");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer0");
         assertThat(content.get(0).getAttribute()).containsAllEntriesOf(attribute);
     }
@@ -237,7 +247,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
         assertThat(content.get(0).getId()).isEqualTo(productDetails.get(0).getId());
-        assertThat(content.get(0).getName()).isEqualTo("product0");
+        assertThat(content.get(0).getName()).isEqualTo("product 0");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer0");
         assertThat(content.get(0).getPrice()).isEqualTo(0);
     }
@@ -307,7 +317,7 @@ class SearchRepositoryTest extends BaseTestContainers {
         // then
         assertThat(page.getTotalElements()).isEqualTo((long) pdN * productN);
         assertThat(page.getNumberOfElements()).isEqualTo(10);
-        assertThat(content.get(0).getName()).isEqualTo("product9");
+        assertThat(content.get(0).getName()).isEqualTo("product 9");
         assertThat(content.get(0).getManufacturer()).isEqualTo("manufacturer9");
     }
 }
