@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = 'jshop'
-    version = '0.1.0'
+    version = 'elk-test'
 
     java {
         sourceCompatibility = '17'
