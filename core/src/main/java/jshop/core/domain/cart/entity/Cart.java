@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 @Slf4j
 @Entity
@@ -47,7 +48,9 @@ public class Cart extends BaseEntity {
 
     public void addCart(ProductDetail productDetail, int quantity) {
         if (quantity <= 0) {
+            MDC.put("error_code", String.valueOf(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getCode()));
             log.error(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), quantity);
+            MDC.clear();
             throw JshopException.of(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION);
         }
 

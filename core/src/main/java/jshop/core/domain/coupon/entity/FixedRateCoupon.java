@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 @Slf4j
 @Getter
@@ -55,7 +56,9 @@ public class FixedRateCoupon extends Coupon {
         checkCouponUsagePeriod();
 
         if (originPrice < minOriginPrice) {
+            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getLogMessage(), minOriginPrice, originPrice);
+            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
         }
 

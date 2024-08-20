@@ -7,6 +7,6 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @Configuration
 @EnableRetry
-@ComponentScan(basePackages = {"jshop.common", "jshop.core"})
+@ComponentScan(basePackages = {"jshop.core"})
 @EnableCaching
 public class InitConfig {}

@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-@WebMvcTest(controllers = {AccountController.class, GlobalExceptionHandler.class})
+@WebMvcTest(controllers = {AccountController.class, GlobalExceptionHandler.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import(TestSecurityConfig.class)
 @DisplayName("[단위 테스트] AccountController")
 class AccountControllerTest {
