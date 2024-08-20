@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = 'jshop'
-    version = '0.1.0'
+    version = '0.1.1'
 
     java {
         sourceCompatibility = '17'
@@ -45,6 +45,7 @@ subprojects {
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
         implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
         implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
         implementation 'org.springframework.retry:spring-retry'
         implementation 'org.springframework.data:spring-data-envers'

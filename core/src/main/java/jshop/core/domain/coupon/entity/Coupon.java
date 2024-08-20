@@ -73,9 +73,7 @@ public abstract class Coupon {
     protected boolean checkCouponUsagePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(useStartDate) || now.isAfter(useEndDate)) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_USAGE_PERIOD_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_USAGE_PERIOD_EXCEPTION.getLogMessage(), useStartDate, useEndDate);
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_USAGE_PERIOD_EXCEPTION);
         }
 
@@ -85,9 +83,7 @@ public abstract class Coupon {
     protected boolean checkCouponIssuePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(issueStartDate) || now.isAfter(issueEndDate)) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION.getLogMessage(), issueStartDate, issueEndDate);
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_ISSUE_PERIOD_EXCEPTION);
         }
 
@@ -98,9 +94,7 @@ public abstract class Coupon {
         checkCouponIssuePeriod();
 
         if (remainingQuantity <= 0) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION.getLogMessage(), id, remainingQuantity);
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_OUT_OF_STOCK_EXCEPTION);
         }
 

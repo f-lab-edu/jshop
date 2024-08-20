@@ -47,9 +47,7 @@ public class AddressService {
     public Address getAddress(Long addressId) {
         Optional<Address> optionalAddress = addressRepository.findById(addressId);
         return optionalAddress.orElseThrow(() -> {
-            MDC.put("error_code", String.valueOf(ErrorCode.ADDRESSID_NOT_FOUND.getCode()));
             log.error(ErrorCode.ADDRESSID_NOT_FOUND.getLogMessage(), addressId);
-            MDC.clear();
             throw JshopException.of(ErrorCode.ADDRESSID_NOT_FOUND);
         });
     }

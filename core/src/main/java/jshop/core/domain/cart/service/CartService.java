@@ -49,9 +49,7 @@ public class CartService {
         Cart cart = getCart(userId);
 
         if (!productDetailRepository.existsByIdAndIsDeletedFalse(detailId)) {
-            MDC.put("error_code", String.valueOf(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getCode()));
             log.error(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), detailId);
-            MDC.clear();
             throw JshopException.of(ErrorCode.PRODUCTDETAIL_ID_NOT_FOUND);
         }
 
@@ -75,9 +73,7 @@ public class CartService {
     public CartProductDetail getCartProductDetail(Long id) {
         Optional<CartProductDetail> optionalCartProductDetail = cartProductDetailRepository.findById(id);
         return optionalCartProductDetail.orElseThrow(() -> {
-            MDC.put("error_code", String.valueOf(ErrorCode.CART_PRODUCTDETAIL_ID_NOT_FOUND.getCode()));
             log.error(ErrorCode.CART_PRODUCTDETAIL_ID_NOT_FOUND.getLogMessage(), id);
-            MDC.clear();
             throw JshopException.of(ErrorCode.CART_PRODUCTDETAIL_ID_NOT_FOUND);
         });
     }
@@ -85,9 +81,7 @@ public class CartService {
     public Cart getCart(Long userId) {
         Optional<Cart> optionalCart = cartRepository.findCartByUserId(userId);
         return optionalCart.orElseThrow(() -> {
-            MDC.put("error_code", String.valueOf(ErrorCode.CART_NOT_FOUND.getCode()));
             log.error(ErrorCode.CART_NOT_FOUND.getLogMessage(), userId);
-            MDC.clear();
             throw JshopException.of(ErrorCode.CART_NOT_FOUND);
         });
     }

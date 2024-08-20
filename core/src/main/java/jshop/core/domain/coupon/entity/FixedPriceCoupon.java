@@ -33,9 +33,7 @@ public class FixedPriceCoupon extends Coupon {
         checkCouponUsagePeriod();
 
         if (originPrice < minOriginPrice) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getLogMessage(), minOriginPrice, originPrice);
-            MDC.clear();
             JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
         }
 

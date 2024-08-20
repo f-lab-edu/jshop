@@ -60,9 +60,7 @@ public class Delivery extends BaseEntity {
 
     public void startTransit() {
         if (!deliveryState.equals(DeliveryState.PREPARING)) {
-            MDC.put("error_code", String.valueOf(ErrorCode.ILLEGAL_DELIVERY_STATE.getCode()));
             log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.PREPARING, deliveryState);
-            MDC.clear();
             throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
         }
         deliveryState = DeliveryState.IN_TRANSIT;
@@ -70,9 +68,7 @@ public class Delivery extends BaseEntity {
 
     public void endDelivered() {
         if (!deliveryState.equals(DeliveryState.IN_TRANSIT)) {
-            MDC.put("error_code", String.valueOf(ErrorCode.ILLEGAL_DELIVERY_STATE.getCode()));
             log.error(ErrorCode.ILLEGAL_DELIVERY_STATE.getLogMessage(), DeliveryState.IN_TRANSIT, deliveryState);
-            MDC.clear();
             throw JshopException.of(ErrorCode.ILLEGAL_DELIVERY_STATE);
         }
         deliveryState = DeliveryState.DELIVERED;

@@ -47,9 +47,7 @@ public class CartProductDetail extends BaseEntity {
 
     public void changeQuantity(int quantity) {
         if (this.quantity + quantity <= 0) {
-            MDC.put("error_code", String.valueOf(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getCode()));
             log.error(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION.getLogMessage(), this.quantity + quantity);
-            MDC.clear();
             throw JshopException.of(ErrorCode.ILLEGAL_CART_QUANTITY_REQUEST_EXCEPTION);
         }
         this.quantity += quantity;

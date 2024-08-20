@@ -33,10 +33,8 @@ public class CouponService {
     public String createCoupon(CreateCouponRequest createCouponRequest) {
         Coupon coupon = null;
         if (createCouponRequest.getCouponType() == null) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_TYPE_NOT_DEFINED.getCode()));
             log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
                 createCouponRequest.getCouponType());
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 
@@ -48,17 +46,13 @@ public class CouponService {
                 coupon = FixedRateCoupon.of(createCouponRequest);
                 break;
             default:
-                MDC.put("error_code", String.valueOf(ErrorCode.COUPON_TYPE_NOT_DEFINED.getCode()));
                 log.error(ErrorCode.COUPON_TYPE_NOT_DEFINED.getLogMessage(), createCouponRequest.getId(),
                     createCouponRequest.getCouponType());
-                MDC.clear();
                 throw JshopException.of(ErrorCode.COUPON_TYPE_NOT_DEFINED);
         }
 
         if (coupon == null) {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_CREATE_EXCEPTION.getCode()));
             log.error(ErrorCode.COUPON_CREATE_EXCEPTION.getLogMessage(), createCouponRequest.getId());
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_CREATE_EXCEPTION);
         }
 
@@ -80,9 +74,7 @@ public class CouponService {
     public Coupon getCoupon(String couponId) {
         Optional<Coupon> optionalCoupon = couponRepository.findById(couponId);
         return optionalCoupon.orElseThrow(() -> {
-            MDC.put("error_code", String.valueOf(ErrorCode.COUPON_ID_NOT_FOUND.getCode()));
             log.error(ErrorCode.COUPON_ID_NOT_FOUND.getLogMessage(), couponId);
-            MDC.clear();
             throw JshopException.of(ErrorCode.COUPON_ID_NOT_FOUND);
         });
     }
@@ -90,9 +82,7 @@ public class CouponService {
     public UserCoupon getUserCoupon(Long userCouponId) {
         Optional<UserCoupon> optionalUserCoupon = userCouponRepository.findById(userCouponId);
         return optionalUserCoupon.orElseThrow(() -> {
-            MDC.put("error_code", String.valueOf(ErrorCode.USER_COUPON_ID_NOT_FOUND.getCode()));
             log.error(ErrorCode.USER_COUPON_ID_NOT_FOUND.getLogMessage(), userCouponId);
-            MDC.clear();
             throw JshopException.of(ErrorCode.USER_COUPON_ID_NOT_FOUND);
         });
     }

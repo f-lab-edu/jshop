@@ -73,8 +73,10 @@ public class LoggingFilter implements Filter {
         MDC.put("headers", requestHeaders.toString());
         MDC.put("queries", httpRequest.getQueryString());
         MDC.put("request_body", requestData);
+        MDC.put("jwt", httpRequest.getHeader("Authorization"));
         log.info("Request Log");
         MDC.clear();
+        MDC.put("jwt", httpRequest.getHeader("Authorization"));
 
         chain.doFilter(requestWrapper, responseWrapper);
 
