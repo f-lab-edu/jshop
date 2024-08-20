@@ -15,6 +15,7 @@ import jshop.common.exception.ErrorCode;
 import jshop.common.exception.JshopException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

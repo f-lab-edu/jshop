@@ -17,10 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import jshop.common.exception.ErrorCode;
 import jshop.web.dto.RequestLog;
 import jshop.web.dto.ResponseLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,39 +65,36 @@ public class LoggingFilter implements Filter {
             }
         }
 
-        RequestLog requestLog = RequestLog
-            .builder()
-            .id(uuid)
-            .uri(httpRequest.getRequestURI())
-            .method(httpRequest.getMethod())
-            .client(httpRequest.getRemoteHost())
-            .protocol(httpRequest.getProtocol())
-            .headers(requestHeaders)
-            .queries(httpRequest.getQueryString())
-            .body(requestData)
-            .build();
-
-        log.info("Request Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestLog));
+        MDC.put("request_id", uuid);
+        MDC.put("uri", httpRequest.getRequestURI());
+        MDC.put("method", httpRequest.getMethod());
+        MDC.put("client", httpRequest.getRemoteHost());
+        MDC.put("protocol", httpRequest.getProtocol());
+        MDC.put("headers", requestHeaders.toString());
+        MDC.put("queries", httpRequest.getQueryString());
+        MDC.put("request_body", requestData);
+        MDC.put("jwt", httpRequest.getHeader("Authorization"));
+        log.info("Request Log");
+        MDC.clear();
+        MDC.put("jwt", httpRequest.getHeader("Authorization"));
 
         chain.doFilter(requestWrapper, responseWrapper);
 
         String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());
 
-        ResponseLog responseLog = ResponseLog
-            .builder()
-            .id(uuid)
-            .status(httpResponse.getStatus())
-            .executeTime(System.currentTimeMillis() - startTime)
-            .headers(httpResponse
-                .getHeaderNames()
-                .stream()
-                .distinct()
-                .collect(Collectors.toMap((header) -> header,
-                    (header) -> httpResponse.getHeaders(header).stream().collect(Collectors.joining(",")))))
-            .body(responseData)
-            .build();
-
-        log.info("Response Log\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLog));
+        MDC.put("uri", httpRequest.getRequestURI());
+        MDC.put("request_id", uuid);
+        MDC.put("status", "" + httpResponse.getStatus());
+        MDC.put("execution_time", String.valueOf(System.currentTimeMillis() - startTime));
+        MDC.put("headers", httpResponse
+            .getHeaderNames()
+            .stream()
+            .distinct()
+            .collect(Collectors.toMap((header) -> header,
+                (header) -> httpResponse.getHeaders(header).stream().collect(Collectors.joining(",")))).toString());
+        MDC.put("response_body", responseData);
+        log.info("Response Log");
+        MDC.clear();
     }
 
     @Override
