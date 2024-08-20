@@ -16,6 +16,7 @@ import lombok.ToString;
 @ToString
 public class AddressInfoResponse {
 
+    private Long addressId;
     private String receiverName;
     private String receiverNumber;
     private String province;
@@ -30,6 +31,7 @@ public class AddressInfoResponse {
     public static AddressInfoResponse of(Address address) {
         return AddressInfoResponse
             .builder()
+            .addressId(address.getId())
             .receiverName(address.getReceiverName())
             .receiverNumber(address.getReceiverNumber())
             .message(address.getMessage())
