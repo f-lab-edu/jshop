@@ -14,6 +14,7 @@ import jshop.core.domain.address.service.AddressService;
 import jshop.core.domain.coupon.entity.Coupon;
 import jshop.core.domain.coupon.entity.FixedPriceCoupon;
 import jshop.core.domain.coupon.entity.UserCoupon;
+import jshop.core.domain.coupon.repository.UserCouponRepository;
 import jshop.core.domain.coupon.service.CouponService;
 import jshop.core.domain.delivery.entity.DeliveryState;
 import jshop.core.domain.inventory.entity.Inventory;
@@ -48,6 +49,9 @@ class OrderServiceTest {
 
     @InjectMocks
     OrderService orderService;
+
+    @Mock
+    UserCouponRepository userCouponRepository;
 
     @Mock
     AddressService addressService;
@@ -394,7 +398,7 @@ class OrderServiceTest {
             when(addressService.getAddress(1L)).thenReturn(address);
             when(productService.getProductDetail(1L)).thenReturn(productDetail1);
             when(productService.getProductDetail(2L)).thenReturn(productDetail2);
-            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
+            when(userCouponRepository.findById(1L)).thenReturn(Optional.of(userCoupon));
             orderService.createOrder(createOrderRequest, 1L);
 
             // then
@@ -427,7 +431,7 @@ class OrderServiceTest {
             when(addressService.getAddress(1L)).thenReturn(address);
             when(productService.getProductDetail(1L)).thenReturn(productDetail1);
             when(productService.getProductDetail(2L)).thenReturn(productDetail2);
-            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
+            when(userCouponRepository.findById(1L)).thenReturn(Optional.of(userCoupon));
             orderService.createOrder(createOrderRequest, 1L);
             verify(orderRepository, times(1)).save(orderArgumentCaptor.capture());
             order = orderArgumentCaptor.getValue();

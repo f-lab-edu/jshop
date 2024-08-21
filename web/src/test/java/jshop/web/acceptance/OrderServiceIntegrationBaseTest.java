@@ -37,6 +37,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@EnableJpaAuditing
 @Transactional
 @DisplayName("[통합 테스트] OrderService")
 class OrderServiceIntegrationBaseTest extends BaseTestContainers {

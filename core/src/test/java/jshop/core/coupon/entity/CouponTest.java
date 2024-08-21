@@ -4,14 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.coupon.entity.Coupon;
 import jshop.core.domain.coupon.entity.FixedPriceCoupon;
 import jshop.core.domain.coupon.entity.FixedRateCoupon;
 import jshop.core.domain.coupon.entity.UserCoupon;
+import jshop.core.domain.inventory.entity.Inventory;
+import jshop.core.domain.order.dto.CreateOrderRequest;
+import jshop.core.domain.order.dto.OrderItemRequest;
 import jshop.core.domain.order.entity.Order;
+import jshop.core.domain.order.entity.OrderProductDetail;
+import jshop.core.domain.product.entity.ProductDetail;
 import jshop.core.domain.user.entity.User;
 import jshop.common.exception.ErrorCode;
 import jshop.common.exception.JshopException;
+import jshop.core.domain.wallet.entity.Wallet;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +34,6 @@ class CouponTest {
     @DisplayName("정액제 할인 검증")
     public void fix_discount_success() {
         // given
-        Order order = Order
-            .builder().totalPrice(10000L).build();
-
         Coupon coupon = FixedPriceCoupon
             .builder()
             .minOriginPrice(1000L)
@@ -33,42 +41,88 @@ class CouponTest {
             .remainingQuantity(10L)
             .discountPrice(1000L).build();
 
+        Inventory inventory = Inventory.create();
+        inventory.addStock(10);
+
+        ProductDetail productDetail = ProductDetail
+            .builder().id(1L).price(1000L).inventory(inventory).build();
+        Wallet wallet = Wallet.create();
+        wallet.deposit(10000L);
+
         User user = User
-            .builder().build();
+            .builder().wallet(wallet).build();
 
         UserCoupon userCoupon = coupon.issueCoupon(user);
 
+        Address address = Address
+            .builder().build();
+
+        OrderItemRequest orderItemRequest = OrderItemRequest
+            .builder().quantity(3).price(1000L).productDetailId(1L).build();
+
+        CreateOrderRequest createOrderRequest = CreateOrderRequest
+            .builder()
+            .addressId(1L)
+            .totalPrice(3000L)
+            .totalQuantity(3)
+            .orderItems(List.of(orderItemRequest))
+            .build();
+
+        List<OrderProductDetail> orderProductDetails = new ArrayList<>();
+        orderProductDetails.add(OrderProductDetail.of(orderItemRequest, productDetail));
+
         // when
-        order.applyCoupon(userCoupon);
+        Order order = Order.createOrder(user, address, orderProductDetails, userCoupon, createOrderRequest);
 
         // then
-        assertThat(order.getPaymentPrice()).isEqualTo(9000L);
+        assertThat(order.getPaymentPrice()).isEqualTo(2000L);
     }
 
     @Test
-    @DisplayName("정액제 할인 검증")
+    @DisplayName("정률제 할인 검증")
     public void rate_discount_success() {
         // given
-        Order order = Order
-            .builder().totalPrice(10000L).build();
-
         Coupon coupon = FixedRateCoupon
             .builder()
             .minOriginPrice(1000L)
             .totalQuantity(10L)
             .remainingQuantity(10L)
-            .discountRate(0.1).build();
+            .discountRate(0.5).build();
+        Inventory inventory = Inventory.create();
+        inventory.addStock(10);
+
+        ProductDetail productDetail = ProductDetail
+            .builder().id(1L).price(1000L).inventory(inventory).build();
+        Wallet wallet = Wallet.create();
+        wallet.deposit(10000L);
 
         User user = User
-            .builder().build();
+            .builder().wallet(wallet).build();
 
         UserCoupon userCoupon = coupon.issueCoupon(user);
 
+        Address address = Address
+            .builder().build();
+
+        OrderItemRequest orderItemRequest = OrderItemRequest
+            .builder().quantity(3).price(1000L).productDetailId(1L).build();
+
+        CreateOrderRequest createOrderRequest = CreateOrderRequest
+            .builder()
+            .addressId(1L)
+            .totalPrice(3000L)
+            .totalQuantity(3)
+            .orderItems(List.of(orderItemRequest))
+            .build();
+
+        List<OrderProductDetail> orderProductDetails = new ArrayList<>();
+        orderProductDetails.add(OrderProductDetail.of(orderItemRequest, productDetail));
+
         // when
-        order.applyCoupon(userCoupon);
+        Order order = Order.createOrder(user, address, orderProductDetails, userCoupon, createOrderRequest);
 
         // then
-        assertThat(order.getPaymentPrice()).isEqualTo(9000L);
+        assertThat(order.getPaymentPrice()).isEqualTo(1500L);
     }
 
     @Test
