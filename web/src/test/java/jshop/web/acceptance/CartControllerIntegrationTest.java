@@ -44,7 +44,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
-@EnableJpaAuditing
 @SpringBootTest
 @DisplayName("[통합 테스트] CartController")
 @Transactional

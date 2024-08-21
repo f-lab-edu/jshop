@@ -45,7 +45,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @SpringBootTest
-@EnableJpaAuditing
 @DisplayName("[통합 테스트] SearchController")
 @Sql(statements = "ALTER TABLE product ADD FULLTEXT(name)", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 class SearchControllerIntegrationBaseTest extends BaseTestContainers {

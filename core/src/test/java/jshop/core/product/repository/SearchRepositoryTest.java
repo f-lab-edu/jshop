@@ -42,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
  * 때문에 QueryDSL 레포인 SearchRepository를 빈으로 등록하고 QueryDSL을 사용하기 위해 SpringBootTest 적용
  */
 @SpringBootTest
-@EnableJpaAuditing
 @Import(BCryptPasswordEncoder.class)
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @DisplayName("[단위 테스트] SearchRepository")
