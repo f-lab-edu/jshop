@@ -16,17 +16,17 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import jshop.common.exception.ErrorCode;
+import jshop.common.exception.JshopException;
+import jshop.core.common.entity.BaseEntity;
+import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.coupon.entity.Coupon;
 import jshop.core.domain.coupon.entity.UserCoupon;
 import jshop.core.domain.delivery.entity.Delivery;
 import jshop.core.domain.delivery.entity.DeliveryState;
 import jshop.core.domain.order.dto.CreateOrderRequest;
-import jshop.core.domain.order.dto.OrderItemRequest;
-import jshop.core.domain.product.entity.ProductDetail;
 import jshop.core.domain.user.entity.User;
-import jshop.common.exception.ErrorCode;
-import jshop.core.common.entity.BaseEntity;
-import jshop.common.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -85,44 +85,56 @@ public class Order extends BaseEntity {
     @Column(name = "total_quantity")
     private Integer totalQuantity;
 
-    public void applyCoupon(UserCoupon userCoupon) {
-        this.userCoupon = userCoupon;
-        Coupon coupon = userCoupon.getCoupon();
-        paymentPrice = coupon.discount(totalPrice);
-        userCoupon.use();
-    }
 
-    public void addProduct(OrderItemRequest orderItem, ProductDetail productDetail) {
-        if (orderItem.getQuantity() == null || orderItem.getPrice() == null) {
-            log.error(ErrorCode.INVALID_ORDER_ITEM.getLogMessage(), orderItem.getQuantity(), orderItem.getPrice());
-            throw JshopException.of(ErrorCode.INVALID_ORDER_ITEM);
+    public static Order createOrder(User user, Address deliveryAddress,
+        List<OrderProductDetail> orderProducts, UserCoupon userCoupon,
+        CreateOrderRequest createOrderRequest) {
+
+        Delivery delivery = Delivery.of(deliveryAddress);
+        Long totalPrice = createOrderRequest.getTotalPrice();
+
+        long totalProductPrice = 0L;
+        int totalProductQuantity = 0;
+
+        for (OrderProductDetail orderProductDetail : orderProducts) {
+            totalProductPrice += orderProductDetail.getOrderPrice() * orderProductDetail.getOrderQuantity();
+            totalProductQuantity += orderProductDetail.getOrderQuantity();
         }
 
-        int quantity = orderItem.getQuantity();
-        long price = orderItem.getPrice();
-
-        if (price != productDetail.getPrice()) {
-            log.error(ErrorCode.PRODUCT_PRICE_MISMATCH.getLogMessage(), productDetail.getId(), price,
-                productDetail.getPrice());
-            throw JshopException.of(ErrorCode.PRODUCT_PRICE_MISMATCH);
+        if (totalProductPrice != totalPrice) {
+            log.error(ErrorCode.ORDER_PRICE_MISMATCH.getLogMessage(), totalPrice, totalProductPrice);
+            throw JshopException.of(ErrorCode.ORDER_PRICE_MISMATCH);
         }
 
-        productDetail.getInventory().purchase(quantity);
+        if (createOrderRequest.getTotalQuantity() != totalProductQuantity) {
+            log.error(ErrorCode.ORDER_QUANTITY_MISMATCH.getLogMessage(), createOrderRequest.getTotalQuantity(),
+                totalProductQuantity);
+            throw JshopException.of(ErrorCode.ORDER_QUANTITY_MISMATCH);
+        }
 
-        OrderProductDetail orderProductDetail = OrderProductDetail
-            .builder().order(this).orderQuantity(quantity).orderPrice(price).productDetail(productDetail).build();
-        productDetails.add(orderProductDetail);
-    }
+        long paymentPrice = createOrderRequest.getTotalPrice();
 
-    public static Order createOrder(User user, Delivery delivery, CreateOrderRequest createOrderRequest) {
-        return Order
+
+        if (userCoupon != null) {
+            Coupon coupon = userCoupon.getCoupon();
+            paymentPrice = coupon.discount(totalPrice);
+            userCoupon.use();
+        }
+
+        user.getWallet().withdraw(paymentPrice);
+
+        Order order = Order
             .builder()
             .user(user)
             .delivery(delivery)
+            .userCoupon(userCoupon)
+            .productDetails(orderProducts)
             .totalPrice(createOrderRequest.getTotalPrice())
-            .paymentPrice(createOrderRequest.getTotalPrice())
             .totalQuantity(createOrderRequest.getTotalQuantity())
+            .paymentPrice(paymentPrice)
             .build();
+
+        return order;
     }
 
     public void cancel() {

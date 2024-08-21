@@ -1,12 +1,14 @@
 package jshop.core.domain.order.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.address.service.AddressService;
 import jshop.core.domain.coupon.entity.UserCoupon;
 import jshop.core.domain.coupon.repository.CouponRepository;
+import jshop.core.domain.coupon.repository.UserCouponRepository;
 import jshop.core.domain.coupon.service.CouponService;
 import jshop.core.domain.delivery.entity.Delivery;
 import jshop.core.domain.order.dto.CreateOrderRequest;
@@ -48,6 +50,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
     private final CouponService couponService;
+    private final UserCouponRepository userCouponRepository;
 
     public OrderListResponse getOrderList(int pageSize, LocalDateTime lastOrderDate, Long userId) {
         User user = userRepository.getReferenceById(userId);
@@ -77,42 +80,22 @@ public class OrderService {
     @Transactional
     public Long createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         User user = userService.getUser(userId);
-        Long totalPrice = createOrderRequest.getTotalPrice();
-
         Address deliveryAddress = addressService.getAddress(createOrderRequest.getAddressId());
-        Delivery delivery = Delivery.of(deliveryAddress);
-
-        Order order = Order.createOrder(user, delivery, createOrderRequest);
-
-        long totalProductPrice = 0L;
-        int totalProductQuantity = 0;
-        for (OrderItemRequest orderItem : createOrderRequest.getOrderItems()) {
-            ProductDetail productDetail = productService.getProductDetail(orderItem.getProductDetailId());
-            order.addProduct(orderItem, productDetail);
-            totalProductPrice += orderItem.getPrice() * orderItem.getQuantity();
-            totalProductQuantity += orderItem.getQuantity();
-        }
-
-        if (totalProductPrice != totalPrice) {
-            log.error(ErrorCode.ORDER_PRICE_MISMATCH.getLogMessage(), totalPrice, totalProductPrice);
-            throw JshopException.of(ErrorCode.ORDER_PRICE_MISMATCH);
-        }
-
-        if (createOrderRequest.getTotalQuantity() != totalProductQuantity) {
-            log.error(ErrorCode.ORDER_QUANTITY_MISMATCH.getLogMessage(), createOrderRequest.getTotalQuantity(),
-                totalProductQuantity);
-            throw JshopException.of(ErrorCode.ORDER_QUANTITY_MISMATCH);
-        }
+        UserCoupon userCoupon = null;
 
         if (createOrderRequest.getUserCouponId() != null) {
-            UserCoupon userCoupon = couponService.getUserCoupon(createOrderRequest.getUserCouponId());
-            order.applyCoupon(userCoupon);
+            userCoupon = couponService.getUserCoupon(createOrderRequest.getUserCouponId());
         }
 
-        user.getWallet().purchase(order.getPaymentPrice());
+        List<OrderProductDetail> orderProductDetails = new ArrayList<>();
 
+        for (OrderItemRequest orderItemRequest : createOrderRequest.getOrderItems()) {
+            ProductDetail productDetail = productService.getProductDetail(orderItemRequest.getProductDetailId());
+            orderProductDetails.add(OrderProductDetail.of(orderItemRequest, productDetail));
+        }
+
+        Order order = Order.createOrder(user, deliveryAddress, orderProductDetails, userCoupon, createOrderRequest);
         orderRepository.save(order);
-
         return order.getId();
     }
 
