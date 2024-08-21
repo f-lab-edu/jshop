@@ -51,7 +51,8 @@ public class LoggingFilter implements Filter {
         Enumeration<String> requestHeaderNames = httpRequest.getHeaderNames();
         Map<String, String> requestHeaders = new HashMap<>();
 
-        String requestData = new String(requestWrapper.getRequestData(), Charset.defaultCharset());
+
+        String requestData = new String(requestWrapper.getInputStream().readAllBytes(), Charset.defaultCharset());
 
         if (httpRequest.getRequestURI().equals("/api/login")) {
             requestData = "Secure Info";

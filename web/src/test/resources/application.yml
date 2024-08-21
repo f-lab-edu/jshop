@@ -7,6 +7,11 @@ spring:
     hibernate:
       ddl-auto: update
 
+  cache:
+    type: redis
+    redis:
+      time-to-live: 36000000
+
 logging:
   level:
     sql: trace
