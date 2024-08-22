@@ -152,7 +152,7 @@ class UserServiceTest {
         @DisplayName("회원 정보가 있다면 회원 정보를 가져올 수 있음")
         public void getUser_success() {
             // when
-            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+            when(userRepository.findUserWithWalletAndAddressById(1L)).thenReturn(Optional.of(user));
             when(addressRepository.findByUser(user)).thenReturn(List.of(address));
             UserInfoResponse userInfoResponse = userService.getUserInfo(1L);
 
