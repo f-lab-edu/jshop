@@ -398,7 +398,7 @@ class OrderServiceTest {
             when(addressService.getAddress(1L)).thenReturn(address);
             when(productService.getProductDetail(1L)).thenReturn(productDetail1);
             when(productService.getProductDetail(2L)).thenReturn(productDetail2);
-            when(userCouponRepository.findById(1L)).thenReturn(Optional.of(userCoupon));
+            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
             orderService.createOrder(createOrderRequest, 1L);
 
             // then
@@ -431,7 +431,7 @@ class OrderServiceTest {
             when(addressService.getAddress(1L)).thenReturn(address);
             when(productService.getProductDetail(1L)).thenReturn(productDetail1);
             when(productService.getProductDetail(2L)).thenReturn(productDetail2);
-            when(userCouponRepository.findById(1L)).thenReturn(Optional.of(userCoupon));
+            when(couponService.getUserCoupon(1L)).thenReturn(userCoupon);
             orderService.createOrder(createOrderRequest, 1L);
             verify(orderRepository, times(1)).save(orderArgumentCaptor.capture());
             order = orderArgumentCaptor.getValue();

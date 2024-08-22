@@ -1,3 +1,10 @@
+server:
+  tomcat:
+    threads:
+      max: 10
+      min-spare: 2
+    accept-count: 100
+
 spring:
   application:
     name: jshop
