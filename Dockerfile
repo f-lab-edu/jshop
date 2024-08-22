@@ -41,4 +41,4 @@ RUN chmod +x ./gradlew
 WORKDIR /app/web
 RUN ./gradlew build -x test
 
-CMD ["sh", "-c", "java -jar -Dspring.profiles.active=product build/libs/web-${VERSION}.jar"]
+CMD ["sh", "-c", "java -jar -Dspring.profiles.active=product,execution_time build/libs/web-${VERSION}.jar"]
