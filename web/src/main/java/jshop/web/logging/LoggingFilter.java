@@ -77,14 +77,13 @@ public class LoggingFilter implements Filter {
         MDC.put("jwt", httpRequest.getHeader("Authorization"));
         log.info("Request Log");
         MDC.clear();
-        MDC.put("jwt", httpRequest.getHeader("Authorization"));
+        MDC.put("request_id", uuid);
 
         chain.doFilter(requestWrapper, responseWrapper);
 
         String responseData = new String(responseWrapper.getResponseData(), Charset.defaultCharset());
 
         MDC.put("uri", httpRequest.getRequestURI());
-        MDC.put("request_id", uuid);
         MDC.put("status", "" + httpResponse.getStatus());
         MDC.put("execution_time", String.valueOf(System.currentTimeMillis() - startTime));
         MDC.put("headers", httpResponse
