@@ -19,6 +19,7 @@ import jshop.core.domain.wallet.entity.Wallet;
 import jshop.core.config.P6SpyConfig;
 import jshop.common.exception.JshopException;
 import jshop.common.test.BaseTestContainers;
+import org.hibernate.Hibernate;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @Import(P6SpyConfig.class)
 @DisplayName("[단위 테스트] UserRepository")
-@Transactional
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class UserRepositoryTest extends BaseTestContainers {
 
@@ -84,8 +84,47 @@ public class UserRepositoryTest extends BaseTestContainers {
     }
 
     @Test
-    @DisplayName("유저 조회시 같이 가져올 데이터의 패치 조인을 검증한다. (proxy인지 확인)")
+    @DisplayName("findById 는 Wallet 만 패치조인 한다.")
     public void check_patchjoin() {
+        // given
+        Wallet wallet = Wallet
+            .builder().balance(0L).build();
+
+        User user = User
+            .builder().email("test").userType(UserType.USER).username("kim").password("kim").wallet(wallet).build();
+
+        Address address = Address
+            .builder()
+            .receiverName("김재현")
+            .receiverNumber("010-1234-5678")
+            .province("경기도")
+            .city("광주시")
+            .district("송정동")
+            .street("경안천로")
+            .detailAddress1("123-1234")
+            .detailAddress2(null)
+            .message("문앞에 놔주세요")
+            .user(user)
+            .build();
+
+        userRepository.save(user);
+        addressRepository.save(address);
+
+        // when
+        em.flush();
+        em.clear();
+
+        Optional<User> optionalFindUser = userRepository.findById(user.getId());
+        User findUser = optionalFindUser.orElseThrow(JshopException::new);
+
+        // then
+        assertThat(Hibernate.isInitialized(findUser.getAddresses())).isFalse();
+        assertThat(Hibernate.isInitialized(findUser.getWallet())).isTrue();
+    }
+
+    @Test
+    @DisplayName("findUserWithWalletAndAddressById 는 유저 조회시 Wallet, Address 정보를 같이 가져온다.")
+    public void check_findUserWithWalletAndAddressById() {
         /**
          * findById의 패치조인 확인.
          */
@@ -117,29 +156,12 @@ public class UserRepositoryTest extends BaseTestContainers {
         em.flush();
         em.clear();
 
-        System.out.println("user 조회 before");
-        Optional<User> optionalFindUser = userRepository.findById(user.getId());
-        System.out.println("user 조회 after");
+        Optional<User> optionalFindUser = userRepository.findUserWithWalletAndAddressById(user.getId());
         User findUser = optionalFindUser.orElseThrow(JshopException::new);
 
-        System.out.println("address 조회 before");
-        List<AddressInfoResponse> findAddresses = addressRepository
-            .findByUser(findUser)
-            .stream()
-            .map(AddressInfoResponse::of)
-            .toList();
-        System.out.println("address 조회 after");
 
-        UserInfoResponse userInfoResponse = UserInfoResponse
-            .builder()
-            .username(findUser.getUsername())
-            .email(findUser.getEmail())
-            .userType(findUser.getUserType())
-            .balance(findUser.getWallet().getBalance())
-            .addresses(findAddresses)
-            .build();
         // then
-        System.out.println("userInfoResponse 출력");
-        System.out.println(userInfoResponse);
+        assertThat(Hibernate.isInitialized(findUser.getAddresses())).isTrue();
+        assertThat(Hibernate.isInitialized(findUser.getWallet())).isTrue();
     }
 }

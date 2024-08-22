@@ -2,6 +2,7 @@ package jshop.core.domain.user.service;
 
 import java.util.List;
 import java.util.Optional;
+import javax.swing.text.html.Option;
 import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.address.repository.AddressRepository;
 import jshop.core.domain.user.repository.UserRepository;
@@ -36,10 +37,9 @@ public class UserService {
     private final WalletRepository walletRepository;
 
     public UserInfoResponse getUserInfo(Long userId) {
-        User user = getUser(userId);
-        List<Address> addresses = addressRepository.findByUser(user);
+        User user = getUserWithWalletAndAddress(userId);
 
-        return UserInfoResponse.of(user, addresses);
+        return UserInfoResponse.of(user);
     }
 
     @Transactional
@@ -88,6 +88,14 @@ public class UserService {
 
     public User getUser(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
+        return optionalUser.orElseThrow(() -> {
+            log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
+            throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
+        });
+    }
+
+    public User getUserWithWalletAndAddress(Long userId) {
+        Optional<User> optionalUser = userRepository.findUserWithWalletAndAddressById(userId);
         return optionalUser.orElseThrow(() -> {
             log.error(ErrorCode.USERID_NOT_FOUND.getLogMessage(), userId);
             throw JshopException.of(ErrorCode.USERID_NOT_FOUND);
