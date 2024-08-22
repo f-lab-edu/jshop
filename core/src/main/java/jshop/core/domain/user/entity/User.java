@@ -9,9 +9,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import java.util.Optional;
+import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.cart.entity.Cart;
 import jshop.core.domain.user.dto.JoinUserRequest;
 import jshop.core.domain.user.dto.UpdateUserRequest;
@@ -33,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"cart", "wallet"})
+@ToString(exclude = {"cart", "wallet", "addresses"})
 @Table(name = "users")
 public class User extends BaseEntity {
 
@@ -69,6 +72,9 @@ public class User extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Address> addresses;
 
     public static User of(JoinUserRequest joinUserRequest, String encryptedPassword) {
         Wallet wallet = Wallet.create();
