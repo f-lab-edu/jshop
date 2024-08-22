@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jshop.common.aop.ExecutionTimeAspect;
 import jshop.web.controller.AccountController;
 import jshop.core.domain.user.entity.User;
 import jshop.core.domain.user.service.UserService;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,7 +37,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootTest(classes = {SecurityConfig.class, JwtUtil.class, ObjectMapper.class, AccountController.class,
-    BCryptPasswordEncoder.class})
+    BCryptPasswordEncoder.class, ExecutionTimeAspect.class})
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @DisplayName("[통합 테스트] SpringSecurity")
 public class LoginBaseTest extends BaseTestContainers {
