@@ -25,8 +25,8 @@ public class UserInfoResponse {
     private Long balance;
     private List<AddressInfoResponse> addresses;
 
-    public static UserInfoResponse of(User user, List<Address> addresses) {
-        List<AddressInfoResponse> addressInfoResponses = addresses.stream().map(AddressInfoResponse::of).toList();
+    public static UserInfoResponse of(User user) {
+        List<AddressInfoResponse> addressInfoResponses = user.getAddresses().stream().map(AddressInfoResponse::of).toList();
 
         return UserInfoResponse
             .builder()
