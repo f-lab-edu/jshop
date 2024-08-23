@@ -1,9 +1,6 @@
 package jshop.core.domain.user.service;
 
-import java.util.List;
 import java.util.Optional;
-import javax.swing.text.html.Option;
-import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.address.repository.AddressRepository;
 import jshop.core.domain.user.repository.UserRepository;
 import jshop.core.domain.wallet.repository.WalletRepository;
@@ -21,7 +18,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final WalletRepository walletRepository;
@@ -51,7 +48,7 @@ public class UserService {
             throw JshopException.of(ErrorCode.ALREADY_REGISTERED_EMAIL);
         }
 
-        User user = User.of(joinUserRequest, bCryptPasswordEncoder.encode(joinUserRequest.getPassword()));
+        User user = User.of(joinUserRequest, passwordEncoder.encode(joinUserRequest.getPassword()));
         userRepository.save(user);
         return user.getId();
     }
