@@ -146,6 +146,8 @@ class UserServiceTest {
                 .message("문앞에 놔주세요")
                 .user(user)
                 .build();
+
+            user.getAddresses().add(address);
         }
 
         @Test
@@ -153,7 +155,6 @@ class UserServiceTest {
         public void getUser_success() {
             // when
             when(userRepository.findUserWithWalletAndAddressById(1L)).thenReturn(Optional.of(user));
-            when(addressRepository.findByUser(user)).thenReturn(List.of(address));
             UserInfoResponse userInfoResponse = userService.getUserInfo(1L);
 
             // then

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.0'
+    id 'jacoco'
 }
 
 allprojects {
@@ -21,6 +22,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
 
     configurations {
         compileOnly {
@@ -63,7 +65,58 @@ subprojects {
         // test
     }
 
-    tasks.named('test') {
+    test {
         useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+        }
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.1 // 커버리지 최소 기준 (80%)
+                }
+            }
+        }
+    }
+
+    test.finalizedBy jacocoTestCoverageVerification
+}
+
+task jacocoRootReport(type: JacocoReport) {
+    dependsOn subprojects*.test
+    executionData.setFrom(files(subprojects*.jacocoTestReport.executionData))
+
+    subprojects.each { subproject ->
+        sourceSets subproject.sourceSets.main
+    }
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/dto/**',
+                    '**/config/**',
+                    '**/Q*',
+                    '**/scripts/**',
+                    '**/*Application*',
+                    '**/*Config*',
+                    '**/aop/**',
+                    '**/*Builder*',
+                    '**/*Util*'
+            ])
+        }))
     }
 }

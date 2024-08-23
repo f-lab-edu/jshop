@@ -145,7 +145,7 @@ public class UserControllerSyncBaseTest extends BaseTestContainers {
         @Test
         @DisplayName("너무 많은 재시도를 시도 하면 예외를 발생시킴")
         public void updateBalance_many_retry() throws Exception {
-            ExecutorService executors = Executors.newFixedThreadPool(10);
+            ExecutorService executors = Executors.newFixedThreadPool(8);
 
             List<ResultActions> performs = new ArrayList<>();
 

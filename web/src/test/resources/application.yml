@@ -1,12 +1,28 @@
 spring:
+  jwt:
+    secret: secret-key-secret-key-secret-key
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#      password: 1234
+
   datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/jshop_test?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+#    username: root
+#    password: 1234
+
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 20
       max-lifetime: 250000
   jpa:
     hibernate:
       ddl-auto: update
-
+  cache:
+    type: redis
+    redis:
+      time-to-live: 36000000
 logging:
   level:
     sql: trace

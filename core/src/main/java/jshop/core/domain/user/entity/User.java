@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import jshop.core.domain.address.entity.Address;
@@ -25,6 +26,7 @@ import jshop.core.common.entity.BaseEntity;
 import jshop.common.exception.JshopException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -74,7 +76,8 @@ public class User extends BaseEntity {
     private Wallet wallet;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Address> addresses;
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
 
     public static User of(JoinUserRequest joinUserRequest, String encryptedPassword) {
         Wallet wallet = Wallet.create();

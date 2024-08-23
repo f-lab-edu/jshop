@@ -32,7 +32,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +74,7 @@ public class CouponIntegrationTest extends BaseTestContainers {
     private ProductDetailRepository productDetailRepository;
 
     @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    PasswordEncoder passwordEncoder;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -87,7 +87,7 @@ public class CouponIntegrationTest extends BaseTestContainers {
         User admin = User
             .builder()
             .username("admin")
-            .password(bCryptPasswordEncoder.encode("admin"))
+            .password(passwordEncoder.encode("admin"))
             .email("admin@admin.com")
             .role("ROLE_ADMIN")
             .build();
