@@ -15,7 +15,7 @@ pipeline {
         REDIS_HOST = credentials('REDIS_HOST')
         REDIS_PORT = credentials('REDIS_PORT')
         REDIS_PASSWORD = credentials('REDIS_PASSWORD')
-        VERSION = '0.1.7'
+        VERSION = '0.1.8'
         IMAGE = 'jshop.kr.ncr.ntruss.com/jshop'
     }
 
