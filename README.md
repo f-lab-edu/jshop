@@ -3,16 +3,18 @@
 ![architecture](/images/architecture.png)
 
 ## 프로젝트 목표
+
 * 이커머스 플랫폼을 설계해보고 직접 구현합니다.
 * 테스트 데이터를 넣어 성능 테스트를 진행하고 결과를 분석해 최적화 합니다.
 
 ## 프로젝트 이슈사항
-1. `WebMvcTest` 슬라이스 테스트에서 `SecurityContext` 설정     
-   https://velog.io/@jhkim31/Controller-단위-테스트에서-SecurityContext를-설정해보자
+
+1. 검색 성능 최적화 과정 (`0.5 RPS` -> `45 RPS`, `4000ms` -> `200ms`)    
+   https://velog.io/@jhkim31/series/검색-성능-최적화
 
 
-2. **스프링 MVC** 로깅하기   
-   https://velog.io/@jhkim31/스프링-MVC-로깅하기
+2. 로그인 성능 최적화 과정 (`60RPS` -> `450 RPS`)    
+   https://velog.io/@jhkim31/로그인-성능-최적화
 
 
 3. 자원 인가로직 **AoP**를 사용해 분리    
@@ -40,14 +42,19 @@
    https://velog.io/@jhkim31/Spring-테스트-컨테이너
 
 
-9. 검색 성능 최적화 과정   
-   https://velog.io/@jhkim31/series/검색-성능-최적화
+9. `WebMvcTest` 슬라이스 테스트에서 `SecurityContext` 설정     
+   https://velog.io/@jhkim31/Controller-단위-테스트에서-SecurityContext를-설정해보자
 
 
 10. 테스트 데이터 삽입 최적화  
     https://velog.io/@jhkim31/테스트-데이터-삽입-최적화
 
+
+11. **스프링 MVC** 로깅하기   
+    https://velog.io/@jhkim31/스프링-MVC-로깅하기
+
 ## 프로젝트 중점사항
+
 * **객체지향 설계**를 통해 재사용성과 유지보수성을 높임
 * 비즈니스로직을 최대한 엔티티에 작성해 재사용성과 테스트 용이성을 높임
 
@@ -83,13 +90,20 @@
 * **Prometheus**로 데이터를 수집하고, **Grafana**로 시각화
 * **ELK** 스택을 구축해 수평확장이 되는 환경에서도 로그를 쉽게 수집, 확인
 
-
 ### ERD
 
 ![img.png](images/erd.png)
 
 ### USECASE
+
 ![usecase.png](/images/usecase.png)
+
 ### 모니터링 스크린샷
 
 ![monitoring.png](images/monitoring.png)
+
+### 성능 테스트 스크린샷 (좌 최적화전, 우 최적화 후)
+<p align="center">   
+   <img src="/images/login_before.png" width="45%" height="45%"/>
+   <img src="/images/login_after.png" width="45%" height="45%"/>
+</p>
