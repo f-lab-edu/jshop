@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class LoggingHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-    private final LoggingServletInputStream loggingServletInputStream;
     private final ServletInputStream original;
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -22,17 +21,11 @@ public class LoggingHttpServletRequestWrapper extends HttpServletRequestWrapper 
         while((data = original.read()) != -1) {
             byteArrayOutputStream.write(data);
         }
-
-        this.loggingServletInputStream = new LoggingServletInputStream(original);
     }
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
         return new ByteServletInputStream(byteArrayOutputStream);
-    }
-
-    public byte[] getRequestData() {
-        return loggingServletInputStream.getBytes();
     }
 
     static class ByteServletInputStream extends ServletInputStream {

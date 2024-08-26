@@ -46,7 +46,7 @@ public class FixedRateCoupon extends Coupon {
                 defaultStartDate)
             .useEndDate(
                 createCouponRequest.getUseEndDate() != null ? createCouponRequest.getUseEndDate() : defaultEndDate)
-            .discountRate(createCouponRequest.getValue1() / 100)
+            .discountRate(createCouponRequest.getValue1() / 100.0)
             .minOriginPrice(createCouponRequest.getValue2())
             .build();
     }

@@ -38,7 +38,7 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public Response<OrderListResponse> getOrderList(@RequestParam("size") Optional<Integer> optionalSize,
         @RequestParam("last_timestamp") Optional<Long> optionalLastTimestamp, @CurrentUserId Long userId) {
-        long lastTimestamp = optionalLastTimestamp.orElse(32503561200000L);
+        long lastTimestamp = optionalLastTimestamp.orElse(3000000000000L);
         LocalDateTime lastOrderDate = TimeUtils.timestampToLocalDateTime(lastTimestamp);
         int pageSize = optionalSize.orElse(10);
 
