@@ -1,3 +1,6 @@
+server:
+  tomcat:
+    accept-count: 1000
 spring:
   application:
     name: jshop
