@@ -16,8 +16,10 @@ import jshop.common.exception.JshopException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -61,8 +63,9 @@ public class CouponService {
     }
 
     @Transactional
-    @RedisLock(key = "coupon")
+//    @RedisLock(key = "coupon")
     public Long issueCoupon(String couponId, Long userId) {
+        log.info(TransactionSynchronizationManager.getCurrentTransactionName());
         Coupon coupon = getCoupon(couponId);
         User user = userRepository.getReferenceById(userId);
         UserCoupon userCoupon = coupon.issueCoupon(user);

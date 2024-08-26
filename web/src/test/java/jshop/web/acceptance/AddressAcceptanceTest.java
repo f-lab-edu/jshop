@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import jshop.core.config.P6SpyConfig;
 import jshop.core.domain.address.dto.CreateAddressResponse;
 import jshop.core.domain.address.entity.Address;
 import jshop.core.domain.address.repository.AddressRepository;
+import jshop.core.domain.address.service.AddressService;
 import jshop.core.domain.user.dto.JoinUserResponse;
 import jshop.core.domain.user.dto.UserInfoResponse;
 import jshop.core.domain.user.entity.User;
@@ -36,7 +39,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +53,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @DisplayName("[통합 테스트] AddressController")
 @Import(P6SpyConfig.class)
 public class AddressAcceptanceTest extends BaseTestContainers {
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -57,16 +60,22 @@ public class AddressAcceptanceTest extends BaseTestContainers {
     private AddressRepository addressRepository;
 
     @Autowired
+    private AddressService addressService;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    PasswordEncoder passwordEncoder;
 
     private Long user1Id;
     private String user1Token;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @PersistenceContext
+    EntityManager em;
 
     private final String createAddressRequestStr = """
         {
@@ -103,7 +112,7 @@ public class AddressAcceptanceTest extends BaseTestContainers {
         User admin = User
             .builder()
             .username("admin")
-            .password(bCryptPasswordEncoder.encode("admin"))
+            .password(passwordEncoder.encode("admin"))
             .email("admin@admin.com")
             .role("ROLE_ADMIN")
             .build();
@@ -179,6 +188,8 @@ public class AddressAcceptanceTest extends BaseTestContainers {
                 .content(createAddressRequestStr));
 
             addressId = getAddressIdFromResultActions(perform);
+            em.flush();
+            em.clear();
         }
 
         @Test
@@ -275,6 +286,9 @@ public class AddressAcceptanceTest extends BaseTestContainers {
                 .content(createAddressRequestStr));
 
             addressId = getAddressIdFromResultActions(perform);
+
+            em.flush();
+            em.clear();
         }
 
         @Test

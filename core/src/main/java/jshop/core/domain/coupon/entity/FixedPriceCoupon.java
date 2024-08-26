@@ -34,7 +34,7 @@ public class FixedPriceCoupon extends Coupon {
 
         if (originPrice < minOriginPrice) {
             log.error(ErrorCode.COUPON_MIN_PRICE_EXCEPTION.getLogMessage(), minOriginPrice, originPrice);
-            JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
+            throw JshopException.of(ErrorCode.COUPON_MIN_PRICE_EXCEPTION);
         }
 
         return originPrice - discountPrice;
@@ -61,19 +61,5 @@ public class FixedPriceCoupon extends Coupon {
             .discountPrice(createCouponRequest.getValue1())
             .minOriginPrice(createCouponRequest.getValue2())
             .build();
-    }
-
-    @Override
-    public String toString() {
-        return "FixedDiscountCoupon{" +
-            "discountPrice=" + discountPrice +
-            ", minOriginPrice=" + minOriginPrice +
-            ", totalQuantity=" + totalQuantity +
-            ", remainingQuantity=" + remainingQuantity +
-            ", issueStartDate=" + issueStartDate +
-            ", issueEndDate=" + issueEndDate +
-            ", useStartDate=" + useStartDate +
-            ", useEndDate=" + useEndDate +
-            '}';
     }
 }

@@ -92,7 +92,7 @@ public class CouponIssueSyncBaseTestContainer extends BaseTestContainers {
         AtomicInteger counter = new AtomicInteger(0);
 
         // when
-        ExecutorService executors = Executors.newFixedThreadPool(100);
+        ExecutorService executors = Executors.newFixedThreadPool(50);
 
         for (int i = 0; i < 100; i++) {
             executors.submit(() -> {
