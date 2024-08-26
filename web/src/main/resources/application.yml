@@ -8,6 +8,7 @@ spring:
     hikari:
       maximum-pool-size: 20
       max-lifetime: 250_000
+      connection-timeout: 50000
     p6spy:
       enable-logging: true
       multiline: true
