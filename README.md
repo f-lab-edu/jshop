@@ -6,6 +6,7 @@
 
 * 이커머스 플랫폼을 설계해보고 직접 구현합니다.
 * 테스트 데이터를 넣어 성능 테스트를 진행하고 결과를 분석해 최적화 합니다.
+* https://github.com/f-lab-edu/jshop/wiki/성능-테스트
 
 ## 프로젝트 이슈사항
 
@@ -90,6 +91,83 @@
 * **Prometheus**로 데이터를 수집하고, **Grafana**로 시각화
 * **ELK** 스택을 구축해 수평확장이 되는 환경에서도 로그를 쉽게 수집, 확인
 
+## API
+
+### User
+
+| METHOD  | URI                  | 설명                                       |
+|:--------|:---------------------|:-----------------------------------------|
+| `POST`  | `/api/login`         | 로그인 (Spring Security)                    |
+| `POST`  | `/api/logout`        | 로그아웃 (Spring Security)                   |
+| `POST`  | `/api/join`          | 회원가입                                     |
+| `GET`   | `/api/users`         | 회원 정보 가져오기, JWT로 회원 구분 (기본정보, 잔액, 주소정보등) |
+| `PATCH` | `/api/users`         | 회원 정보 수정                                 |
+| `PATCH` | `/api/users/balance` | 회원 잔액 수정                                 |
+| `PATCH` | `/api/users/balance` | 회원 잔액 수정                                 |
+
+### Address
+
+| METHOD   | URI                   | 설명                  |
+|:---------|:----------------------|:--------------------|
+| `POST`   | `/api/addresses`      | 현재 로그인한 회원으로 주소 생성  |
+| `DELETE` | `/api/addresses/{id}` | 회원이 주소의 소유자라면 주소 삭제 |
+| `PUT`    | `/api/addresses/{id}` | 회원이 주소의 소유자라면 주소 수정 |
+
+### Cart
+
+| METHOD   | URI                                      | 설명                          |
+|:---------|:-----------------------------------------|:----------------------------|
+| `POST`   | `/api/cart`                              | 현재 로그인한 회원의 장바구니에 상품 추가     |
+| `GET`    | `/api/cart?page={page:0}&size={size:30}` | 현재 로그인한 회원의 장바구니 가져오기       |
+| `PUT`    | `/api/cart/{cart_product_detail_id}`     | 현재 로그인한 회원의 장바구니 상품 수정 (수량) |
+| `DELETE` | `/api/cart/{cart_product_detail_id}`     | 현재 로그인한 회원의 장바구니 상품 삭제      |
+
+### Category
+
+| METHOD | URI               | 설명                 |
+|:-------|:------------------|:-------------------|
+| `POST` | `/api/categories` | 카테고리 생성 (ADMIN 전용) |
+| `GET`  | `/api/categories` | 카테고리 정보 가져오기       |
+
+### Coupon
+
+| METHOD | URI                       | 설명               |
+|:-------|:--------------------------|:-----------------|
+| `POST` | `/api/coupon`             | 쿠폰 생성 (ADMIN 전용) |
+| `POST` | `/api/coupon/{coupon_id}` | 쿠폰 발급 요청 (일반 회원) |
+
+### Search
+
+| METHOD | URI                                                                | 설명                                   |
+|:-------|:-------------------------------------------------------------------|:-------------------------------------|
+| `GET`  | `/api/search?query={query}`                                        | 상품 검색 (query)                        |
+| `GET`  | `/api/search?manufacturer={manufacturer}`                          | 상품 검색 필터링 (제조사)                      |
+| `GET`  | `/api/search?categoryId={category_id}`                             | 상품 검색 필터링 (카테고리)                     |
+| `GET`  | `/api/search?attributeFilters[0][attr_key]=attr_value`             | 상품 검색 필터링 (상품 속성, ex {color : red} ) |
+| `GET`  | `/api/search?page={page:0}&size={size:30}&sort={key,(desc / asc)}` | 상품 검색 페이징 및 정렬                       |
+
+### Product
+
+| METHOD   | URI                                                     | 설명                      |
+|:---------|:--------------------------------------------------------|:------------------------|
+| `POST`   | `/api/products`                                         | 현재 로그인한 회원이 판매자라면 상품 생성 |
+| `GET`    | `/api/products?page={page:0}&size={size:30}`            | 현재 로그인한 회원의 상품 정보 제공    |
+| `POST`   | `/api/products/{product_id}/details`                    | 상품의 상세 상품 생성            |
+| `PUT`    | `/api/products/{product_id}/details/{detail_id}`        | 상품의 상세 상품 수정            |
+| `DELETE` | `/api/products/{product_id}/details/{detail_id}`        | 상품의 상세 상품 삭제            |
+| `PATCH`  | `/api/products/{product_id}/details/{detail_id}/stocks` | 상품의 상세 상품 재고 수정         |
+
+### Order
+
+| METHOD   | URI                                                          | 설명                              |
+|:---------|:-------------------------------------------------------------|:--------------------------------|
+| `POST`   | `/api/orders`                                                | 주문 생성                           |
+| `GET`    | `/api/orders?last_timestamp={last_timestamp}&size={size:10}` | 자신의 주문 정보 제공 (주문 시점을 키로 커서 페이징) |
+| `GET`    | `/api/orders/{order_id}`                                     | (주문의 소유주라면) 주문 가져오기             |
+| `DELETE` | `/api/orders/{order_id}`                                     | (주문의 소유주라면) 주문 삭제하기             |
+
+## 스크린샷
+
 ### ERD
 
 ![img.png](images/erd.png)
@@ -98,11 +176,16 @@
 
 ![usecase.png](/images/usecase.png)
 
-### 모니터링 스크린샷
+### 모니터링
 
 ![monitoring.png](images/monitoring.png)
 
-### 성능 테스트 스크린샷 (좌 최적화전, 우 최적화 후)
+### 로깅
+
+![elk.png](images/elk.png)
+
+### 성능 테스트 (좌 최적화전, 우 최적화 후)
+
 <p align="center">   
    <img src="/images/login_before.png" width="45%" height="45%"/>
    <img src="/images/login_after.png" width="45%" height="45%"/>
