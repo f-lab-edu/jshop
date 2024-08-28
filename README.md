@@ -184,9 +184,10 @@
 
 ![elk.png](images/elk.png)
 
-### 성능 테스트 (좌 최적화전, 우 최적화 후)
+### 성능 테스트 ( 최적화전 | + SQL 최적화 | + Redis 캐싱 )
 
 <p align="center">   
-   <img src="/images/login_before.png" width="45%" height="45%"/>
-   <img src="/images/login_after.png" width="45%" height="45%"/>
+   <img src="/images/perf_test1.png" width="30%" height="30%"/>
+   <img src="/images/perf_test2.png" width="30%" height="30%"/>
+   <img src="/images/perf_test3.png" width="30%" height="30%"/>
 </p>

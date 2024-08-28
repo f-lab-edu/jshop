@@ -1,5 +1,6 @@
 package jshop.core.domain.coupon.service;
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.Optional;
 import jshop.core.domain.coupon.repository.CouponRepository;
 import jshop.core.domain.coupon.repository.UserCouponRepository;
@@ -65,8 +66,9 @@ public class CouponService {
     @Transactional
 //    @RedisLock(key = "coupon")
     public Long issueCoupon(String couponId, Long userId) {
-        log.info(TransactionSynchronizationManager.getCurrentTransactionName());
+        log.info("try lock");
         Coupon coupon = getCoupon(couponId);
+        log.info("get lock!");
         User user = userRepository.getReferenceById(userId);
         UserCoupon userCoupon = coupon.issueCoupon(user);
         userCouponRepository.save(userCoupon);

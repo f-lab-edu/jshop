@@ -31,7 +31,7 @@ public class SearchCounterQueryRepositoryQuerydsl implements SearchCounterQueryR
     private final ObjectMapper objectMapper;
 
     @Override
-    @Cacheable(value = "search", key="#condition")
+//    @Cacheable(value = "search", key="#condition")
     public Long getTotalCount(SearchCondition condition) {
 
         Long totalCount = queryFactory
