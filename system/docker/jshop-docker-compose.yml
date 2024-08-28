@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  jshop:
+    image: jshop.kr.ncr.ntruss.com/jshop:0.1.1
+    ports:
+      - "8000:8080"
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == app
+      labels:
+        jshop: was
+      replicas: 2
+      rollback_config:
+        parallelism: 1
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+    networks:
+    - jshop
+
+networks:
+  jshop:
+    external: true

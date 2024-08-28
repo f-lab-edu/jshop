@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo virt-install --name master-01 --vcpus 2 --ram 4096 --location /nvme1/ubuntu-20.04.6-live-server-amd64.iso  --network network=default --graphics none --extra-args='console=ttyS0' --disk size=50

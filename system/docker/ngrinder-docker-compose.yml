@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  controller:
+    image: ngrinder/controller
+    restart: always
+    volumes:
+      - ./run.sh:/scripts/run.sh
+      - ./ngrinder-controller:/opt/ngrinder-controller
+    ports:
+      - "9000:9000"
+    networks:
+      - ngrinder
+
+  agent:
+    image: ngrinder/agent
+    restart: always
+    deploy:
+      replicas: 3
+    networks:
+      - ngrinder
+    command:
+      - controller:9000
+
+networks:
+  ngrinder:
+    external: true
