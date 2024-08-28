@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=1234
+    volumes:
+      - /mnt/nfs_share/monitoring/grafana:/var/lib/grafana
+    networks:
+    - jshop
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == monitoring
+
+  prometheus:
+    image: prom/prometheus
+    ports: 
+      - "9090:9090"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /mnt/nfs_share/monitoring/prometheus/data:/prometheus
+    - /mnt/nfs_share/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+    - jshop
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == monitoring
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-remote-write-receiver'
+      - '--enable-feature=native-histograms'
+
+  cadvisor:
+    image: google/cadvisor
+    deploy:
+      mode: global
+      labels:
+        prometheus-job: cadvisor
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /:/rootfs:ro
+    - /var/run:/var/run
+    - /sys:/sys:ro
+    - /var/lib/docker:/bar/lib/docker:ro
+    ports:
+      - target: 8080
+        protocol: tcp
+        mode: host
+
+
+
+networks:
+  jshop:
+    external: true 
