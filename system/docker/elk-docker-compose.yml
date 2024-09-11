@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - /mnt/nfs_share/elk/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - jshop
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == monitoring
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.0
+    container_name: logstash
+    networks:
+      - jshop
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == monitoring
+    volumes:
+      - /mnt/nfs_share/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5010:5010"
+      - "5044:5044"
+      - "9600:9600"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_URL: http://elk_elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - jshop
+    deploy:
+      placement:
+        constraints:
+        - node.labels.role == monitoring
+
+networks:
+  jshop:
+    external: true
